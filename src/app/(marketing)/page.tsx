@@ -522,10 +522,13 @@ export default async function HomePage() {
             <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-lime/60 blur-3xl" />
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
               <div>
-                <Eyebrow tone="ink">Gratis, en un minuto</Eyebrow>
-                <Title className="mt-4">¿Está tu web lista para que la IA te recomiende?</Title>
+                <Eyebrow tone="ink">Gratis · solo diagnóstico</Eyebrow>
+                <Title className="mt-4">¿Tu web está preparada? Mira la nota. El trabajo empieza después.</Title>
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-2">
+                  El análisis gratuito mide la base técnica (0–100). Si sigues con YesWeContent, pasamos a generar artículos, backlinks, auditoría completa, social y seguimiento en IA — en automático.
+                </p>
               </div>
-              <form action="/herramientas/auditoria-ia" method="get" className="surface p-4 sm:p-5">
+              <form action="/herramientas/auditoria-ia#analizador" method="get" className="surface p-4 sm:p-5">
                 <label htmlFor="home-url" className="mb-1.5 block text-[13px] font-medium text-ink-2">
                   Tu web
                 </label>
@@ -535,10 +538,10 @@ export default async function HomePage() {
                     <Input id="home-url" name="url" required placeholder="tuweb.com" inputMode="url" autoComplete="url" className="h-11 pl-9" />
                   </div>
                   <Button type="submit" size="lg" className="h-11">
-                    Analizar
+                    Ver diagnóstico
                   </Button>
                 </div>
-                <p className="mt-3 text-xs text-ink-3">Revisamos robots.txt, sitemap, etiquetas, datos estructurados y llms.txt. No hace falta registrarse.</p>
+                <p className="mt-3 text-xs text-ink-3">Sin registro. Tras el informe, puedes probar 3 días todo el servicio (contenido, enlaces, panel y más).</p>
               </form>
             </div>
           </div>

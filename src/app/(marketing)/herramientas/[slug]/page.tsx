@@ -6,6 +6,7 @@ import { getTool, toolCategories, tools } from "@/lib/marketing/tools";
 import { ToolRunner } from "@/components/marketing/tools/tool-runner";
 import { KeywordDensityTool, RobotsGeneratorTool, SchemaGeneratorTool, SerpPreviewTool } from "@/components/marketing/tools/client-tools";
 import { Badge, Card } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import { Container, CtaLink, Eyebrow, HoverCard, Lead, Section, Title } from "@/components/marketing/primitives";
 
 export const dynamicParams = false;
@@ -34,23 +35,24 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
   const initialUrl = typeof sp.url === "string" ? sp.url.slice(0, 2048) : undefined;
   const cat = toolCategories.find((c) => c.id === t.category);
   const siblings = tools.filter((x) => x.category === t.category && x.slug !== t.slug && x.kind !== "soon").slice(0, 3);
+  const isAudit = t.slug === "auditoria-ia";
 
   return (
     <>
-      <section className="glow relative overflow-hidden border-b border-line">
-        <Container className="relative py-10 sm:py-14 md:py-16">
+      <section className={cn("glow relative overflow-hidden border-b border-line", isAudit && "border-b-0")}>
+        <Container className={cn("relative", isAudit ? "py-6 sm:py-8" : "py-10 sm:py-14 md:py-16")}>
           <Link href="/herramientas" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
             <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
           </Link>
-          <Eyebrow className="mt-8">{cat?.label} · herramienta gratuita</Eyebrow>
-          <Title as="h1" size="lg" className="mt-4 max-w-4xl">
+          <Eyebrow className={isAudit ? "mt-4" : "mt-8"}>{cat?.label} · {isAudit ? "diagnóstico gratuito" : "herramienta gratuita"}</Eyebrow>
+          <Title as="h1" size={isAudit ? "md" : "lg"} className="mt-3 max-w-4xl sm:mt-4">
             {t.name}
           </Title>
-          <Lead className="mt-5 max-w-2xl">{t.tagline}</Lead>
+          <Lead className={cn("max-w-2xl", isAudit ? "mt-3 text-base sm:text-lg" : "mt-5")}>{t.tagline}</Lead>
         </Container>
       </section>
 
-      <Section className="py-10 sm:py-12 md:py-16 lg:py-16">
+      <Section className={isAudit ? "pt-0 pb-10 sm:pb-12" : "py-10 sm:py-12 md:py-16 lg:py-16"}>
         <Container>
           {t.kind === "server" && <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} />}
           {t.kind === "client" && clientTools[t.slug]?.()}

@@ -436,7 +436,11 @@ async function auditoriaIa(url: string): Promise<ToolResult> {
     url: res.url,
     score,
     summary:
-      score >= 85 ? "Muy buena base: tu web es fácil de leer para buscadores y asistentes." : score >= 65 ? "Buena base con algunos huecos que conviene tapar." : "Hay varias cosas que impiden que la IA y Google te entiendan bien.",
+      score >= 85
+        ? "Buena base para empezar. El análisis gratuito termina aquí; lo siguiente es el plan de YesWeContent: contenido, enlaces y visibilidad en IA."
+        : score >= 65
+          ? "Base mejorable en lo técnico. Este informe es solo el diagnóstico — el trabajo continuo (contenido, backlinks, auditoría y seguimiento) lo hacemos dentro del servicio."
+          : "Hay que reforzar la base técnica. Aun así, el objetivo no es solo la nota: hace falta generar contenido y autoridad — eso es lo que activamos contigo en YesWeContent.",
     checks,
   };
 }

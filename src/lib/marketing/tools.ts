@@ -4,7 +4,7 @@ export type ToolKind = "server" | "client" | "soon" | "signup";
 export type ToolCategory = "ia" | "rastreo" | "onpage" | "datos" | "contenido" | "competencia";
 
 export const toolCategories: { id: ToolCategory; label: string; intro: string }[] = [
-  { id: "ia", label: "Visibilidad en IA", intro: "¿Te pueden leer, entender y citar los asistentes?" },
+  { id: "ia", label: "Visibilidad en IA", intro: "Primero que te lean; después, que te citen — con contenido publicado con regularidad." },
   { id: "rastreo", label: "Rastreo e indexación", intro: "Lo que ven los robots antes de leer una sola palabra." },
   { id: "onpage", label: "SEO on-page", intro: "Las etiquetas pequeñas que deciden el clic." },
   { id: "datos", label: "Datos estructurados", intro: "Contexto en formato máquina para Google y los LLM." },
@@ -31,10 +31,19 @@ export const tools: Tool[] = [
     name: "Auditoría exprés para IA",
     category: "ia",
     kind: "server",
-    tagline: "Una nota de 0 a 100 sobre lo preparada que está tu web para buscadores y asistentes.",
-    checks: ["Acceso de los rastreadores de IA en robots.txt", "Sitemap localizable", "Title, meta descripción, H1 y canonical", "Open Graph para compartir", "Datos estructurados JSON-LD", "Archivo llms.txt"],
-    why: "Los asistentes no recomiendan lo que no pueden leer. Esta auditoría junta en un minuto las señales básicas que facilitan que Google y los LLM entiendan quién eres y qué ofreces.",
-    cta: "Auditar mi web",
+    tagline:
+      "Gratis y en un minuto: ves qué tan preparada está tu web para buscadores y asistentes. No es el servicio completo — es el punto de partida antes de generar contenido, backlinks y visibilidad con YesWeContent.",
+    checks: [
+      "Acceso de los rastreadores de IA en robots.txt",
+      "Sitemap localizable",
+      "Title, meta descripción, H1 y canonical",
+      "Open Graph para compartir",
+      "Datos estructurados JSON-LD",
+      "Archivo llms.txt",
+      "Señales de que hay texto que un modelo pueda leer y citar",
+    ],
+    why: "Esta herramienta solo mide la preparación técnica: si te pueden rastrear, leer y entender. Cuando te unes a YesWeContent empezamos el trabajo de verdad: plan editorial, artículos con tu voz publicados en tu CMS, red de backlinks, auditoría técnica completa, publicación en redes, informes y seguimiento de si los modelos te mencionan. La nota gratuita te orienta; el crecimiento lo hacemos nosotros.",
+    cta: "Ver mi diagnóstico",
   },
   {
     slug: "robots-txt",

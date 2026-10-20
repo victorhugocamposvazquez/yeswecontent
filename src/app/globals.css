@@ -375,8 +375,17 @@ body {
 .sx-watch:not([data-on]) .sx-piece-up { opacity: 0; transform: translateY(8px); }
 .sx-piece-up { transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(var(--i, 0) * 40ms + 200ms); }
 
+/* Logos flotando: deriva lenta y desfasada (el paralaje del scroll va en el contenedor) */
+@keyframes sx-float {
+  0%, 100% { transform: translate(0, 0) rotate(-4deg); }
+  33% { transform: translate(6px, -10px) rotate(3deg); }
+  66% { transform: translate(-5px, 6px) rotate(-1deg); }
+}
+.sx-float { animation: sx-float var(--dur, 8s) ease-in-out var(--delay, 0s) infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-statement .sx-word { opacity: 1; transform: none; }
+  .sx-float { animation: none; }
   .sx-serp-row, .sx-serp-me, .sx-serp-badge, .sx-before, .sx-after, .sx-pop, .sx-reveal, .sx-stagger > *, .sx-panel, .sx-url, .sx-step, .sx-piece, .sx-piece-line, .sx-piece-up, .sx-rail-list > li, .sx-showcase [data-sx-text], .sx-showcase [data-sx-media] { transition: none; }
   /* Sin movimiento: cada pantalla aparece ya completa y cambia sin transición. */
   .sx-at, .sx-check { opacity: 1; transform: none; }

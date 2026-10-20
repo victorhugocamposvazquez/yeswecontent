@@ -805,3 +805,55 @@ export function CountUpText({ text, className }: { text: string; className?: str
     </span>
   );
 }
+
+/* ───────── Logos de buscadores y asistentes flotando alrededor de una frase ───────── */
+
+// x/y en % del contenedor; d = profundidad (cuánto se desplaza con el scroll); s = tamaño.
+// Van por los bordes para no tapar nunca el texto. Los marcados con m también salen en móvil.
+const floaters = [
+  { name: "Google", x: 9, y: 12, d: 1.2, s: 52, m: true },
+  { name: "ChatGPT", x: 88, y: 10, d: 0.8, s: 48, m: true },
+  { name: "Claude", x: 3, y: 58, d: 0.6, s: 40 },
+  { name: "Gemini", x: 93, y: 52, d: 1.4, s: 44 },
+  { name: "Perplexity", x: 14, y: 90, d: 1, s: 44, m: true },
+  { name: "Gemini", x: 46, y: 4, d: 0.5, s: 32 },
+  { name: "Claude", x: 80, y: 86, d: 1.1, s: 48, m: true },
+  { name: "Google", x: 60, y: 94, d: 0.7, s: 32 },
+  { name: "Perplexity", x: 72, y: 4, d: 0.9, s: 30 },
+  { name: "ChatGPT", x: 30, y: 95, d: 1.3, s: 34 },
+];
+
+export function FloatingEngines({ className }: { className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const items = useRef<(HTMLSpanElement | null)[]>([]);
+  useScrollProgress(
+    ref,
+    (p) => {
+      // En móvil hay menos aire alrededor del texto: menos recorrido.
+      const amp = window.innerWidth < 768 ? 36 : 90;
+      items.current.forEach((el, i) => {
+        if (el) el.style.transform = `translate3d(0, ${((0.5 - p) * amp * floaters[i].d).toFixed(1)}px, 0)`;
+      });
+    },
+    { measure: (r, vh) => (vh - r.top) / (vh + r.height), smooth: 0.08 },
+  );
+  return (
+    <div ref={ref} aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}>
+      {floaters.map((f, i) => (
+        <span
+          key={i}
+          ref={(el) => void (items.current[i] = el)}
+          className={cn("absolute will-change-transform", !f.m && "max-md:hidden")}
+          style={{ left: `${f.x}%`, top: `${f.y}%` }}
+        >
+          <span
+            className="sx-float grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl border border-line bg-card shadow-[var(--shadow-md)] max-md:scale-75"
+            style={{ width: f.s, height: f.s, "--dur": `${7 + (i % 4) * 1.7}s`, "--delay": `${-i * 1.3}s` } as CSSProperties}
+          >
+            <EngineLogo name={f.name} size={Math.round(f.s * 0.52)} alt="" />
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+}

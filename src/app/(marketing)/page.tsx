@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, Check, Globe, Quote, Search } from "lucide-react";
 import { listPlans } from "@/lib/data";
-import { eur, num } from "@/lib/utils";
+import { cn, eur, num } from "@/lib/utils";
 import { getProduct } from "@/lib/marketing/products";
 import { growth, listPublishedCases } from "@/lib/marketing/cases";
 import { Badge, Button, Card, Input } from "@/components/ui";
@@ -14,7 +14,7 @@ import { EngineWordmark } from "@/components/marketing/engine-wordmark";
 import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup, SocialMockup } from "@/components/marketing/mockups";
 import { ENGINES } from "@/lib/marketing/social-proof";
 import { StepStory } from "@/components/marketing/step-stories";
-import { AiCitations, GrowthChart, RankClimb, Reveal, ScrollStatement, ScrollSteps, Stagger, StickyShowcase, TiltIn, Watch, type StatementPart } from "@/components/marketing/scroll-fx";
+import { AiCitations, GrowthChart, RankClimb, Reveal, FloatingEngines, ScrollStatement, ScrollSteps, Stagger, StickyShowcase, TiltIn, Watch, type StatementPart } from "@/components/marketing/scroll-fx";
 import { Container, CtaBand, CtaLink, EngineLogo, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
@@ -70,11 +70,12 @@ const faqs = [
   { q: "¿Puedo cancelar cuando quiera?", a: "Sí, sin permanencia y desde el propio panel. Además, si en 60 días no ves más tráfico orgánico, te devolvemos el dinero." },
 ];
 
-function Statement({ parts, tone = "paper" }: { parts: StatementPart[]; tone?: "paper" | "paper-2" }) {
+function Statement({ parts, tone = "paper", engines = false }: { parts: StatementPart[]; tone?: "paper" | "paper-2"; engines?: boolean }) {
   return (
-    <section className={tone === "paper-2" ? "bg-paper-2" : undefined}>
-      <Container className="py-20 sm:py-28 md:py-36 lg:py-44">
-        <ScrollStatement parts={parts} className="max-w-[1080px]" />
+    <section className={cn("relative", tone === "paper-2" && "bg-paper-2")}>
+      {engines && <FloatingEngines />}
+      <Container className="relative py-20 sm:py-28 md:py-36 lg:py-44">
+        <ScrollStatement parts={parts} className={cn("mx-auto max-w-[1080px] text-center", engines && "max-w-[880px]")} />
       </Container>
     </section>
   );
@@ -292,11 +293,12 @@ export default async function HomePage() {
         </Container>
       </Section>
 
-      {/* ───────── FRASE: TU NEGOCIO ───────── */}
+      {/* ───────── FRASE: MIENTRAS DUERMEN ───────── */}
       <Statement
+        engines
         parts={[
-          "Mientras tú atiendes tu negocio, nosotros conseguimos que",
-          { text: "Google y la IA", tone: "accent" },
+          "Mientras los demás duermen, nosotros conseguimos que",
+          { text: "Google y las IAs", tone: "accent" },
           "hablen de ti.",
         ]}
       />

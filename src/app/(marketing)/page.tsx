@@ -12,6 +12,7 @@ import { RatingPill } from "@/components/marketing/rating-pill";
 import { EngineWordmark } from "@/components/marketing/engine-wordmark";
 import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup, SocialMockup } from "@/components/marketing/mockups";
 import { ENGINES } from "@/lib/marketing/social-proof";
+import { AiCitations, GrowthChart, RankClimb, Reveal, ScrollStatement, type StatementPart } from "@/components/marketing/scroll-fx";
 import { Container, CtaBand, CtaLink, EngineLogo, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
@@ -66,6 +67,16 @@ const faqs = [
   { q: "¿Cómo funciona eso de que la IA me recomiende?", a: "Los asistentes responden a partir de lo que encuentran y entienden en la web. Publicar contenido claro, bien estructurado y citado por otras webs aumenta las opciones de aparecer. Lo medimos a diario para que veas si funciona." },
   { q: "¿Puedo cancelar cuando quiera?", a: "Sí, sin permanencia y desde el propio panel. Además, si en 60 días no ves más tráfico orgánico, te devolvemos el dinero." },
 ];
+
+function Statement({ parts, tone = "paper" }: { parts: StatementPart[]; tone?: "paper" | "paper-2" }) {
+  return (
+    <section className={tone === "paper-2" ? "bg-paper-2" : undefined}>
+      <Container className="py-20 sm:py-28 md:py-36 lg:py-44">
+        <ScrollStatement parts={parts} className="max-w-[1080px]" />
+      </Container>
+    </section>
+  );
+}
 
 export default async function HomePage() {
   const [plans, cases] = await Promise.all([listPlans(), listPublishedCases()]);
@@ -139,6 +150,16 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ───────── FRASE: EQUIPO ───────── */}
+      <Statement
+        parts={[
+          "Tu equipo de expertos en SEO y GEO que trabaja sin descanso,",
+          { text: "yeswecan,", tone: "accent" },
+          "con",
+          { text: "yeswecontent!", tone: "brand" },
+        ]}
+      />
+
       {/* ───────── 3 PASOS ───────── */}
       <Section id="como-funciona">
         <Container>
@@ -174,6 +195,35 @@ export default async function HomePage() {
             </div>
             <HeroVisual />
           </div>
+        </Container>
+      </Section>
+
+      {/* ───────── ANTES Y DESPUÉS ───────── */}
+      <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
+        <Container>
+          <div className="mx-auto max-w-3xl text-center">
+            <Eyebrow>Antes y después</Eyebrow>
+            <Title className="mt-4">
+              La semana 20 empezó a publicar. <span className="marker">Mira la curva</span>.
+            </Title>
+            <Lead className="mx-auto mt-5 max-w-2xl">
+              Así se ve en Search Console una web que pasa de publicar cuando puede a publicar cada semana con plan, enlaces y datos estructurados.
+            </Lead>
+          </div>
+          <Reveal className="mt-10 md:mt-14">
+            <GrowthChart />
+          </Reveal>
+          <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+            <Reveal>
+              <p className="mb-3 text-[13px] font-semibold text-ink-2">Sube en Google</p>
+              <RankClimb />
+            </Reveal>
+            <Reveal delay={120}>
+              <p className="mb-3 text-[13px] font-semibold text-ink-2">Y la IA empieza a citarte</p>
+              <AiCitations />
+            </Reveal>
+          </div>
+          <p className="mt-5 text-xs text-ink-3">Ejemplo ilustrativo con una marca ficticia. Cada web crece a su ritmo.</p>
         </Container>
       </Section>
 
@@ -230,6 +280,15 @@ export default async function HomePage() {
           </div>
         </Container>
       </Section>
+
+      {/* ───────── FRASE: TU NEGOCIO ───────── */}
+      <Statement
+        parts={[
+          "Mientras tú atiendes tu negocio, nosotros conseguimos que",
+          { text: "Google y la IA", tone: "accent" },
+          "hablen de ti.",
+        ]}
+      />
 
       {/* ───────── SOCIAL ───────── */}
       <Section>
@@ -437,6 +496,11 @@ export default async function HomePage() {
           </div>
         </Container>
       </Section>
+
+      {/* ───────── FRASE: CADA SEMANA ───────── */}
+      <Statement
+        parts={["Cada semana, más búsquedas que", { text: "terminan en tu web.", tone: "accent" }, "Sin reuniones. Sin excusas. Sin parar."]}
+      />
 
       {/* ───────── CASOS ───────── */}
       {cases.length > 0 && (

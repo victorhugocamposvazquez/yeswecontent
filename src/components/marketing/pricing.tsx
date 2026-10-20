@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Check, Minus, Plus } from "lucide-react";
+import { Stagger } from "./scroll-fx";
 import { cn, eur } from "@/lib/utils";
 import type { Plan } from "@/lib/types";
 import { Badge, Button, ButtonLink, Input, Label, Select } from "@/components/ui";
@@ -47,12 +48,13 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
         </div>
       </div>
 
-      <div className={cn("mx-auto mt-10 grid gap-5 md:mt-12", plans.length === 1 ? "max-w-md" : plans.length === 2 ? "max-w-4xl md:grid-cols-2" : "md:grid-cols-3")}>
+      <Stagger className={cn("mx-auto mt-10 grid gap-5 md:mt-12", plans.length === 1 ? "max-w-md" : plans.length === 2 ? "max-w-4xl md:grid-cols-2" : "md:grid-cols-3")}>
         {plans.map((p, idx) => {
           const featured = plans.length > 1 && idx === plans.length - 1;
           return (
             <div
               key={p.id}
+              style={{ "--i": idx * 4 } as React.CSSProperties}
               className={cn(
                 "relative flex flex-col rounded-3xl border p-6 sm:p-8",
                 featured
@@ -109,7 +111,7 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
             </div>
           );
         })}
-      </div>
+      </Stagger>
 
       <VolumeCalculator plans={plans} discounts={discounts} interval={interval} />
     </div>

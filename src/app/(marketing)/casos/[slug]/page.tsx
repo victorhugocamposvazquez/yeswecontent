@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { num } from "@/lib/utils";
 import type { CaseStudy } from "@/lib/types";
 import { getPublishedCase, growth, listPublishedCases } from "@/lib/marketing/cases";
+import { CountUpText } from "@/components/marketing/scroll-fx";
 import { Markdown } from "@/components/marketing/markdown";
 import { Badge, Card } from "@/components/ui";
 import { Container, CtaBand, Eyebrow, Section, Title } from "@/components/marketing/primitives";
@@ -85,7 +86,9 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
             {g && (
               <Card className="bg-lime-soft p-6">
                 <p className="text-[13px] font-medium text-ink-2">Crecimiento</p>
-                <p className="tabular mt-1 text-[3.5rem] font-semibold leading-none tracking-tight">{g}</p>
+                <p className="tabular mt-1 text-[3.5rem] font-semibold leading-none tracking-tight">
+                  <CountUpText text={g} />
+                </p>
                 <p className="mt-2 text-sm text-ink-2">{c.metric_label}</p>
               </Card>
             )}

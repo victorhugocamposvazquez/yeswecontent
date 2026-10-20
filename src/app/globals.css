@@ -343,9 +343,41 @@ body {
   .sx-step:not([data-active]) { opacity: 0.32; transform: none; pointer-events: auto; }
 }
 
+/* Escaparate con captura fija (solo escritorio) */
+@media (min-width: 1024px) {
+  .sx-showcase [data-sx-text] { grid-column: 1; }
+  .sx-showcase [data-sx-media] { grid-column: 2; grid-row: 1 / span 5; position: sticky; top: max(6rem, calc(50vh - 15rem)); align-self: start; }
+  .sx-showcase [data-sx-text] { transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  .sx-showcase [data-sx-text]:not([data-active]) { opacity: 0.28; }
+  .sx-showcase [data-sx-media] { transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); }
+  .sx-showcase [data-sx-media]:not([data-active]) { opacity: 0; transform: translateY(28px) scale(0.97); pointer-events: none; }
+}
+
+/* Raíl de pasos */
+.sx-rail-list .sx-rail { transform: scaleY(var(--pp, 1)); }
+.sx-rail-list > li { transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+.sx-rail-list > li .sx-dot { transition: background-color 0.4s, transform 0.5s cubic-bezier(0.34, 1.5, 0.64, 1); }
+.sx-rail-list > li[data-lit] .sx-dot { background: var(--signal); transform: scale(1.08); }
+@media (scripting: enabled) {
+  .sx-rail-list > li:not([data-lit]) { opacity: 0.45; transform: translateX(6px); }
+}
+
+/* Aparición por piezas dentro de un .sx-watch (si el mockup no está envuelto, se ve normal) */
+.sx-piece {
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 45ms + 150ms);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.sx-watch:not([data-on]) .sx-piece { opacity: 0; transform: scale(0.6); }
+.sx-watch:not([data-on]) .sx-piece-line { opacity: 0; }
+.sx-piece-line { transition: opacity 0.9s ease; transition-delay: calc(var(--i, 0) * 40ms + 500ms); }
+.sx-watch:not([data-on]) .sx-piece-up { opacity: 0; transform: translateY(8px); }
+.sx-piece-up { transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(var(--i, 0) * 40ms + 200ms); }
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-statement .sx-word { opacity: 1; transform: none; }
-  .sx-serp-row, .sx-serp-me, .sx-serp-badge, .sx-before, .sx-after, .sx-pop, .sx-reveal, .sx-stagger > *, .sx-panel, .sx-url, .sx-step { transition: none; }
+  .sx-serp-row, .sx-serp-me, .sx-serp-badge, .sx-before, .sx-after, .sx-pop, .sx-reveal, .sx-stagger > *, .sx-panel, .sx-url, .sx-step, .sx-piece, .sx-piece-line, .sx-piece-up, .sx-rail-list > li, .sx-showcase [data-sx-text], .sx-showcase [data-sx-media] { transition: none; }
   /* Sin movimiento: cada pantalla aparece ya completa y cambia sin transición. */
   .sx-at, .sx-check { opacity: 1; transform: none; }
   .sx-type { transform: scaleX(0); }

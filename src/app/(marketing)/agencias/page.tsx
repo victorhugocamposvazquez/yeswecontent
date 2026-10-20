@@ -1,9 +1,11 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { Building2, Eye, Layers, Palette, Receipt, Users } from "lucide-react";
 import { volumeDiscounts } from "@/lib/demo";
 import { Card } from "@/components/ui";
 import { AgencyForm } from "@/components/marketing/agency-form";
 import { AgencyPortalMockup } from "@/components/marketing/mockups";
+import { Stagger, TiltIn } from "@/components/marketing/scroll-fx";
 import { Container, CtaLink, Eyebrow, Faq, IconBox, Lead, Section, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
@@ -59,7 +61,9 @@ export default function AgenciasPage() {
             </div>
           </div>
           <div className="rise rise-3">
-            <AgencyPortalMockup />
+            <TiltIn>
+              <AgencyPortalMockup />
+            </TiltIn>
           </div>
         </Container>
       </section>
@@ -72,9 +76,9 @@ export default function AgenciasPage() {
               Tu servicio, <span className="marker">nuestra sala de máquinas</span>.
             </Title>
           </div>
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 md:gap-5 lg:grid-cols-3">
-            {pillars.map(({ icon: Icon, title, text }) => (
-              <Card key={title} className="p-6 sm:p-7">
+          <Stagger className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 md:gap-5 lg:grid-cols-3">
+            {pillars.map(({ icon: Icon, title, text }, i) => (
+              <Card key={title} className="p-6 sm:p-7" style={{ "--i": i * 3 } as CSSProperties}>
                 <IconBox>
                   <Icon />
                 </IconBox>
@@ -82,7 +86,7 @@ export default function AgenciasPage() {
                 <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{text}</p>
               </Card>
             ))}
-          </div>
+          </Stagger>
         </Container>
       </Section>
 
@@ -92,13 +96,13 @@ export default function AgenciasPage() {
             <Eyebrow>Cómo empezar</Eyebrow>
             <Title className="mt-4">Tres pasos y estás vendiendo.</Title>
           </div>
-          <ol className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+          <Stagger as="ol" className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {[
               ["1", "Llamada de 15 minutos", "Vemos cuántos clientes tienes, qué vendes y si encajamos. Sin presentaciones eternas."],
               ["2", "Configuramos tu marca", "Logo, colores, subdominio y remitente de emails. Lo dejamos listo contigo."],
               ["3", "Das de alta clientes", `Cada web nueva suma al descuento por volumen, hasta un ${maxPct}%.`],
-            ].map(([n, t, d]) => (
-              <li key={n}>
+            ].map(([n, t, d], i) => (
+              <li key={n} style={{ "--i": i * 5 } as CSSProperties}>
                 <Card className="h-full p-6">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-ink text-sm font-semibold text-paper">{n}</span>
                   <h3 className="mt-4 text-lg font-semibold tracking-tight">{t}</h3>
@@ -106,7 +110,7 @@ export default function AgenciasPage() {
                 </Card>
               </li>
             ))}
-          </ol>
+          </Stagger>
         </Container>
       </Section>
 

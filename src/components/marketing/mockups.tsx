@@ -3,6 +3,7 @@
  * construidas con los mismos primitivos del panel. Marca de ejemplo ficticia: Tierrafina.
  */
 import { BarChart3, CalendarDays, CircleAlert, CircleCheck, CircleX, FileText, Home, Link2, Network, Plus, ScanSearch, Settings, Share2, Sparkles, Send } from "lucide-react";
+import type { CSSProperties } from "react";
 import { AreaChart, Progress, ScoreRing, Sparkline } from "@/components/charts";
 import { Badge, Logo } from "@/components/ui";
 import { cn } from "@/lib/utils";
@@ -303,11 +304,11 @@ export function AiMatrixMockup({ className }: { className?: string }) {
             </tr>
           </thead>
           <tbody>
-            {prompts.map((p) => (
+            {prompts.map((p, row) => (
               <tr key={p.q} className="border-b border-line last:border-0">
                 <td className="px-4 py-2.5 font-medium">«{p.q}»</td>
                 {p.r.map((r, i) => (
-                  <td key={i} className="px-2 py-2.5 text-center">
+                  <td key={i} className="sx-piece-up px-2 py-2.5 text-center" style={{ "--i": row * 2 + i * 3 } as CSSProperties}>
                     {r === null ? (
                       <span className="inline-flex items-center text-ink-3">
                         <CircleX className="h-3.5 w-3.5" aria-hidden /> <span className="sr-only">No aparece</span>
@@ -420,6 +421,8 @@ export function NetworkGraphMockup({ className }: { className?: string }) {
           {edges.map(([a, b], i) => (
             <line
               key={i}
+              className="sx-piece-line"
+              style={{ "--i": i } as CSSProperties}
               x1={nodes[a].x}
               y1={nodes[a].y}
               x2={nodes[b].x}
@@ -430,7 +433,7 @@ export function NetworkGraphMockup({ className }: { className?: string }) {
             />
           ))}
           {nodes.map((n, i) => (
-            <g key={i}>
+            <g key={i} className="sx-piece" style={{ "--i": i * 1.5 } as CSSProperties}>
               <circle cx={n.x} cy={n.y} r={n.r + 4} fill={n.main ? "var(--signal)" : "var(--ink)"} opacity={n.main ? 0.12 : 0.04} />
               <circle cx={n.x} cy={n.y} r={n.r} fill={n.main ? "var(--signal)" : "var(--card)"} stroke={n.main ? "var(--signal)" : "var(--line-2)"} strokeWidth="1.5" />
               {n.label && (

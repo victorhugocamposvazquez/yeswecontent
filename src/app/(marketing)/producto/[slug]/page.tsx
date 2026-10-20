@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
@@ -5,6 +6,7 @@ import { getProduct, products } from "@/lib/marketing/products";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui";
 import { ProductMockup } from "@/components/marketing/mockups";
+import { ScrollRail, Stagger, TiltIn, Watch } from "@/components/marketing/scroll-fx";
 import { Container, CtaBand, CtaLink, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Ticket, Title } from "@/components/marketing/primitives";
 
 export const dynamicParams = false;
@@ -57,7 +59,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
           <div className={wide ? "rise rise-3 mt-12 w-full max-w-[1100px] pb-14 sm:mt-16 md:pb-20" : "rise rise-3 w-full"}>
-            <ProductMockup slug={p.slug} />
+            <TiltIn>
+              <Watch>
+                <ProductMockup slug={p.slug} />
+              </Watch>
+            </TiltIn>
           </div>
         </Container>
       </section>
@@ -70,15 +76,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               Lo que hace por ti, <span className="marker">punto por punto</span>.
             </Title>
           </div>
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 md:gap-5">
+          <Stagger className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 md:gap-5">
             {p.features.map((f, i) => (
-              <Card key={f.title} className="p-6 sm:p-7">
+              <Card key={f.title} className="p-6 sm:p-7" style={{ "--i": i * 3 } as CSSProperties}>
                 <span className="tabular text-sm font-semibold text-signal">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="mt-3 text-lg font-semibold tracking-tight sm:text-xl">{f.title}</h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{f.text}</p>
               </Card>
             ))}
-          </div>
+          </Stagger>
         </Container>
       </Section>
 
@@ -92,11 +98,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <Ticket {...p.sample} className="max-w-sm" />
               </div>
             </div>
-            <ol className="grid grid-cols-1 gap-4">
+            <ScrollRail className="grid grid-cols-1 gap-4">
               {p.steps.map((s, i) => (
                 <li key={s.title}>
                   <Card className="flex gap-5 p-6">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-paper">{i + 1}</span>
+                    <span className="sx-dot grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-paper">{i + 1}</span>
                     <div>
                       <h3 className="text-lg font-semibold tracking-tight">{s.title}</h3>
                       <p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">{s.text}</p>
@@ -104,7 +110,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   </Card>
                 </li>
               ))}
-            </ol>
+            </ScrollRail>
           </div>
         </Container>
       </Section>

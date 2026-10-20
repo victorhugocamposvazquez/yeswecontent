@@ -701,3 +701,105 @@ export function ScrollSteps({ steps }: { steps: Step[] }) {
     </div>
   );
 }
+
+/** Solo marca data-on al entrar en pantalla; los hijos con clases sx-* deciden cómo aparecer. */
+export function Watch({ children, className, threshold = 0.3 }: { children: ReactNode; className?: string; threshold?: number }) {
+  const [ref, on] = useInView<HTMLDivElement>(threshold);
+  return (
+    <div ref={ref} className={cn("sx-watch", className)} data-on={on || undefined}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Escaparate con la captura fija (escritorio): los textos con [data-sx-text="i"] pasan con el
+ * scroll y la captura [data-sx-media="i"] del que está en el centro de la pantalla se queda
+ * delante. En móvil no hace nada: cada texto va seguido de su captura.
+ */
+export function StickyShowcase({ children, className }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const texts = Array.from(root.querySelectorAll<HTMLElement>("[data-sx-text]"));
+    const media = Array.from(root.querySelectorAll<HTMLElement>("[data-sx-media]"));
+    const set = (i: string) => {
+      for (const el of [...texts, ...media]) {
+        const mine = (el.dataset.sxText ?? el.dataset.sxMedia) === i;
+        if (mine) el.setAttribute("data-active", "");
+        else el.removeAttribute("data-active");
+      }
+    };
+    set("0");
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) set((e.target as HTMLElement).dataset.sxText!);
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    texts.forEach((t) => io.observe(t));
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={cn("sx-showcase", className)}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Lista de pasos con un raíl que se llena con el scroll; cada paso se enciende cuando el raíl
+ * llega a él. Los pasos son los hijos directos de la lista (li).
+ */
+export function ScrollRail({ children, className }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLOListElement>(null);
+  useScrollProgress(
+    ref,
+    (p) => {
+      const el = ref.current;
+      if (!el) return;
+      el.style.setProperty("--pp", p.toFixed(4));
+      const items = el.querySelectorAll<HTMLElement>(":scope > li");
+      items.forEach((li, i) => {
+        if (p >= (i + 0.35) / items.length || p >= 0.999) li.setAttribute("data-lit", "");
+        else li.removeAttribute("data-lit");
+      });
+    },
+    { start: 0.8, end: 0.6, smooth: 0.12 },
+  );
+  return (
+    <ol ref={ref} className={cn("sx-rail-list relative", className)}>
+      <span aria-hidden className="sx-rail-track pointer-events-none absolute top-6 bottom-6 left-[2.75rem] w-0.5 overflow-hidden rounded-full bg-line">
+        <span className="sx-rail block h-full origin-top bg-signal" />
+      </span>
+      {children}
+    </ol>
+  );
+}
+
+/** Cuenta hacia arriba el primer número de un texto (p. ej. "+340 %") al entrar en pantalla. */
+export function CountUpText({ text, className }: { text: string; className?: string }) {
+  const [ref, on] = useInView<HTMLSpanElement>(0.5);
+  const m = text.match(/^(\D*)(\d[\d.]*)(.*)$/);
+  const target = m ? Number(m[2].replace(/\./g, "")) : 0;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !on || !m || reducedMotion()) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const k = easeOut(clamp((t - t0) / 1800));
+      el.textContent = `${m[1]}${num(Math.round(target * k))}${m[3]}`;
+      if (k < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [on, text]);
+  return (
+    <span ref={ref} className={className}>
+      {text}
+    </span>
+  );
+}

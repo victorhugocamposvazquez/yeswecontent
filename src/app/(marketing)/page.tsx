@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { Fragment, type CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, Check, Globe, Quote, Search } from "lucide-react";
@@ -13,7 +13,7 @@ import { RatingPill } from "@/components/marketing/rating-pill";
 import { EngineWordmark } from "@/components/marketing/engine-wordmark";
 import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup, SocialMockup } from "@/components/marketing/mockups";
 import { ENGINES } from "@/lib/marketing/social-proof";
-import { AiCitations, GrowthChart, Parallax, RankClimb, Reveal, ScrollStatement, ScrollSteps, Stagger, TiltIn, type StatementPart } from "@/components/marketing/scroll-fx";
+import { AiCitations, GrowthChart, RankClimb, Reveal, ScrollStatement, ScrollSteps, Stagger, StickyShowcase, TiltIn, Watch, type StatementPart } from "@/components/marketing/scroll-fx";
 import { Container, CtaBand, CtaLink, EngineLogo, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
@@ -230,51 +230,51 @@ export default async function HomePage() {
             </Title>
             <Lead className="mt-5">Cinco piezas que normalmente necesitan cinco proveedores. Aquí funcionan juntas y se hablan entre sí.</Lead>
           </div>
-          <div className="mt-14 space-y-16 md:mt-20 md:space-y-24 lg:space-y-28">
+          <StickyShowcase className="mt-14 grid grid-cols-1 lg:mt-12 lg:grid-cols-2 lg:gap-x-16">
             {featureRows.map((f, i) => {
               const p = getProduct(f.slug)!;
               return (
-                <div key={f.slug} className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16">
-                  <div className={i % 2 ? "lg:order-2" : ""}>
-                    <div className="flex items-center gap-3">
-                      <IconBox>
-                        <ProductGlyph icon={p.icon} />
-                      </IconBox>
-                      <Eyebrow tone="ink">
-                        {String(i + 1).padStart(2, "0")} · {f.eyebrow}
-                      </Eyebrow>
+                <Fragment key={f.slug}>
+                  <div data-sx-text={i} className={i ? "pt-16 md:pt-24 lg:pt-0" : ""}>
+                    <div className="lg:flex lg:min-h-[80vh] lg:flex-col lg:justify-center">
+                      <div className="flex items-center gap-3">
+                        <IconBox>
+                          <ProductGlyph icon={p.icon} />
+                        </IconBox>
+                        <Eyebrow tone="ink">
+                          {String(i + 1).padStart(2, "0")} · {f.eyebrow}
+                        </Eyebrow>
+                      </div>
+                      <Title as="h3" size="sm" className="mt-5">
+                        {f.title}
+                      </Title>
+                      <Lead className="mt-4 max-w-md text-base">{f.text}</Lead>
+                      <ul className="mt-5 space-y-2.5">
+                        {p.features.slice(0, 3).map((x) => (
+                          <li key={x.title} className="flex gap-2.5 text-[15px] text-ink-2">
+                            <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-signal-soft text-signal">
+                              <Check className="h-3 w-3" aria-hidden />
+                            </span>
+                            <span>
+                              <strong className="font-semibold text-ink">{x.title}.</strong> {x.text}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <TextLink href={`/producto/${p.slug}`} className="mt-6">
+                        Ver {p.name.toLowerCase()}
+                      </TextLink>
                     </div>
-                    <Title as="h3" size="sm" className="mt-5">
-                      {f.title}
-                    </Title>
-                    <Lead className="mt-4 max-w-md text-base">{f.text}</Lead>
-                    <ul className="mt-5 space-y-2.5">
-                      {p.features.slice(0, 3).map((x) => (
-                        <li key={x.title} className="flex gap-2.5 text-[15px] text-ink-2">
-                          <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-signal-soft text-signal">
-                            <Check className="h-3 w-3" aria-hidden />
-                          </span>
-                          <span>
-                            <strong className="font-semibold text-ink">{x.title}.</strong> {x.text}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <TextLink href={`/producto/${p.slug}`} className="mt-6">
-                      Ver {p.name.toLowerCase()}
-                    </TextLink>
                   </div>
-                  <div className={i % 2 ? "lg:order-1" : ""}>
+                  <div data-sx-media={i} className="mt-8 lg:mt-0">
                     <Reveal>
-                      <Parallax amount={40}>
-                        <ProductMockup slug={f.slug} />
-                      </Parallax>
+                      <ProductMockup slug={f.slug} />
                     </Reveal>
                   </div>
-                </div>
+                </Fragment>
               );
             })}
-          </div>
+          </StickyShowcase>
         </Container>
       </Section>
 
@@ -334,7 +334,9 @@ export default async function HomePage() {
               </span>
             ))}
           </div>
-          <AiMatrixMockup className="mt-5" />
+          <Watch className="mt-5">
+            <AiMatrixMockup />
+          </Watch>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-xs text-paper/50">Ejemplo con una marca ficticia · #n = posición en la respuesta</p>
             <Link href="/producto/visibilidad-ia" className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-lime transition-colors duration-150 hover:text-paper sm:min-h-0">
@@ -417,7 +419,9 @@ export default async function HomePage() {
         <Container>
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
             <div className="order-2 lg:order-1">
-              <NetworkGraphMockup />
+              <Watch>
+                <NetworkGraphMockup />
+              </Watch>
             </div>
             <div className="order-1 lg:order-2">
               <Eyebrow>Red de enlaces</Eyebrow>
@@ -559,9 +563,9 @@ export default async function HomePage() {
                 <TextLink href="/agencias">¿Eres agencia?</TextLink>
               </div>
             </div>
-            <div className="space-y-3">
+            <Stagger className="space-y-3">
               {plans.map((p, i) => (
-                <div key={p.id} className={`flex items-center justify-between rounded-xl border px-5 py-4 ${i === plans.length - 1 && plans.length > 1 ? "border-ink bg-ink text-paper" : "border-line bg-paper-2"}`}>
+                <div key={p.id} style={{ "--i": i * 4 } as CSSProperties} className={`flex items-center justify-between rounded-xl border px-5 py-4 ${i === plans.length - 1 && plans.length > 1 ? "border-ink bg-ink text-paper" : "border-line bg-paper-2"}`}>
                   <div>
                     <p className="text-lg font-semibold tracking-tight">{p.name}</p>
                     <p className={`text-[13px] ${i === plans.length - 1 && plans.length > 1 ? "text-paper/65" : "text-ink-2"}`}>
@@ -574,8 +578,12 @@ export default async function HomePage() {
                   </p>
                 </div>
               ))}
-              {cheapest !== null && <p className="text-center text-xs text-ink-3">Desde {eur(cheapest)}/mes · 3 días gratis</p>}
-            </div>
+              {cheapest !== null && (
+                <p className="text-center text-xs text-ink-3" style={{ "--i": plans.length * 4 } as CSSProperties}>
+                  Desde {eur(cheapest)}/mes · 3 días gratis
+                </p>
+              )}
+            </Stagger>
           </Card>
         </Container>
       </Section>

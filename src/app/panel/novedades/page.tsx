@@ -22,7 +22,7 @@ export default async function UpdatesPage() {
                     {fmtDate(u.published_at, { day: "numeric", month: "long", year: "numeric" })}
                   </time>
                 </div>
-                <h2 className="font-display text-2xl">{u.title}</h2>
+                <h2 className="font-semibold tracking-tight text-lg">{u.title}</h2>
                 <MarkdownView md={u.body_md} className="mt-2" />
               </Card>
             </li>

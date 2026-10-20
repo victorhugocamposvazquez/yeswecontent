@@ -105,7 +105,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SP }) {
             <Link href={`/panel/plan?${new URLSearchParams({ ...clean(extra), vista: view, mes: prevMonth })}`} className="rounded-full p-2 hover:bg-paper-2" aria-label="Mes anterior">
               <ChevronLeft className="h-4 w-4" />
             </Link>
-            <h2 className="font-display text-2xl capitalize">{monthLabel}</h2>
+            <h2 className="font-semibold tracking-tight text-lg capitalize">{monthLabel}</h2>
             <Link href={`/panel/plan?${new URLSearchParams({ ...clean(extra), vista: view, mes: nextMonth })}`} className="rounded-full p-2 hover:bg-paper-2" aria-label="Mes siguiente">
               <ChevronRight className="h-4 w-4" />
             </Link>

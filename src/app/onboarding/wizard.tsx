@@ -522,7 +522,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                   )}
                   <p className="text-lg font-semibold">{p.name}</p>
                   <p className="mt-1">
-                    <span className="font-display text-4xl">{eur(s.interval === "year" ? p.yearly_price_eur : p.monthly_price_eur)}</span>
+                    <span className="font-semibold tracking-tight text-2xl">{eur(s.interval === "year" ? p.yearly_price_eur : p.monthly_price_eur)}</span>
                     <span className="text-sm text-ink-3">/mes</span>
                   </p>
                   {s.interval === "year" && <p className="text-xs text-ink-3">facturado anualmente</p>}
@@ -597,7 +597,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
 function StepHead({ title, intro, children }: { title: string; intro: string; children: React.ReactNode }) {
   return (
     <section>
-      <h1 className="font-display text-3xl leading-tight md:text-4xl">{title}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight leading-tight">{title}</h1>
       <p className="mb-6 mt-2 text-ink-2">{intro}</p>
       {children}
     </section>

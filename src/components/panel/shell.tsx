@@ -101,10 +101,10 @@ export function PanelShell({
         </button>
       </div>
       {siteSwitcher}
-      <nav aria-label="Panel" className="-mx-1 flex-1 space-y-5 overflow-y-auto px-1">
+      <nav aria-label="Panel" className="-mx-1 flex-1 space-y-4 overflow-y-auto px-1">
         {NAV.map((g) => (
           <div key={g.group || "main"}>
-            {g.group && <p className="mb-1.5 px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">{g.group}</p>}
+            {g.group && <p className="mb-1 px-2.5 text-[11px] font-medium uppercase tracking-wide text-ink-3">{g.group}</p>}
             <ul className="space-y-0.5">
               {g.items.map((it) => {
                 const active = isActive(path, it.href);
@@ -114,11 +114,11 @@ export function PanelShell({
                       href={it.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition",
-                        active ? "bg-ink font-medium text-paper" : "text-ink-2 hover:bg-paper-2 hover:text-ink",
+                        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition",
+                        active ? "bg-paper-2 font-medium text-ink" : "text-ink-2 hover:bg-paper-2 hover:text-ink",
                       )}
                     >
-                      <it.icon className={cn("h-4 w-4", active && "text-lime")} aria-hidden />
+                      <it.icon className={cn("h-4 w-4", active ? "text-signal" : "text-ink-3")} aria-hidden />
                       {it.label}
                     </Link>
                   </li>
@@ -132,12 +132,12 @@ export function PanelShell({
         <Link
           href="/panel/ajustes/cuenta"
           aria-current={path.startsWith("/panel/ajustes") ? "page" : undefined}
-          className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm", path.startsWith("/panel/ajustes") ? "bg-ink text-paper" : "text-ink-2 hover:bg-paper-2")}
+          className={cn("flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px]", path.startsWith("/panel/ajustes") ? "bg-paper-2 font-medium text-ink" : "text-ink-2 hover:bg-paper-2")}
         >
           <Settings className="h-4 w-4" aria-hidden /> Ajustes
         </Link>
         {isAdmin && (
-          <Link href="/admin" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-ink-2 hover:bg-paper-2">
+          <Link href="/admin" className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] text-ink-2 hover:bg-paper-2">
             <Shield className="h-4 w-4" aria-hidden /> Administración
           </Link>
         )}
@@ -179,7 +179,7 @@ export function PanelShell({
         </div>
       )}
       <div className="flex">
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-line bg-card lg:block print:hidden">{sidebar}</aside>
+        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-line bg-card lg:block print:hidden">{sidebar}</aside>
 
         {open && (
           <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Menú del panel">

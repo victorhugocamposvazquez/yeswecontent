@@ -114,8 +114,8 @@ export function PageHeader({ title, intro, actions }: { title: string; intro?: R
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="font-display text-3xl leading-tight">{title}</h1>
-        {intro && <p className="mt-1 max-w-2xl text-ink-2">{intro}</p>}
+        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        {intro && <p className="mt-1 max-w-2xl text-sm text-ink-2">{intro}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -125,8 +125,8 @@ export function PageHeader({ title, intro, actions }: { title: string; intro?: R
 export function Stat({ label, value, delta, className }: { label: string; value: ReactNode; delta?: string; className?: string }) {
   return (
     <Card className={cn("p-5", className)}>
-      <p className="text-sm text-ink-3">{label}</p>
-      <p className="mt-1 text-3xl font-semibold tracking-tight">{value}</p>
+      <p className="text-[13px] text-ink-3">{label}</p>
+      <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
       {delta && <p className="mt-1 text-xs font-medium text-ok">{delta}</p>}
     </Card>
   );

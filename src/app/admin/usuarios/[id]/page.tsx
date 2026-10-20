@@ -28,7 +28,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
       </Link>
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-4xl leading-tight">{user.full_name ?? user.email}</h1>
+          <h1 className="font-semibold tracking-tight text-2xl leading-tight">{user.full_name ?? user.email}</h1>
           <p className="mt-1 flex flex-wrap items-center gap-2 text-ink-2">
             {user.email}
             <Badge tone={user.role === "admin" ? "lime" : "neutral"}>{user.role === "admin" ? "Admin" : "Usuario"}</Badge>

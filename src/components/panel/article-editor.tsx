@@ -60,7 +60,7 @@ export function ArticleEditor({
 
         <Card className="space-y-4 p-5 md:p-6">
           <Field label="Título (H1 y título SEO)" hint={`${title.length}/60 caracteres recomendados`}>
-            <Input name="title" value={title} onChange={(e) => setTitle(e.target.value)} className="font-display text-xl" />
+            <Input name="title" value={title} onChange={(e) => setTitle(e.target.value)} className="font-semibold tracking-tight text-xl" />
           </Field>
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Slug (URL)">
@@ -118,7 +118,7 @@ export function ArticleEditor({
               />
             </div>
             <div className={cn("h-[560px] overflow-y-auto bg-white p-5", pane === "edit" && "hidden lg:block")}>
-              <h1 className="mb-4 font-display text-3xl leading-tight">{title}</h1>
+              <h1 className="mb-4 font-semibold tracking-tight text-xl leading-tight">{title}</h1>
               <div className={proseClass} dangerouslySetInnerHTML={{ __html: html }} />
               {faq.length > 0 && (
                 <div className={cn(proseClass, "mt-6")}>

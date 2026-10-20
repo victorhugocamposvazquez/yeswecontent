@@ -28,7 +28,7 @@ function render(md: string) {
     if (h) {
       close();
       const lvl = h[1].length + 1;
-      out.push(`<h${lvl} class="font-display ${lvl <= 2 ? "text-2xl" : "text-xl"} mt-4 mb-1">${inline(h[2])}</h${lvl}>`);
+      out.push(`<h${lvl} class="font-semibold tracking-tight ${lvl <= 2 ? "text-xl" : "text-lg"} mt-4 mb-1">${inline(h[2])}</h${lvl}>`);
     } else if (ul || ol) {
       const kind = ul ? "ul" : "ol";
       if (list !== kind) {

@@ -24,7 +24,7 @@ export function CarouselPreview({ slides, brand, channel }: { slides: string[]; 
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">
             {i + 1}/{slides.length}
           </span>
-          <p className={cn("font-display leading-tight", i === 0 ? "text-3xl" : "text-2xl")}>{slides[i]}</p>
+          <p className={cn("font-semibold tracking-tight leading-tight", i === 0 ? "text-2xl" : "text-xl")}>{slides[i]}</p>
           <span className="text-xs opacity-70">{i === last ? "Guárdalo · Compártelo" : "Desliza →"}</span>
         </div>
         {i > 0 && (

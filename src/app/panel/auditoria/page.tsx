@@ -46,7 +46,7 @@ export default async function AuditPage() {
       <Card className="mb-6 grid items-center gap-6 p-6 md:grid-cols-[auto_1fr_auto]">
         <ScoreRing score={audit.score ?? 0} size={128} />
         <div>
-          <p className="font-display text-3xl">{(audit.score ?? 0) >= 85 ? "Tu web está en forma" : (audit.score ?? 0) >= 65 ? "Buena base, con margen" : "Hay trabajo por delante"}</p>
+          <p className="font-semibold tracking-tight text-xl">{(audit.score ?? 0) >= 85 ? "Tu web está en forma" : (audit.score ?? 0) >= 65 ? "Buena base, con margen" : "Hay trabajo por delante"}</p>
           <p className="mt-1 text-sm text-ink-2">
             {audit.url} · analizada el {fmtDate(audit.created_at, { day: "numeric", month: "long" })}
           </p>

@@ -17,7 +17,7 @@ export default async function PlansPage() {
         {plans.map((p) => (
           <Card key={p.id} className="p-5 sm:p-6">
             <div className="mb-5 flex flex-wrap items-center gap-3">
-              <h2 className="font-display text-2xl">{p.name}</h2>
+              <h2 className="font-semibold tracking-tight text-lg">{p.name}</h2>
               <Badge tone={p.active ? "ok" : "neutral"}>{p.active ? "Activo" : "Oculto"}</Badge>
               <span className="text-sm text-ink-3">
                 {p.monthly_price_eur ? `${eur(p.monthly_price_eur)}/mes · ${eur(p.yearly_price_eur)}/mes en anual` : "Precio a medida"}
@@ -39,7 +39,7 @@ export default async function PlansPage() {
         </details>
 
         <Card className="p-5 sm:p-6">
-          <h2 className="font-display text-2xl">Descuentos por volumen</h2>
+          <h2 className="font-semibold tracking-tight text-lg">Descuentos por volumen</h2>
           <p className="mb-4 text-sm text-ink-2">Porcentaje de descuento según el número de sitios contratados por un mismo cliente.</p>
           <VolumeTiersEditor tiers={tiers} action={saveVolumeTiers} />
         </Card>

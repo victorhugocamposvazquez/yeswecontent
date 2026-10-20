@@ -646,7 +646,7 @@ export function FacturacionSection({
         {sub && plan ? (
           <div className="flex flex-wrap items-center gap-6">
             <div className="flex-1">
-              <p className="font-display text-3xl">{plan.name}</p>
+              <p className="font-semibold tracking-tight text-xl">{plan.name}</p>
               <p className="text-sm text-ink-2">
                 {eur(sub.interval === "year" ? plan.yearly_price_eur : plan.monthly_price_eur)}/mes · pago {sub.interval === "year" ? "anual" : "mensual"} · <Badge tone={sub.status === "active" ? "ok" : sub.status === "trialing" ? "lime" : "warn"}>{statusLabel[sub.status]}</Badge>
               </p>

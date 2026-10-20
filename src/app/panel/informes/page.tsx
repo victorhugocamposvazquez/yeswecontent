@@ -68,7 +68,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-signal">Informe mensual</p>
-            <h1 className="mt-1 font-display text-4xl capitalize">{month.label}</h1>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight capitalize">{month.label}</h1>
             <p className="text-ink-2">
               {site.name} · {site.url.replace(/^https?:\/\//, "")}
             </p>

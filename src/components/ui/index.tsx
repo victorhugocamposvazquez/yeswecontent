@@ -130,8 +130,8 @@ export function Logo({ className, inverted = false, compact = false }: { classNa
           stroke={inverted ? "var(--paper)" : "var(--ink)"}
           strokeWidth="2"
         />
-        <text x="20" y="17" textAnchor="middle" fontSize="11" fontWeight="800" fill="#fff" fontFamily="var(--font-body)">
-          yes<tspan dx="0.5" fontFamily="var(--font-serif), Georgia, serif" fontStyle="italic" fontWeight="400" fontSize="13">!</tspan>
+        <text x="20" y="18.6" textAnchor="middle" fontSize="15" letterSpacing="-0.4" fontWeight="800" fill="#fff" fontFamily="var(--font-body)">
+          yes<tspan dx="0.5" fontFamily="var(--font-serif), Georgia, serif" fontStyle="italic" fontWeight="400" fontSize="17">!</tspan>
         </text>
       </svg>
       {!compact && (

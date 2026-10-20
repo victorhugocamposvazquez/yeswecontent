@@ -4,6 +4,7 @@
  */
 import "server-only";
 import { publishGhost } from "./ghost";
+import { publishGithub } from "./github";
 import { publishShopify } from "./shopify";
 import { publishWebflow } from "./webflow";
 import { publishWebhook } from "./webhook";
@@ -25,6 +26,8 @@ export async function publish(article: PublishableArticle, integration: Integrat
         return await publishGhost(article, integration.config);
       case "webhook":
         return await publishWebhook(article, integration.config);
+      case "github":
+        return await publishGithub(article, integration.config);
     }
   } catch (e) {
     return { ok: false, url: null, error: e instanceof Error ? e.message : String(e) };
@@ -33,7 +36,7 @@ export async function publish(article: PublishableArticle, integration: Integrat
 
 /** Convierte una fila de `integrations` en una configuración tipada (o null si no es un CMS). */
 export function toIntegrationConfig(row: { provider: string; config: unknown }): IntegrationConfig | null {
-  const providers = ["wordpress", "shopify", "webflow", "ghost", "webhook"];
+  const providers = ["wordpress", "shopify", "webflow", "ghost", "webhook", "github"];
   if (!providers.includes(row.provider) || !row.config || typeof row.config !== "object") return null;
   return { provider: row.provider, config: row.config } as IntegrationConfig;
 }

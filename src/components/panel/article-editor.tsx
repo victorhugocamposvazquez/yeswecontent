@@ -4,6 +4,7 @@ import { useActionState, useMemo, useState } from "react";
 import { CalendarClock, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
 import { ScoreRing } from "@/components/charts";
 import { Card, Field, Input, Textarea } from "@/components/ui";
+import type { ImageAction } from "@/lib/images/action-types";
 import type { FormAction } from "@/lib/panel/action-types";
 import { buildJsonLd } from "@/lib/panel/jsonld";
 import { markdownToHtml, proseClass } from "@/lib/panel/markdown";
@@ -11,6 +12,7 @@ import { SCORE_LABELS, scoreArticle } from "@/lib/panel/score";
 import type { Article } from "@/lib/types";
 import { cn, slugify } from "@/lib/utils";
 import { Notice, SubmitButton } from "./action-form";
+import { ArticleImages } from "./article-images";
 
 type Actions = { save: FormAction; regenerate: FormAction; publish: FormAction; schedule: FormAction };
 
@@ -21,6 +23,7 @@ export function ArticleEditor({
   site,
   cmsLabel,
   actions,
+  imageAction,
 }: {
   article: Article;
   keyword: string;
@@ -28,6 +31,8 @@ export function ArticleEditor({
   site: { name: string; url: string; min_words?: number; internal_links?: number; schema?: boolean };
   cmsLabel: string | null;
   actions: Actions;
+  /** Regenerar portada / imágenes interiores / infografía. */
+  imageAction?: ImageAction;
 }) {
   const [title, setTitle] = useState(article.title);
   const [slug, setSlug] = useState(article.slug);
@@ -35,6 +40,8 @@ export function ArticleEditor({
   const [body, setBody] = useState(article.body_md);
   const [faq, setFaq] = useState(article.faq ?? []);
   const [keyword, setKeyword] = useState(initialKeyword);
+  const [cover, setCover] = useState(article.cover_url);
+  const [images, setImages] = useState(article.images ?? []);
   // Pestañas en móvil/tablet (< lg). En escritorio todo se ve a la vez.
   const [tab, setTab] = useState<"edit" | "preview" | "seo">("edit");
   const mobileHidden = (t: typeof tab) => tab !== t && "max-lg:hidden";
@@ -130,6 +137,10 @@ export function ArticleEditor({
               />
             </div>
             <div className={cn("bg-white p-5 lg:h-[560px] lg:overflow-y-auto", tab !== "preview" && "hidden lg:block")}>
+              {cover && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={cover} alt={images.find((i) => i.kind === "cover")?.alt ?? ""} className="mb-4 aspect-video w-full rounded-xl object-cover" />
+              )}
               <h1 className="mb-4 font-semibold tracking-tight text-xl leading-tight">{title}</h1>
               <div className={proseClass} dangerouslySetInnerHTML={{ __html: html }} />
               {faq.length > 0 && (
@@ -223,6 +234,20 @@ export function ArticleEditor({
             </div>
           )}
         </Card>
+
+        {imageAction && (
+          <ArticleImages
+            articleId={article.id}
+            cover={cover}
+            images={images}
+            body={body}
+            onBody={setBody}
+            onCover={setCover}
+            onImages={setImages}
+            action={imageAction}
+            className={cn(mobileHidden("edit"))}
+          />
+        )}
 
         <Card className="space-y-5 p-5">
           <h2 className="font-semibold">Publicación</h2>

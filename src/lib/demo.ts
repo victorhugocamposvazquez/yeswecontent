@@ -21,6 +21,7 @@ import type {
   Subscription,
   TrafficPoint,
 } from "./types";
+import { renderUrl } from "./images/render-url";
 
 const day = 86_400_000;
 const today = new Date("2026-10-20T09:00:00Z").getTime();
@@ -159,10 +160,18 @@ Cada pieza pasa por dos cocciones y una revisión a mano. Si algo no nos convenc
 Elige por material, uso y mantenimiento. Y si dudas, escríbenos: te ayudamos a acertar.
 `;
 
+const demoPalette = "terracota y crema";
+
 export const articles: Article[] = contentItems
   .filter((c) => ["published", "scheduled", "review"].includes(c.status))
   .map((c, i) => {
     const status: Article["status"] = c.status === "published" ? "published" : c.status === "scheduled" ? "scheduled" : "review";
+    const cover = { kind: "cover" as const, url: renderUrl({ kind: "cover", title: c.title, kicker: c.cluster ?? undefined, site: "Tierrafina", palette: demoPalette, seed: `d${i}` }), alt: `${c.keyword.charAt(0).toUpperCase()}${c.keyword.slice(1)}: piezas de cerámica artesanal sobre una mesa de madera con luz cálida`, provider: "demo" as const };
+    const inline = { kind: "inline" as const, url: renderUrl({ kind: "inline", title: "Qué mirar antes de decidir", kicker: c.keyword, site: "Tierrafina", palette: demoPalette, seed: `i${i}` }), alt: `Manos revisando el esmalte y el borde de una pieza de gres, en relación con ${c.keyword}`, provider: "demo" as const, section: "Qué mirar antes de decidir" };
+    const info = { kind: "infographic" as const, url: renderUrl({ kind: "infographic", title: "Qué mirar antes de decidir", site: "Tierrafina", palette: demoPalette, items: ["El tipo de barro: el gres cocido a alta temperatura resiste más que la loza", "El esmalte: apto para uso alimentario y bien vitrificado", "El peso y el borde: una pieza bien hecha se siente equilibrada"] }), alt: "Infografía: qué mirar antes de decidir — el tipo de barro, el esmalte, el peso y el borde", provider: "demo" as const, section: "Qué mirar antes de decidir" };
+    const withImages = body(c.title)
+      .replace("## Qué mirar antes de decidir\n", `## Qué mirar antes de decidir\n\n![${inline.alt}](${inline.url})\n`)
+      .replace("\n\n## Cómo lo hacemos en Tierrafina", `\n\n![${info.alt}](${info.url})\n\n## Cómo lo hacemos en Tierrafina`);
     return {
       id: `a_${i + 1}`,
       site_id: demoSite.id,
@@ -170,12 +179,13 @@ export const articles: Article[] = contentItems
       title: c.title,
       slug: c.keyword.replace(/\s+/g, "-"),
       meta_description: `${c.title}. Consejos de taller para acertar a la primera.`,
-      body_md: body(c.title),
+      body_md: i < 3 ? withImages : body(c.title),
       faq: [
         { q: `¿Merece la pena invertir en ${c.keyword}?`, a: "Si buscas piezas que duren y se disfruten a diario, sí." },
         { q: "¿Hacéis envíos a toda España?", a: "Sí, en 48–72 horas y con embalaje reforzado." },
       ],
-      cover_url: null,
+      cover_url: i < 5 ? cover.url : null,
+      images: i < 3 ? [cover, inline, info] : i < 5 ? [cover] : [],
       language: "es",
       word_count: 1450 + i * 120,
       quality_score: [92, 88, 95, 84, 90, 79, 86][i] ?? 85,
@@ -272,12 +282,12 @@ export const demoAudit: Audit = {
 };
 
 export const backlinks: BacklinkLink[] = [
-  { id: "b1", direction: "received", partner_domain: "casaycampo-blog.es", source_article_url: "https://casaycampo-blog.es/mesas-otono", target_url: "https://tierrafina.es/blog/mesa-de-otono", anchor: "mesa de otoño con piezas de barro", domain_rating: 46, status: "live", created_at: iso(-20) },
-  { id: "b2", direction: "received", partner_domain: "cocinadetemporada.com", source_article_url: "https://cocinadetemporada.com/emplatar", target_url: "https://tierrafina.es/vajilla", anchor: "vajilla de gres", domain_rating: 52, status: "live", created_at: iso(-16) },
-  { id: "b3", direction: "given", partner_domain: "huertovertical.com", source_article_url: "https://tierrafina.es/blog/jarron-flores-secas", target_url: "https://huertovertical.com/plantas-interior", anchor: "plantas de interior", domain_rating: 31, status: "live", created_at: iso(-14) },
+  { id: "b1", direction: "received", partner_domain: "casaycampo-blog.es", source_article_url: "https://casaycampo-blog.es/mesas-otono", source_article_title: "Cómo decorar una mesa de otoño con elementos naturales", target_url: "https://tierrafina.es/blog/mesa-de-otono", anchor: "mesa de otoño con piezas de barro", domain_rating: 46, status: "live", created_at: iso(-20) },
+  { id: "b2", direction: "received", partner_domain: "cocinadetemporada.com", source_article_url: "https://cocinadetemporada.com/emplatar", source_article_title: "Cómo emplatar en casa como en un restaurante", target_url: "https://tierrafina.es/vajilla", anchor: "vajilla de gres", domain_rating: 52, status: "live", created_at: iso(-16) },
+  { id: "b3", direction: "given", partner_domain: "huertovertical.com", source_article_url: "https://tierrafina.es/blog/jarron-flores-secas", source_article_title: "Jarrones para flores secas: proporciones que funcionan", target_url: "https://huertovertical.com/plantas-interior", anchor: "plantas de interior", domain_rating: 31, status: "live", created_at: iso(-14) },
   { id: "b4", direction: "received", partner_domain: "regalosconalma.es", source_article_url: null, target_url: "https://tierrafina.es/blog/regalo-boda-ceramica", anchor: "regalar cerámica en una boda", domain_rating: 38, status: "pending", created_at: iso(-3) },
-  { id: "b5", direction: "received", partner_domain: "hosteleriahoy.net", source_article_url: "https://hosteleriahoy.net/proveedores", target_url: "https://tierrafina.es/restaurantes", anchor: "vajilla para restaurantes", domain_rating: 61, status: "live", created_at: iso(-9) },
-  { id: "b6", direction: "given", partner_domain: "cafeteriasconencanto.es", source_article_url: "https://tierrafina.es/blog/tazas-de-ceramica", target_url: "https://cafeteriasconencanto.es/guia", anchor: "cafeterías con encanto", domain_rating: 29, status: "pending", created_at: iso(-1) },
+  { id: "b5", direction: "received", partner_domain: "hosteleriahoy.net", source_article_url: "https://hosteleriahoy.net/proveedores", source_article_title: "Proveedores para abrir un restaurante: la lista completa", target_url: "https://tierrafina.es/restaurantes", anchor: "vajilla para restaurantes", domain_rating: 61, status: "live", created_at: iso(-9) },
+  { id: "b6", direction: "given", partner_domain: "floresdelsur.es", source_article_url: null, source_article_title: "Guía para montar una mesa de otoño con piezas de barro", source_article_id: "a_6", target_url: "https://floresdelsur.es/secar-flores", anchor: "ramos de flores secas", domain_rating: 34, status: "pending", created_at: iso(-1) },
 ];
 
 export const socialPosts: SocialPost[] = [
@@ -289,8 +299,15 @@ export const socialPosts: SocialPost[] = [
 
 export const integrations: Integration[] = [
   { id: "i1", site_id: demoSite.id, provider: "wordpress", status: "connected", created_at: iso(-60) },
-  { id: "i2", site_id: demoSite.id, provider: "gsc", status: "connected", created_at: iso(-60) },
-  { id: "i3", site_id: demoSite.id, provider: "ga4", status: "connected", created_at: iso(-58) },
+  {
+    id: "i2",
+    site_id: demoSite.id,
+    provider: "google",
+    status: "connected",
+    created_at: iso(-60),
+    account_name: "hola@tierrafina.es",
+    meta: { gsc_property: "sc-domain:tierrafina.es", ga4_property: "properties/312456789", ga4_property_name: "Tierrafina · Web", last_sync_at: iso(0) },
+  },
 ];
 
 export const teamMembers = [

@@ -93,6 +93,10 @@ A partir de ahí puedes conceder o quitar el rol desde `/admin/usuarios/<id>`. E
 | `RESEND_API_KEY` (y `EMAIL_FROM`, opcional) | Emails transaccionales |
 | `CRON_SECRET` | Protege `/api/cron/*` |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | OAuth de Search Console y GA4 |
+| `META_APP_ID`, `META_APP_SECRET` | OAuth de Facebook e Instagram (publicar en la página y carruseles) |
+| `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT` | OAuth de Reddit (responder en hilos) |
+| `OAUTH_STATE_SECRET` | Firma (HMAC) del parámetro `state` de OAuth y de las URLs de las diapositivas |
+| `INTEGRATIONS_ENCRYPTION_KEY` | Cifra con AES-256-GCM los tokens OAuth y las credenciales de los CMS en `integrations.config` |
 
 Encontrarás una plantilla en [`.env.example`](.env.example).
 
@@ -123,6 +127,71 @@ Endpoints:
 | `POST /api/stripe/portal` | `{ returnPath? }` | `{ url }` o `{ url: null, demo: true }` |
 | `POST /api/stripe/webhook` | Evento firmado de Stripe | Sincroniza `public.subscriptions`, con una fila por web |
 
+## Conexiones OAuth (Google, Meta, Reddit)
+
+Analítica y redes sociales se conectan con OAuth desde **Ajustes › Analítica**, **Ajustes › Redes sociales** y el paso «Conexiones» del onboarding. En modo demo los botones simulan la conexión.
+
+**Cómo funciona.** `GET /api/oauth/{provider}/start?site=<site_id>&return=<ruta>` comprueba que tienes acceso al sitio, firma un `state` con HMAC (`OAUTH_STATE_SECRET`) que lleva el sitio, la ruta de vuelta y tu usuario, y guarda un nonce en una cookie httpOnly de 10 minutos. Con Google añade PKCE (S256). El callback `/api/oauth/{provider}/callback` valida el state, la cookie y la sesión, canjea el código y guarda los tokens **cifrados** (AES-256-GCM con `INTEGRATIONS_ENCRYPTION_KEY`) en `integrations.config`, con este formato: `{ v: 1, secret: "v1.…", account, meta }`. Los tokens se renuevan solos cuando les quedan menos de 2 minutos (`getAccessToken` en `src/lib/oauth/tokens.ts`). Las credenciales de los CMS usan el mismo cifrado.
+
+1. Genera los dos secretos:
+
+   ```bash
+   openssl rand -base64 32   # INTEGRATIONS_ENCRYPTION_KEY (no la cambies después: no podrías descifrar los tokens)
+   openssl rand -base64 32   # OAUTH_STATE_SECRET
+   ```
+
+2. Aplica `supabase/migrations/0005_integrations.sql`. Crea `analytics_daily`, `analytics_snapshots`, las columnas de publicación de `social_posts` y el bucket público `social` de Storage (de ahí descarga Instagram las imágenes de los carruseles).
+
+URIs de redirección exactas (cámbialas por tu dominio en producción; han de coincidir con `NEXT_PUBLIC_SITE_URL`):
+
+| Proveedor | Redirect URI |
+| --- | --- |
+| Google | `https://tu-dominio/api/oauth/google/callback` y `http://localhost:3000/api/oauth/google/callback` |
+| Meta | `https://tu-dominio/api/oauth/meta/callback` |
+| Reddit | `https://tu-dominio/api/oauth/reddit/callback` (Reddit admite una sola URI por app: crea otra para local) |
+
+### Google Cloud (Search Console y GA4)
+
+1. En [console.cloud.google.com](https://console.cloud.google.com) crea un proyecto y activa estas APIs: **Google Search Console API**, **Google Analytics Data API** y **Google Analytics Admin API**.
+2. En *APIs y servicios › Pantalla de consentimiento de OAuth* elige el tipo «Externo» y añade los scopes `openid`, `email`, `https://www.googleapis.com/auth/webmasters.readonly` y `https://www.googleapis.com/auth/analytics.readonly`. Mientras esté en modo «Prueba», añade a mano los emails que vayan a conectar (100 como máximo; los refresh tokens caducan a los 7 días).
+3. En *Credenciales › Crear credenciales › ID de cliente de OAuth* elige «Aplicación web», añade las Redirect URIs de la tabla y copia el ID y el secreto en `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`.
+4. Para producción, publica la app y pide la verificación de Google. Los dos scopes son «sensibles», no «restringidos»: hace falta verificar el dominio, una política de privacidad pública y un vídeo que enseñe el flujo. No exigen auditoría de seguridad.
+
+Al conectar, si alguna propiedad de Search Console encaja con la web del sitio, se elige sola y se importan 90 días de datos. Si no, el usuario la elige (junto con la de GA4) en Ajustes › Analítica. Las visitas desde IA son sesiones de GA4 cuyo `sessionSource` contiene `chatgpt.com`, `chat.openai.com`, `perplexity.ai`, `gemini.google.com`, `claude.ai` o `copilot.microsoft.com`.
+
+### Meta (Facebook e Instagram)
+
+1. En [developers.facebook.com](https://developers.facebook.com/apps) crea una app de tipo **Empresa** y añade el producto **Inicio de sesión con Facebook para empresas** (o *Facebook Login*).
+2. En *Configuración* del login, añade la Redirect URI en «URI de redireccionamiento de OAuth válidos» y deja activados «Inicio de sesión de OAuth web» y «Modo estricto para URI de redireccionamiento».
+3. Copia el *App ID* y la *App Secret* (Configuración › Básica) en `META_APP_ID` y `META_APP_SECRET`. Rellena allí también la URL de la política de privacidad, la de eliminación de datos y el icono.
+4. Permisos que pedimos: `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `instagram_basic`, `instagram_content_publish` y `business_management`, este último para ver páginas gestionadas desde un Business Manager.
+5. **Revisión de la app.** En modo desarrollo solo funciona con usuarios que tengan un rol en la app. Para clientes reales hace falta:
+   - verificar la empresa (Business Verification);
+   - pedir **acceso avanzado** a cada permiso en *Revisión de la app*, con un screencast por permiso (conectar, elegir página, publicar un carrusel) e instrucciones de prueba;
+   - poner la app en modo «Activo».
+
+   Cuenta con varios días o semanas.
+6. Requisitos del usuario: una **página de Facebook** que gestione y, para Instagram, una **cuenta profesional** (Empresa o Creador) vinculada a esa página. Instagram acepta hasta 50 publicaciones por API cada 24 horas por cuenta.
+
+El token de usuario se canjea por uno de larga duración (unos 60 días). Al elegir la página guardamos su token de página, que no caduca mientras el usuario no cambie su contraseña ni retire los permisos. Instagram descarga cada diapositiva por URL: las renderizamos con `next/og` (`/api/social/slide`, firmadas), las convertimos a JPEG y las subimos al bucket público `social`.
+
+### Reddit
+
+1. En [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps) pulsa «create another app…», elige el tipo **web app** y pon la Redirect URI de la tabla.
+2. Copia el ID (debajo del nombre de la app) y el secreto en `REDDIT_CLIENT_ID` y `REDDIT_CLIENT_SECRET`.
+3. Define `REDDIT_USER_AGENT` con el formato que pide Reddit: `web:yeswecontent:1.0 (by /u/tu_usuario)`.
+4. Scopes: `identity`, `submit` y `read`, con `duration=permanent` para recibir el refresh token. Para uso comercial o volumen alto, Reddit exige aceptar sus [Data API Terms](https://redditinc.com/policies/data-api-terms) y puede pedir que solicites acceso a la API comercial.
+
+Cada respuesta aprobada en Social › Reddit se publica como comentario en el hilo (o como respuesta al comentario, si la URL lo apunta) desde la cuenta conectada.
+
+### Quora
+
+Quora no tiene API pública para publicar. Las sugerencias se quedan en Social › Quora con el botón «Copiar y abrir en Quora»: copia el texto, abre la pregunta y el usuario la marca como publicada.
+
+### Ajustes en otros módulos
+
+- Los CMS se leen con `loadIntegrationConfig(row)` (`src/lib/oauth/tokens.ts`), que descifra y sigue aceptando las filas antiguas en JSON plano.
+
 ## Despliegue en Vercel
 
 1. Importa el repositorio en Vercel. El framework se detecta solo.
@@ -130,6 +199,8 @@ Endpoints:
 3. **Crons** (definidos en `vercel.json`):
    - `/api/cron/publish`, cada hora: publica los artículos programados.
    - `/api/cron/visibility`, a diario a las 05:00 UTC: consulta los asistentes de IA.
+   - `/api/cron/analytics`, a diario a las 04:00 UTC: sincroniza Search Console y GA4 en `analytics_daily`.
+   - `/api/cron/social`, cada 15 minutos: publica en Instagram, Facebook y Reddit lo programado (necesita el plan Pro de Vercel; en Hobby los crons solo pueden ser diarios).
 
    Vercel envía `Authorization: Bearer $CRON_SECRET` y los endpoints rechazan cualquier otra llamada.
 4. Configura el webhook de Stripe con el dominio de producción y verifica el dominio de envío en Resend.

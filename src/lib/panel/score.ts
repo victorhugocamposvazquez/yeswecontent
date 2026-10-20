@@ -48,7 +48,8 @@ const norm = (s: string) =>
     .toLowerCase();
 
 export function scoreArticle(input: ScoreInput): ScoreResult {
-  const body = input.body_md ?? "";
+  // Las imágenes (![alt](url)) no cuentan como texto ni como enlaces.
+  const body = (input.body_md ?? "").replace(/^\s*!\[[^\]]*\]\([^)\s]+\)\s*$/gm, "").replace(/!\[[^\]]*\]\([^)\s]+\)/g, "");
   const plain = body.replace(/[#*>`_[\]()-]/g, " ");
   const words = plain.trim() ? plain.trim().split(/\s+/) : [];
   const wc = words.length;

@@ -33,12 +33,17 @@ export interface Site {
   audience: string | null;
   description: string | null;
   brand_voice: { tone?: string; person?: string; avoid?: string[]; examples?: string[] };
-  seo_settings: { min_words?: number; internal_links?: number; faq?: boolean; schema?: boolean };
+  seo_settings: { min_words?: number; internal_links?: number; faq?: boolean; schema?: boolean; backlinks?: BacklinkPrefs; images?: { inline?: number; infographic?: boolean } };
   visual_style: { style?: string; palette?: string };
+  /** DR estimado (0–100). null o ausente = desconocido. */
+  domain_rating?: number | null;
   schedule: { days: string[]; time: string; mode: "drip" | "batch" };
   onboarding_step: string;
   created_at: string;
 }
+
+/** Preferencias de la red de enlaces (sites.seo_settings.backlinks). */
+export interface BacklinkPrefs { opt_in?: boolean; anchors?: string; min_dr?: number; exclude?: string[] }
 
 export interface Subscription {
   id: string;
@@ -75,6 +80,8 @@ export interface Article {
   body_md: string;
   faq: { q: string; a: string }[];
   cover_url: string | null;
+  /** Imágenes generadas (portada, interiores e infografías). */
+  images?: ArticleImage[];
   language: string;
   word_count: number;
   quality_score: number | null;
@@ -84,6 +91,17 @@ export interface Article {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export type ArticleImageKind = "cover" | "inline" | "infographic";
+export interface ArticleImage {
+  kind: ArticleImageKind;
+  url: string;
+  alt: string;
+  prompt?: string;
+  provider?: "openai" | "editorial" | "infographic" | "demo";
+  /** Título de la sección donde va insertada (imágenes interiores). */
+  section?: string;
 }
 
 export interface AiPrompt { id: string; site_id: string; prompt: string; active: boolean }
@@ -107,6 +125,9 @@ export interface BacklinkLink {
   direction: "received" | "given";
   partner_domain: string;
   source_article_url: string | null;
+  /** Artículo de origen (título e id) cuando se conoce. */
+  source_article_title?: string | null;
+  source_article_id?: string | null;
   target_url: string;
   anchor: string;
   domain_rating: number | null;
@@ -123,12 +144,40 @@ export interface SocialPost {
   thread_url: string | null;
   content: string;
   slides: string[] | null;
-  status: "suggested" | "approved" | "scheduled" | "published" | "dismissed";
+  status: "suggested" | "approved" | "scheduled" | "published" | "dismissed" | "failed";
   scheduled_for: string | null;
   created_at: string;
+  published_url?: string | null;
+  published_at?: string | null;
+  last_error?: string | null;
 }
 
-export interface Integration { id: string; site_id: string; provider: string; status: string; created_at: string }
+/** Datos no sensibles de una integración (los secretos van cifrados aparte). */
+export interface IntegrationMeta {
+  connected_at?: string;
+  last_error?: string | null;
+  last_sync_at?: string | null;
+  // Google
+  gsc_property?: string | null;
+  ga4_property?: string | null;
+  ga4_property_name?: string | null;
+  // Meta
+  page_id?: string | null;
+  page_name?: string | null;
+  ig_user_id?: string | null;
+  ig_username?: string | null;
+}
+
+export interface Integration {
+  id: string;
+  site_id: string;
+  provider: string;
+  status: string;
+  created_at: string;
+  /** Cuenta conectada por OAuth (email de Google, u/usuario de Reddit…). */
+  account_name?: string | null;
+  meta?: IntegrationMeta;
+}
 export interface Lead { id: string; email: string | null; url: string | null; tool: string; created_at: string }
 export interface CaseStudy {
   id: string;
@@ -143,7 +192,7 @@ export interface CaseStudy {
   published: boolean;
 }
 export interface ProductUpdate { id: string; title: string; body_md: string; tag: string | null; published_at: string }
-export interface TrafficPoint { date: string; clicks: number; impressions: number; ai_visits: number }
+export interface TrafficPoint { date: string; clicks: number; impressions: number; ai_visits: number; sessions?: number }
 
 export interface AdminUserRow {
   id: string;
@@ -154,5 +203,13 @@ export interface AdminUserRow {
   plan_id: string | null;
   status: Subscription["status"] | null;
   mrr_eur: number;
+  created_at: string;
+}
+
+export interface CreditEntry {
+  id: string;
+  delta: number;
+  reason: "welcome" | "earned" | "spent" | "refund" | "adjustment";
+  note: string | null;
   created_at: string;
 }

@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { articleHtml, readError } from "./html";
+import { absoluteAsset, articleHtml, readError } from "./html";
 import type { PublishResult, PublishableArticle, WebhookConfig } from "./types";
 
 export const signPayload = (secret: string, timestamp: string, body: string) => createHmac("sha256", secret).update(`${timestamp}.${body}`).digest("hex");
@@ -21,7 +21,8 @@ export async function publishWebhook(a: PublishableArticle, c: WebhookConfig): P
       body_markdown: a.body_md,
       body_html: articleHtml(a),
       faq: a.faq,
-      cover_url: a.cover_url,
+      cover_url: absoluteAsset(a.cover_url),
+      images: (a.images ?? []).map((i) => ({ ...i, url: absoluteAsset(i.url) })),
       schema_jsonld: a.schema_jsonld ?? null,
     },
     sent_at: new Date().toISOString(),

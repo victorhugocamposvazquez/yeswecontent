@@ -7,6 +7,7 @@ import { Badge, Button, Card, Field, Input, Select, Textarea } from "@/component
 import type { Plan } from "@/lib/types";
 import { cn, eur } from "@/lib/utils";
 import { finishOnboarding, saveOnboardingStep } from "./actions";
+import { ConnectionsStep, type OAuthReturn } from "./connections-step";
 import { initialState, type OnboardingState } from "./types";
 
 type StepId = "web" | "agencia" | "equipo" | "dominio" | "llamada" | "negocio" | "idioma" | "voz" | "competidores" | "seo" | "conectar" | "plan" | "encuesta";
@@ -67,6 +68,18 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
   const [pending, startTransition] = useTransition();
   const [aiLoading, setAiLoading] = useState(false);
   const [aiNote, setAiNote] = useState<string | null>(null);
+  const [oauth, setOauth] = useState<OAuthReturn | null>(null);
+
+  // Vuelta de una conexión OAuth (?oauth=google&estado=ok|error&motivo=…): lo mostramos y limpiamos la URL.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const provider = q.get("oauth");
+    const estado = q.get("estado");
+    if (provider && estado) {
+      setOauth({ provider, estado, motivo: q.get("motivo") ?? undefined });
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
 
   // Recupera el progreso si se recarga la página.
   useEffect(() => {
@@ -479,9 +492,9 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
         )}
 
         {step === "conectar" && (
-          <StepHead title="Conecta tus herramientas" intro="Para medir resultados y publicar sin que muevas un dedo. Puedes hacerlo ahora o más tarde.">
+          <StepHead title="Conecta tus herramientas" intro="Para medir resultados y publicar desde tus cuentas sin que muevas un dedo. Puedes hacerlo ahora o más tarde desde Ajustes.">
             <div className="space-y-3">
-              <CheckCard checked={s.gsc} onChange={(v) => set("gsc", v)} title="Google Search Console" desc="Clics, impresiones y oportunidades de palabras clave." />
+              <ConnectionsStep siteId={siteId} demo={demo} oauth={oauth} />
               <fieldset>
                 <legend className="mb-2 mt-3 text-sm font-medium text-ink-2">¿Dónde está tu blog?</legend>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">

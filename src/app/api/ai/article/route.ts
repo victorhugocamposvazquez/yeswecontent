@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentSite, listArticles, listContentItems } from "@/lib/data";
+import { getCurrentSite, listContentItems } from "@/lib/data";
+import { isDemo } from "@/lib/env";
+import { listInternalCandidates } from "@/lib/links";
 import { requireUser } from "@/lib/panel/auth";
-import { generateArticle } from "@/lib/panel/generate";
+import { generateArticleWithEngine } from "@/lib/panel/generate";
 
 export const maxDuration = 300;
 
@@ -12,6 +14,8 @@ const input = z.object({
   keyword: z.string().optional(),
   intent: z.enum(["informational", "commercial", "transactional", "navigational"]).nullable().optional(),
   cluster: z.string().nullable().optional(),
+  /** Generar también portada e imágenes (por defecto solo en demo, donde no cuesta nada). */
+  images: z.boolean().optional(),
 });
 
 /**
@@ -35,10 +39,12 @@ export async function POST(req: Request) {
   }
   if (!item) return NextResponse.json({ error: "Indica un tema del plan o un título y una palabra clave." }, { status: 400 });
 
-  const links = (await listArticles(site.id))
-    .filter((a) => a.published_url)
-    .slice(0, 12)
-    .map((a) => ({ title: a.title, url: new URL(a.published_url!).pathname }));
-  const article = await generateArticle(item, site, links);
+  // Vista previa del motor completo. Los enlaces de la red solo se simulan en demo:
+  // fuera de demo se insertan y registran al guardar el artículo (writeNow).
+  const article = await generateArticleWithEngine(item, site, {
+    internalCandidates: await listInternalCandidates(site.id),
+    images: parsed.data.images ?? isDemo,
+    backlinks: isDemo,
+  });
   return NextResponse.json(article);
 }

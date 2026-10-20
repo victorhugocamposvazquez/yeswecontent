@@ -152,8 +152,7 @@ export async function getPortalResults(site: Site): Promise<PortalResults> {
       checks: demo.demoClientChecks(site.id),
       analyticsConnected: true,
     };
-  const [articles, items, vis, analytics] = await Promise.all([listArticles(site.id), listContentItems(site.id), getVisibility(site.id), getAnalytics()]);
-  // TODO: analítica por sitio cuando exista la sincronización con Search Console.
+  const [articles, items, vis, analytics] = await Promise.all([listArticles(site.id), listContentItems(site.id), getVisibility(site.id), getAnalytics(site.id)]);
   return { traffic: analytics.traffic, articles, items, checks: vis.checks, analyticsConnected: analytics.connected };
 }
 

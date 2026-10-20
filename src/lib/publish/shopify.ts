@@ -1,4 +1,4 @@
-import { articleHtml, readError } from "./html";
+import { absoluteAsset, articleHtml, coverAlt, readError } from "./html";
 import type { PublishResult, PublishableArticle, ShopifyConfig } from "./types";
 
 /** Shopify Admin REST: crea un artículo en un blog de la tienda. */
@@ -16,7 +16,7 @@ export async function publishShopify(a: PublishableArticle, c: ShopifyConfig): P
         body_html: articleHtml(a),
         summary_html: a.meta_description ?? "",
         published: true,
-        ...(a.cover_url ? { image: { src: a.cover_url, alt: a.title } } : {}),
+        ...(a.cover_url ? { image: { src: absoluteAsset(a.cover_url), alt: coverAlt(a) } } : {}),
         metafields: a.meta_description
           ? [{ key: "description_tag", value: a.meta_description, type: "single_line_text_field", namespace: "global" }]
           : [],

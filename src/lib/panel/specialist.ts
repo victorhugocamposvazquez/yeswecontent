@@ -67,7 +67,7 @@ export async function getSpecialistContext(site: Site): Promise<SpecialistContex
     getVisibility(site.id),
     listContentItems(site.id),
     listArticles(site.id),
-    getAnalytics(),
+    getAnalytics(site.id),
     listCompetitors(site.id),
   ]);
   const plan = plans.find((p) => p.id === sub?.plan_id) ?? null;

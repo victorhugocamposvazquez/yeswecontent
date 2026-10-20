@@ -15,7 +15,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
     listArticles(site.id),
     getVisibility(site.id),
     getLatestAudit(site.id),
-    getAnalytics(),
+    getAnalytics(site.id),
     listBacklinks(site.id),
     getWorkspace(site.workspace_id),
   ]);

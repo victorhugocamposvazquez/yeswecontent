@@ -7,6 +7,7 @@ import { getArticle, getCurrentSite, listContentItems } from "@/lib/data";
 import { listIntegrations } from "@/lib/panel/data";
 import { fmtDate } from "@/lib/utils";
 import { publishNow, regenerateArticle, saveArticle, scheduleArticle } from "../../actions";
+import { regenerateArticleImage } from "../image-actions";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const a = await getArticle((await params).id);
@@ -48,6 +49,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
         site={{ name: site.name, url: site.url, min_words: site.seo_settings?.min_words, internal_links: site.seo_settings?.internal_links, schema: site.seo_settings?.schema }}
         cmsLabel={cms ? cms.provider.charAt(0).toUpperCase() + cms.provider.slice(1) : null}
         actions={{ save: saveArticle, regenerate: regenerateArticle, publish: publishNow, schedule: scheduleArticle }}
+        imageAction={regenerateArticleImage}
       />
     </>
   );

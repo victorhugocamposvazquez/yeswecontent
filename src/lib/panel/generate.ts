@@ -1,7 +1,9 @@
 import "server-only";
 import { z } from "zod";
 import { hasClaude } from "@/lib/env";
-import type { ContentItem, Site } from "@/lib/types";
+import { generateArticleImages } from "@/lib/images";
+import { insertInternalLinks, planBacklinks, type BacklinkPlacement, type InternalCandidate } from "@/lib/links";
+import type { ArticleImage, ContentItem, Site } from "@/lib/types";
 import { slugify } from "@/lib/utils";
 import { askClaudeJSON } from "./claude";
 import { SYSTEM_STRATEGIST, analyzeSitePrompt, articlePrompt, contentPlanPrompt } from "./prompts";
@@ -175,6 +177,96 @@ export async function generateArticle(item: ArticleItem, site: ArticleSite, inte
     internal_links: site.seo_settings?.internal_links,
   });
   return { ...base, slug, schema_jsonld: buildJsonLd(base, site), score, source };
+}
+
+/* ───────── Motor completo: texto → imágenes → enlaces internos → red → puntuación ───────── */
+
+export type EngineStep = "ok" | "skipped" | "failed";
+export interface EngineOptions {
+  /** Artículos publicados del propio sitio para el enlazado interno. */
+  internalCandidates?: InternalCandidate[];
+  images?: boolean;
+  backlinks?: boolean;
+}
+export type EngineArticle = GeneratedArticle & {
+  cover_url: string | null;
+  images: ArticleImage[];
+  internal: { url: string; anchor: string; title: string }[];
+  backlinks: BacklinkPlacement[];
+  steps: { images: EngineStep; internal: EngineStep; backlinks: EngineStep };
+};
+
+/**
+ * Genera el artículo completo. Cada paso es independiente: si uno falla, el
+ * artículo sigue adelante sin él (nunca bloquea la publicación).
+ * Los enlaces de la red se devuelven en `backlinks` y se registran con
+ * commitBacklinks() en cuanto el artículo tenga id.
+ */
+export async function generateArticleWithEngine(item: ArticleItem, site: Site, opts: EngineOptions = {}): Promise<EngineArticle> {
+  const candidates = opts.internalCandidates ?? [];
+  const toPath = (u: string) => {
+    try {
+      return new URL(u).pathname;
+    } catch {
+      return u;
+    }
+  };
+  const base = await generateArticle(item, site, candidates.slice(0, 12).map((c) => ({ title: c.title, url: toPath(c.url) })));
+  let body = base.body_md;
+  const steps: EngineArticle["steps"] = { images: "skipped", internal: "skipped", backlinks: "skipped" };
+  let cover_url: string | null = null;
+  let images: ArticleImage[] = [];
+  let internal: EngineArticle["internal"] = [];
+  let backlinks: BacklinkPlacement[] = [];
+
+  if (opts.images !== false) {
+    try {
+      const r = await generateArticleImages({ siteId: site.id, site, title: base.title, keyword: item.keyword, cluster: item.cluster, slug: base.slug, body_md: body });
+      body = r.body_md;
+      cover_url = r.cover_url;
+      images = r.images;
+      steps.images = "ok";
+    } catch (e) {
+      console.warn("[engine] imágenes:", e instanceof Error ? e.message : e);
+      steps.images = "failed";
+    }
+  }
+
+  if (candidates.length) {
+    try {
+      const r = await insertInternalLinks({ title: base.title, keyword: item.keyword, cluster: item.cluster, body_md: body, slug: base.slug }, candidates, site.seo_settings?.internal_links ?? 3);
+      body = r.body_md;
+      internal = r.inserted;
+      steps.internal = "ok";
+    } catch (e) {
+      console.warn("[engine] enlaces internos:", e instanceof Error ? e.message : e);
+      steps.internal = "failed";
+    }
+  }
+
+  if (opts.backlinks !== false) {
+    try {
+      const r = await planBacklinks(site, { title: base.title, keyword: item.keyword, cluster: item.cluster, body_md: body });
+      body = r.body_md;
+      backlinks = r.placements;
+      steps.backlinks = "ok";
+    } catch (e) {
+      console.warn("[engine] red de enlaces:", e instanceof Error ? e.message : e);
+      steps.backlinks = "failed";
+    }
+  }
+
+  const score = scoreArticle({
+    title: base.title,
+    body_md: body,
+    keyword: item.keyword,
+    meta_description: base.meta_description,
+    faq: base.faq,
+    schema: site.seo_settings?.schema !== false,
+    min_words: site.seo_settings?.min_words,
+    internal_links: site.seo_settings?.internal_links,
+  });
+  return { ...base, body_md: body, score, cover_url, images, internal, backlinks, steps };
 }
 
 function demoArticle(item: ArticleItem, site: ArticleSite, links: { title: string; url: string }[]) {

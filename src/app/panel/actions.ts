@@ -1,18 +1,23 @@
 "use server";
 
+import { headlessDelivery } from "@/lib/headless/delivery";
+import { notifyFrameworkSiteForArticle } from "@/lib/headless/webhook";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getCurrentSite, getProfile, listArticles, listContentItems } from "@/lib/data";
+import { getCurrentSite, getProfile, listContentItems } from "@/lib/data";
 import { isDemo } from "@/lib/env";
 import { DEMO_NOTE, type ActionState } from "@/lib/panel/action-types";
 import { getGlobalSettings } from "@/lib/panel/app-settings";
 import { runAudit } from "@/lib/panel/audit";
 import { listCompetitors } from "@/lib/panel/data";
-import { buildJsonLd, generateArticle, generatePlan } from "@/lib/panel/generate";
+import { commitBacklinks, ensureBacklinksBeforePublish, listInternalCandidates, markBacklinksLive } from "@/lib/links";
+import { buildJsonLd, generateArticleWithEngine, generatePlan } from "@/lib/panel/generate";
 import { scoreArticle } from "@/lib/panel/score";
 import { runVisibilityCheck } from "@/lib/panel/visibility";
-import { CMS_PROVIDERS, publish, toIntegrationConfig } from "@/lib/publish";
+import { hasEncryptionKey } from "@/lib/crypto";
+import { loadIntegrationConfig, sealConfig } from "@/lib/oauth/tokens";
+import { CMS_PROVIDERS, publish } from "@/lib/publish";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import type { Site } from "@/lib/types";
 import { slugify } from "@/lib/utils";
@@ -146,22 +151,23 @@ export async function removeCompetitor(_prev: ActionState, fd: FormData): Promis
   return ok("Competidor eliminado.");
 }
 
-/** Guarda credenciales de una integración (CMS, analítica, redes). */
+/** Guarda las credenciales de un CMS, cifradas (AES-256-GCM). Analítica y redes van por OAuth (/api/oauth/…). */
 export async function connectIntegration(provider: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const config: Record<string, string | boolean> = {};
+  if (["google", "gsc", "ga4", "meta", "reddit", "quora"].includes(provider)) return fail("Esta conexión se hace con el botón «Conectar» (OAuth).");
+  if (!CMS_PROVIDERS.includes(provider as (typeof CMS_PROVIDERS)[number])) return fail("Integración desconocida.");
+  const config: Record<string, string> = {};
   for (const [k, v] of fd.entries()) if (!k.startsWith("$") && typeof v === "string" && v.trim()) config[k] = v.trim();
-  const oauth = ["gsc", "ga4", "meta", "reddit", "quora"].includes(provider);
-  if (!oauth && !Object.keys(config).length) return fail("Rellena los datos de conexión.");
-  if (isDemo) return ok(oauth ? "Conexión simulada." : "Integración guardada.");
+  if (!Object.keys(config).length) return fail("Rellena los datos de conexión.");
+  if (isDemo) return ok("Integración guardada.");
+  if (!hasEncryptionKey()) return fail("Falta INTEGRATIONS_ENCRYPTION_KEY en el servidor: no guardamos credenciales sin cifrar.");
   const site = await siteOrFail();
   const sb = await createClient();
-  // TODO: cifrar `config` (Supabase Vault) antes de guardarlo. TODO: flujo OAuth real para gsc/ga4/meta/reddit.
   const { error } = await sb
     .from("integrations")
-    .upsert({ site_id: site.id, provider, status: oauth ? "pending" : "connected", config }, { onConflict: "site_id,provider" });
+    .upsert({ site_id: site.id, provider, status: "connected", config: sealConfig(config) }, { onConflict: "site_id,provider" });
   if (error) return fail(error.message);
   revalidatePath("/panel/ajustes", "layout");
-  return ok(oauth ? "Solicitud registrada. El acceso OAuth se activará en cuanto configures las credenciales de la app." : "Integración guardada.");
+  return ok("Integración guardada.");
 }
 
 export async function disconnectIntegration(provider: string): Promise<ActionState> {
@@ -262,29 +268,35 @@ export async function writeNow(_prev: ActionState, fd: FormData): Promise<Action
   if (!item) return fail("No encontramos ese tema.");
   const sb = await createClient();
   await sb.from("content_items").update({ status: "writing" }).eq("id", id);
-  const links = (await listArticles(site.id)).filter((a) => a.published_url).slice(0, 12).map((a) => ({ title: a.title, url: new URL(a.published_url!).pathname }));
-  const g = await generateArticle(item, site, links);
-  const { data, error } = await sb
-    .from("articles")
-    .insert({
-      site_id: site.id,
-      content_item_id: item.id,
-      title: g.title,
-      slug: g.slug,
-      meta_description: g.meta_description,
-      body_md: g.body_md,
-      faq: g.faq,
-      schema_jsonld: g.schema_jsonld,
-      language: item.language,
-      word_count: g.score.word_count,
-      quality_score: g.score.score,
-      quality_breakdown: g.score.breakdown,
-      status: "review",
-    })
-    .select("id")
-    .single();
-  if (error) return fail(error.message);
+  // Motor: texto → imágenes → enlaces internos → red de enlaces → puntuación.
+  const g = await generateArticleWithEngine(item, site, { internalCandidates: await listInternalCandidates(site.id) });
+  const row = {
+    site_id: site.id,
+    content_item_id: item.id,
+    title: g.title,
+    slug: g.slug,
+    meta_description: g.meta_description,
+    body_md: g.body_md,
+    faq: g.faq,
+    schema_jsonld: g.schema_jsonld,
+    cover_url: g.cover_url,
+    images: g.images,
+    language: item.language,
+    word_count: g.score.word_count,
+    quality_score: g.score.score,
+    quality_breakdown: g.score.breakdown,
+    status: "review",
+  };
+  let { data, error } = await sb.from("articles").insert(row).select("id").single();
+  if (error && /images/.test(error.message)) {
+    // Migración 0006 sin aplicar: guardamos sin la columna images.
+    const { images: _images, ...rest } = row;
+    void _images;
+    ({ data, error } = await sb.from("articles").insert(rest).select("id").single());
+  }
+  if (error || !data) return fail(error?.message ?? "No se pudo guardar el artículo.");
   await sb.from("content_items").update({ status: "review" }).eq("id", id);
+  if (g.backlinks.length) await commitBacklinks(data.id, site.id, g.backlinks).catch((e) => console.warn("[links]", e));
   redirect(`/panel/articulos/${data.id}`);
 }
 
@@ -335,12 +347,17 @@ export async function regenerateArticle(_prev: ActionState, fd: FormData): Promi
   const { data: art } = await sb.from("articles").select("title, content_item_id").eq("id", id).maybeSingle();
   if (!art) return fail("No encontramos ese artículo.");
   const item = art.content_item_id ? (await listContentItems(site.id)).find((c) => c.id === art.content_item_id) : null;
-  const g = await generateArticle(item ?? { title: art.title, keyword: art.title, intent: null, cluster: null }, site);
-  const { error } = await sb
-    .from("articles")
-    .update({ title: g.title, meta_description: g.meta_description, body_md: g.body_md, faq: g.faq, schema_jsonld: g.schema_jsonld, word_count: g.score.word_count, quality_score: g.score.score, quality_breakdown: g.score.breakdown, status: "review", updated_at: new Date().toISOString() })
-    .eq("id", id);
+  const g = await generateArticleWithEngine(item ?? { title: art.title, keyword: art.title, intent: null, cluster: null }, site, { internalCandidates: await listInternalCandidates(site.id, { excludeId: id }) });
+  const patch = { title: g.title, meta_description: g.meta_description, body_md: g.body_md, faq: g.faq, schema_jsonld: g.schema_jsonld, cover_url: g.cover_url, images: g.images, word_count: g.score.word_count, quality_score: g.score.score, quality_breakdown: g.score.breakdown, status: "review", updated_at: new Date().toISOString() };
+  let { error } = await sb.from("articles").update(patch).eq("id", id);
+  if (error && /images/.test(error.message)) {
+    const { images: _images, ...rest } = patch;
+    void _images;
+    ({ error } = await sb.from("articles").update(rest).eq("id", id));
+  }
   if (error) return fail(error.message);
+  // Retira los enlaces pendientes del texto anterior y registra los nuevos.
+  await commitBacklinks(id, site.id, g.backlinks).catch((e) => console.warn("[links]", e));
   revalidatePath(`/panel/articulos/${id}`);
   return ok(`Artículo regenerado (${g.score.score}/100).`);
 }
@@ -353,12 +370,26 @@ export async function publishNow(_prev: ActionState, fd: FormData): Promise<Acti
   const { data: art } = await sb.from("articles").select("*").eq("id", id).maybeSingle();
   if (!art) return fail("No encontramos ese artículo.");
   const { data: rows } = await sb.from("integrations").select("provider, config, status").eq("site_id", site.id).in("provider", CMS_PROVIDERS);
-  const integration = (rows ?? []).filter((r) => r.status === "connected").map(toIntegrationConfig).find(Boolean);
-  if (!integration) return fail("Conecta tu CMS en Ajustes › Publicación para publicar.");
-  const res = await publish({ ...art, schema_jsonld: art.schema_jsonld ?? buildJsonLd(art, site) }, integration);
+  const integration = (rows ?? []).filter((r) => r.status === "connected").map(loadIntegrationConfig).find(Boolean);
+  const headless = integration ? null : await headlessDelivery(sb, site.id, art.slug);
+  if (!integration && !headless) return fail("Conecta tu CMS en Ajustes › Publicación, o activa la API o el blog alojado en Integraciones.");
+  // Si el artículo nunca pasó por la red, insertamos sus enlaces ahora (sin bloquear si falla).
+  let body_md = art.body_md as string;
+  try {
+    const item = art.content_item_id ? (await listContentItems(site.id)).find((c) => c.id === art.content_item_id) : null;
+    body_md = await ensureBacklinksBeforePublish({ id, title: art.title, body_md, keyword: item?.keyword, cluster: item?.cluster }, site);
+  } catch (e) {
+    console.warn("[links] antes de publicar:", e);
+  }
+  const res = integration
+    ? await publish({ ...art, body_md, schema_jsonld: art.schema_jsonld ?? buildJsonLd(art, site) }, integration)
+    : { ok: true, url: headless!.url, error: undefined as string | undefined };
+  if (!integration) await sb.from("articles").update({ body_md }).eq("id", id);
   const now = new Date().toISOString();
   await sb.from("articles").update(res.ok ? { status: "published", published_url: res.url, published_at: now, updated_at: now } : { status: "failed", updated_at: now }).eq("id", id);
   if (res.ok && art.content_item_id) await sb.from("content_items").update({ status: "published" }).eq("id", art.content_item_id);
+  if (res.ok) await markBacklinksLive(id, res.url).catch((e) => console.warn("[links]", e));
+  if (res.ok) await notifyFrameworkSiteForArticle(site.id, { id, slug: art.slug, title: art.title, language: art.language, published_url: res.url, published_at: now, updated_at: now, tags: art.tags ?? [] });
   revalidatePath(`/panel/articulos/${id}`);
   return res.ok ? ok(`Publicado${res.url ? `: ${res.url}` : ""}.`) : fail(`No se ha podido publicar: ${res.error ?? "error desconocido"}`);
 }
@@ -432,14 +463,70 @@ export async function rerunAudit(): Promise<ActionState> {
 
 /* ───────── social ───────── */
 
+const SOCIAL_PROVIDER: Record<string, string | null> = { reddit: "reddit", instagram: "meta", facebook: "meta", quora: null };
+const SOCIAL_LABEL: Record<string, string> = { reddit: "Reddit", instagram: "Instagram y Facebook", facebook: "Instagram y Facebook" };
+
+/** Momento de publicación: "now" | "d1" | "d2" | "d3" (días a la hora del calendario del sitio, UTC como el cron de artículos). */
+function socialWhen(when: string, time: string): Date {
+  if (!/^d[1-7]$/.test(when)) return new Date();
+  const [h, m] = (/^\d{2}:\d{2}$/.test(time) ? time : "09:00").split(":").map(Number);
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + Number(when.slice(1)));
+  d.setUTCHours(h, m, 0, 0);
+  return d;
+}
+
 export async function updateSocialPost(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const op = str(fd, "op");
-  const msg: Record<string, string> = { approve: "Aprobada. Se publicará desde tu cuenta conectada.", dismiss: "Sugerencia descartada.", save: "Texto actualizado.", schedule: "Carrusel programado." };
-  if (isDemo) return ok(msg[op] ?? "Hecho.");
+  const id = str(fd, "id");
+  const msg: Record<string, string> = {
+    approve: "Aprobada. Se publicará desde tu cuenta en los próximos 15 minutos.",
+    dismiss: "Sugerencia descartada.",
+    save: "Texto actualizado.",
+    schedule: "Programado. Lo publicaremos desde tu cuenta conectada.",
+    manual: "Marcada como publicada.",
+    retry: "Lo volveremos a intentar en los próximos 15 minutos.",
+    unschedule: "Programación cancelada.",
+  };
+  if (isDemo) return ok(op === "schedule" && str(fd, "when") !== "now" ? "Carrusel programado." : (msg[op] ?? "Hecho."));
   const sb = await createClient();
-  const patch =
-    op === "approve" ? { status: "approved" } : op === "dismiss" ? { status: "dismissed" } : op === "schedule" ? { status: "scheduled", scheduled_for: new Date(Date.now() + 86_400_000).toISOString() } : { content: str(fd, "content") };
-  const { error } = await sb.from("social_posts").update(patch).eq("id", str(fd, "id"));
+  const { data: post } = await sb.from("social_posts").select("id, site_id, channel, status").eq("id", id).maybeSingle();
+  if (!post) return fail("No encontramos esa publicación.");
+
+  let patch: Record<string, unknown>;
+  switch (op) {
+    case "approve":
+    case "schedule":
+    case "retry": {
+      const provider = SOCIAL_PROVIDER[post.channel as string];
+      if (!provider) {
+        // Quora: sin API. Queda aprobada para copiar y publicar a mano.
+        patch = { status: "approved" };
+        break;
+      }
+      const { data: integ } = await sb.from("integrations").select("status, config").eq("site_id", post.site_id).eq("provider", provider).maybeSingle();
+      if (!integ || integ.status !== "connected") return fail(`Conecta ${SOCIAL_LABEL[post.channel as string]} en Ajustes › Redes sociales para publicar.`);
+      if (provider === "meta" && !(integ.config as { meta?: { page_id?: string } } | null)?.meta?.page_id) return fail("Elige tu página de Facebook en Ajustes › Redes sociales.");
+      if (post.channel === "instagram" && !(integ.config as { meta?: { ig_user_id?: string } } | null)?.meta?.ig_user_id) return fail("Tu página de Facebook no tiene una cuenta profesional de Instagram vinculada.");
+      const site = await siteOrFail();
+      const at = op === "schedule" ? socialWhen(str(fd, "when"), site.schedule?.time ?? "09:00") : new Date();
+      patch = { status: "scheduled", scheduled_for: at.toISOString(), ...(op === "retry" ? { attempts: 0, last_error: null } : {}) };
+      if (op === "schedule") msg.schedule = at.getTime() - Date.now() < 3_600_000 ? "Programado: saldrá en los próximos 15 minutos." : `Programado para el ${new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).format(at)} (UTC).`;
+      break;
+    }
+    case "unschedule":
+      patch = { status: "approved", scheduled_for: null };
+      break;
+    case "dismiss":
+      patch = { status: "dismissed" };
+      break;
+    case "manual":
+      patch = { status: "published", published_at: new Date().toISOString() };
+      break;
+    default:
+      patch = { content: str(fd, "content") };
+  }
+  const { error } = await sb.from("social_posts").update(patch).eq("id", id);
   if (error) return fail(error.message);
   revalidatePath("/panel/social");
   return ok(msg[op] ?? "Hecho.");

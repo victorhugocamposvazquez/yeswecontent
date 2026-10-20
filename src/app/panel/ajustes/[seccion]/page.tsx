@@ -4,7 +4,6 @@ import {
   CalendarioSection,
   CatalogoSection,
   CompetidoresSection,
-  ConnectList,
   CuentaSection,
   EquipoSection,
   EscrituraSection,
@@ -19,7 +18,12 @@ import {
 import { SETTINGS_SECTIONS } from "@/components/panel/settings-config";
 import { getCurrentSite, getProfile, getSubscription, listArticles, listPlans } from "@/lib/data";
 import { siteUrl } from "@/lib/env";
+import { ConnectionsList, OAuthNotice } from "@/components/panel/connections";
 import { getWorkspace, listCompetitors, listIntegrations, listInvoices, listTeam } from "@/lib/panel/data";
+import { getConnectionDetails } from "@/lib/oauth/connections";
+import { isDemo } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
+import { Section } from "@/components/panel/settings-sections";
 
 const ALL = SETTINGS_SECTIONS.flatMap((g) => g.items);
 
@@ -28,8 +32,11 @@ export async function generateMetadata({ params }: { params: Promise<{ seccion: 
   return { title: `${ALL.find((s) => s.id === seccion)?.label ?? "Ajustes"} · Ajustes` };
 }
 
-export default async function SettingsSectionPage({ params }: { params: Promise<{ seccion: string }> }) {
+type Search = { oauth?: string; estado?: string; motivo?: string };
+
+export default async function SettingsSectionPage({ params, searchParams }: { params: Promise<{ seccion: string }>; searchParams: Promise<Search> }) {
   const { seccion } = await params;
+  const sp = await searchParams;
   if (!ALL.some((s) => s.id === seccion)) notFound();
   const site = (await getCurrentSite())!;
 
@@ -61,30 +68,24 @@ export default async function SettingsSectionPage({ params }: { params: Promise<
       return <PublicacionSection site={site} integrations={integrations} articles={articles} />;
     }
     case "analitica":
+    case "social": {
+      const simulated = isDemo && sp.estado === "ok" && sp.oauth ? [sp.oauth] : [];
+      const details = await getConnectionDetails(isDemo ? null : await createClient(), site.id, { simulated });
+      const isSocial = seccion === "social";
       return (
-        <ConnectList
-          title="Analítica"
-          intro="Conecta tus cuentas de Google para ver clics, impresiones y conversiones en el panel y en los informes."
-          integrations={await listIntegrations(site.id)}
-          items={[
-            { id: "gsc", name: "Google Search Console", desc: "Clics, impresiones, posiciones y consultas." },
-            { id: "ga4", name: "Google Analytics 4", desc: "Sesiones, conversiones y tráfico desde asistentes de IA." },
-          ]}
-        />
+        <Section
+          title={isSocial ? "Redes sociales" : "Analítica"}
+          intro={
+            isSocial
+              ? "Publicamos los carruseles y las respuestas que apruebes desde tus propias cuentas. Puedes desconectarlas cuando quieras."
+              : "Conecta tu cuenta de Google para ver clics, impresiones y visitas desde IA en el panel y en los informes. Solo pedimos permisos de lectura."
+          }
+        >
+          <OAuthNotice provider={sp.oauth} estado={sp.estado} motivo={sp.motivo} demo={isDemo} />
+          <ConnectionsList details={details} siteId={site.id} returnTo={`/panel/ajustes/${seccion}`} show={isSocial ? ["meta", "reddit", "quora"] : ["google"]} />
+        </Section>
       );
-    case "social":
-      return (
-        <ConnectList
-          title="Redes sociales"
-          intro="Publicamos los carruseles y las respuestas que apruebes desde tus propias cuentas."
-          integrations={await listIntegrations(site.id)}
-          items={[
-            { id: "meta", name: "Instagram y Facebook", desc: "Carruseles a partir de tus artículos." },
-            { id: "reddit", name: "Reddit", desc: "Respuestas útiles en conversaciones de tu sector." },
-            { id: "quora", name: "Quora", desc: "Respuestas a preguntas donde tu experiencia suma." },
-          ]}
-        />
-      );
+    }
     case "catalogo": {
       const integrations = await listIntegrations(site.id);
       return <CatalogoSection shopifyConnected={integrations.some((i) => i.provider === "shopify") || site.id === "s_tierrafina"} />;

@@ -1,6 +1,8 @@
 "use server";
 
 import { resolveCname } from "node:dns/promises";
+import { hasEncryptionKey } from "@/lib/crypto";
+import { sealConfig } from "@/lib/oauth/tokens";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -192,6 +194,7 @@ const CMS_FIELDS: Record<Provider, { key: string; url?: boolean }[]> = {
   webflow: [{ key: "token" }, { key: "collection_id" }],
   ghost: [{ key: "url", url: true }, { key: "admin_key" }],
   webhook: [{ key: "url", url: true }, { key: "secret" }],
+  github: [{ key: "token" }, { key: "owner" }, { key: "repo" }, { key: "branch" }],
 };
 
 export async function saveClientCms(_prev: ActionState, fd: FormData): Promise<ActionState> {
@@ -211,7 +214,10 @@ export async function saveClientCms(_prev: ActionState, fd: FormData): Promise<A
     }
     if (isDemo) return ok("CMS conectado. Publicaremos directamente en tu web.");
     const sb = await createClient();
-    const { error } = await sb.from("integrations").upsert({ site_id: ctx.site.id, provider, status: "connected", config }, { onConflict: "site_id,provider" });
+    const { error } = await sb
+      .from("integrations")
+      // Cifrado AES-256-GCM (mismo formato que el panel); sin clave se guarda como antes.
+      .upsert({ site_id: ctx.site.id, provider, status: "connected", config: hasEncryptionKey() ? sealConfig(config) : config }, { onConflict: "site_id,provider" });
     if (error) return fail("No hemos podido guardar la conexión.");
     revalidatePath("/clientes/ajustes/hosting");
     return ok("CMS conectado. Publicaremos directamente en tu web.");

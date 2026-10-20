@@ -18,7 +18,7 @@ export default async function OverviewPage() {
     listArticles(site.id),
     getVisibility(site.id),
     getLatestAudit(site.id),
-    getAnalytics(),
+    getAnalytics(site.id),
     listIntegrations(site.id),
   ]);
 
@@ -40,7 +40,7 @@ export default async function OverviewPage() {
 
   const todos = [
     { done: hasCms, label: "Conecta tu CMS para publicar solo", href: "/panel/ajustes/publicacion" },
-    { done: has("gsc"), label: "Conecta Google Search Console", href: "/panel/ajustes/analitica" },
+    { done: has("google") || has("gsc"), label: "Conecta Google Search Console", href: "/panel/ajustes/analitica" },
     { done: !!site.brand_voice?.tone, label: "Define tu voz de marca", href: "/panel/ajustes/escritura" },
     { done: vis.prompts.length >= 5, label: "Sigue al menos 5 preguntas en IA", href: "/panel/visibilidad-ia" },
     { done: toReview.length === 0, label: toReview.length ? `Revisa ${toReview.length} artículo(s) pendientes` : "Sin artículos pendientes de revisar", href: "/panel/articulos?estado=review" },

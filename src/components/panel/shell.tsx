@@ -21,6 +21,7 @@ import {
   Sparkles,
   X,
   MessagesSquare,
+  Plug,
   Users,
 } from "lucide-react";
 import { Logo } from "@/components/ui";
@@ -50,6 +51,7 @@ const NAV: { group: string; items: { href: string; label: string; icon: typeof L
     group: "Resultados",
     items: [
       { href: "/panel/analitica", label: "Analítica", icon: BarChart3 },
+      { href: "/panel/integraciones", label: "Integraciones", icon: Plug },
       { href: "/panel/informes", label: "Informes", icon: FileBarChart },
       { href: "/panel/novedades", label: "Novedades", icon: Megaphone },
     ],

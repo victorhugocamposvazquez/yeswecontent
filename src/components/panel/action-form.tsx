@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, type ReactNode } from "react";
+import { useActionState, useEffect, useRef, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { Check, CircleAlert, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui";
@@ -51,6 +51,7 @@ export function ActionForm({
   footerClassName,
   hideSubmit = false,
   inline = false,
+  onSuccess,
 }: {
   action: FormAction;
   children?: ReactNode;
@@ -61,8 +62,17 @@ export function ActionForm({
   footerClassName?: string;
   hideSubmit?: boolean;
   inline?: boolean;
+  /** Se llama tras cada respuesta correcta (p. ej. para recargar datos en un componente cliente). */
+  onSuccess?: (state: NonNullable<ActionState>) => void;
 }) {
   const [state, formAction] = useActionState(action, null);
+  const cb = useRef(onSuccess);
+  useEffect(() => {
+    cb.current = onSuccess;
+  });
+  useEffect(() => {
+    if (state?.ok) cb.current?.(state);
+  }, [state]);
   return (
     <form action={formAction} className={cn(inline ? "flex flex-wrap items-center gap-2" : "space-y-5", className)}>
       {children}

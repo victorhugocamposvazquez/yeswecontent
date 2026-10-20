@@ -476,35 +476,6 @@ export function PublicacionSection({ site, integrations, articles }: { site: Sit
   );
 }
 
-/* ───────── Conexiones OAuth (analítica y redes) ───────── */
-export function ConnectList({ title, intro, items, integrations }: { title: string; intro: string; items: { id: string; name: string; desc: string }[]; integrations: Integration[] }) {
-  return (
-    <Section title={title} intro={intro}>
-      <ul className="space-y-3">
-        {items.map((it) => {
-          const row = integrations.find((i) => i.provider === it.id);
-          return (
-            <li key={it.id} className="flex flex-wrap items-center gap-4 rounded-xl border border-line bg-paper p-4">
-              <div className="min-w-0 flex-1">
-                <p className="font-medium">
-                  {it.name}{" "}
-                  {row && <Badge tone={row.status === "connected" ? "ok" : "warn"}>{row.status === "connected" ? "Conectado" : "Pendiente"}</Badge>}
-                </p>
-                <p className="text-sm text-ink-3">{it.desc}</p>
-              </div>
-              {row ? (
-                <ActionForm action={disconnectIntegration.bind(null, it.id)} submitLabel="Desconectar" variant="ghost" inline />
-              ) : (
-                <ActionForm action={connectIntegration.bind(null, it.id)} submitLabel="Conectar" variant="ink" inline />
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </Section>
-  );
-}
-
 /* ───────── Catálogo ───────── */
 export function CatalogoSection({ shopifyConnected }: { shopifyConnected: boolean }) {
   const products = [

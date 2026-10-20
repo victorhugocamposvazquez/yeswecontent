@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { articleHtml, readError } from "./html";
+import { absoluteAsset, articleHtml, coverAlt, readError } from "./html";
 import type { GhostConfig, PublishResult, PublishableArticle } from "./types";
 
 const b64url = (b: Buffer | string) => Buffer.from(b).toString("base64").replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
@@ -27,7 +27,8 @@ export async function publishGhost(a: PublishableArticle, c: GhostConfig): Promi
           html: articleHtml(a, { withSchema: false }),
           custom_excerpt: a.meta_description?.slice(0, 300) ?? null,
           meta_description: a.meta_description ?? null,
-          feature_image: a.cover_url,
+          feature_image: absoluteAsset(a.cover_url),
+          feature_image_alt: a.cover_url ? coverAlt(a).slice(0, 125) : null,
           status: c.status ?? "published",
           codeinjection_head: a.schema_jsonld ? `<script type="application/ld+json">${JSON.stringify(a.schema_jsonld).replace(/</g, "\\u003c")}</script>` : null,
         },

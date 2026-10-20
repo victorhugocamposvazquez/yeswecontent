@@ -80,8 +80,8 @@ export async function saveOnboardingStep(step: string, s: OnboardingState, siteI
         schedule: { days: s.days, time: s.time, mode: s.mode },
       });
     case "conectar": {
-      if (siteId && s.gsc) await sb.from("integrations").upsert({ site_id: siteId, provider: "gsc", status: "pending", config: {} }, { onConflict: "site_id,provider" });
-      // TODO: flujo OAuth real de Search Console y alta del CMS elegido (s.cms).
+      // Google, Meta y Reddit se conectan por OAuth (/api/oauth/…) desde el propio paso; aquí no hay nada que guardar.
+      // TODO: alta del CMS elegido (s.cms) desde el onboarding.
       return updateSite({});
     }
     case "plan": {

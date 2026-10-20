@@ -131,12 +131,12 @@ export function Logo({ className, inverted = false, compact = false }: { classNa
           strokeWidth="2"
         />
         <text x="20" y="17" textAnchor="middle" fontSize="11" fontWeight="800" fill="#fff" fontFamily="var(--font-body)">
-          yes!
+          yes<tspan dx="0.5" fontFamily="var(--font-serif), Georgia, serif" fontStyle="italic" fontWeight="400" fontSize="13">!</tspan>
         </text>
       </svg>
       {!compact && (
         <span className={cn("whitespace-nowrap text-[22px] leading-none sm:text-2xl", inverted ? "text-paper" : "text-ink")}>
-          yeswe<span className="font-logo text-[25px] sm:text-[27px]">content</span>!
+          yeswe<span className="font-logo text-[25px] sm:text-[27px]">content!</span>
         </span>
       )}
     </span>

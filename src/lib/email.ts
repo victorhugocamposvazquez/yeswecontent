@@ -19,7 +19,7 @@ function layout({ preheader, title, body, cta }: { preheader: string; title: str
 <span style="display:none;max-height:0;overflow:hidden">${esc(preheader)}</span>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#fffdf8;border:1px solid #d9d0bd;border-radius:16px">
-<tr><td style="padding:28px 32px 0;font-weight:700;font-size:18px">yeswe<em style="font-family:Georgia,serif;font-weight:400">content</em></td></tr>
+<tr><td style="padding:28px 32px 0;font-weight:700;font-size:18px">yeswe<em style="font-family:Georgia,serif;font-weight:400">content</em>!</td></tr>
 <tr><td style="padding:16px 32px 8px"><h1 style="margin:0;font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:1.2">${esc(title)}</h1></td></tr>
 <tr><td style="padding:8px 32px 8px;font-size:15px;line-height:1.6;color:#4a453c">${body}</td></tr>
 ${

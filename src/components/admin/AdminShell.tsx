@@ -17,8 +17,8 @@ function AdminBadge() {
 function SidebarBody({ email, demo, env, onNavigate }: { email: string; demo: boolean; env: EnvCheck[]; onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col gap-5 p-3">
-      <div className="flex h-[52px] items-center gap-2 px-2.5">
-        <Logo inverted className="origin-left scale-[0.85]" />
+      <div className="flex flex-col items-start gap-1.5 px-2.5 pt-2">
+        <Logo inverted />
         <AdminBadge />
       </div>
       <AdminNav onNavigate={onNavigate} />

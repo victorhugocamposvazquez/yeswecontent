@@ -28,11 +28,16 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <svg width="64" height="52" viewBox="0 0 40 32">
-            <path d="M4 2h32a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H16l-8 6v-6H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" fill={SIGNAL} stroke={INK} strokeWidth="2" />
-          </svg>
+          <div style={{ display: "flex", position: "relative", width: 64, height: 52 }}>
+            <svg width="64" height="52" viewBox="0 0 40 32">
+              <path d="M4 2h32a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H16l-8 6v-6H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" fill={SIGNAL} stroke={INK} strokeWidth="2" />
+            </svg>
+            <div style={{ position: "absolute", top: 0, left: 0, width: 64, height: 38, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 17, fontWeight: 800 }}>
+              yes!
+            </div>
+          </div>
           <div style={{ display: "flex", fontSize: 40, fontWeight: 700, letterSpacing: -1 }}>
-            yeswe<span style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontWeight: 400 }}>content</span>
+            yeswe<span style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontWeight: 400 }}>content</span>!
           </div>
         </div>
 

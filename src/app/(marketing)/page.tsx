@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, Check, Globe, Quote, Search } from "lucide-react";
@@ -12,7 +13,7 @@ import { RatingPill } from "@/components/marketing/rating-pill";
 import { EngineWordmark } from "@/components/marketing/engine-wordmark";
 import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup, SocialMockup } from "@/components/marketing/mockups";
 import { ENGINES } from "@/lib/marketing/social-proof";
-import { AiCitations, GrowthChart, RankClimb, Reveal, ScrollStatement, type StatementPart } from "@/components/marketing/scroll-fx";
+import { AiCitations, GrowthChart, Parallax, RankClimb, Reveal, ScrollStatement, ScrollSteps, Stagger, TiltIn, type StatementPart } from "@/components/marketing/scroll-fx";
 import { Container, CtaBand, CtaLink, EngineLogo, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
@@ -113,7 +114,9 @@ export default async function HomePage() {
 
           <div className="rise rise-3 relative mt-12 w-full max-w-[1100px] sm:mt-16">
             <div aria-hidden className="pointer-events-none absolute -inset-x-10 -top-10 h-40 rounded-full bg-signal/10 blur-3xl" />
-            <PanelMockup className="relative" />
+            <TiltIn className="relative">
+              <PanelMockup />
+            </TiltIn>
           </div>
         </Container>
 
@@ -172,17 +175,7 @@ export default async function HomePage() {
             </div>
             <Lead className="max-w-sm text-base">Configuras una vez. A partir de ahí, el sistema trabaja cada semana y tú decides cuánto quieres supervisar.</Lead>
           </div>
-          <ol className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
-            {steps.map((s) => (
-              <li key={s.n}>
-                <Card className="h-full p-6 sm:p-7">
-                  <span className="tabular text-sm font-semibold text-signal">{s.n}</span>
-                  <h3 className="mt-4 text-lg font-semibold tracking-tight sm:text-xl">{s.title}</h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{s.text}</p>
-                </Card>
-              </li>
-            ))}
-          </ol>
+          <ScrollSteps steps={steps} />
           <div className="mt-6 grid grid-cols-1 items-center gap-10 rounded-3xl border border-line bg-paper-2 p-6 sm:p-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:p-14">
             <div>
               <Eyebrow tone="ink">Lo que pasa cada semana</Eyebrow>
@@ -272,7 +265,11 @@ export default async function HomePage() {
                     </TextLink>
                   </div>
                   <div className={i % 2 ? "lg:order-1" : ""}>
-                    <ProductMockup slug={f.slug} />
+                    <Reveal>
+                      <Parallax amount={40}>
+                        <ProductMockup slug={f.slug} />
+                      </Parallax>
+                    </Reveal>
                   </div>
                 </div>
               );
@@ -363,14 +360,16 @@ export default async function HomePage() {
                 <Globe className="h-4 w-4" aria-hidden /> Con hreflang y versiones enlazadas entre sí.
               </p>
             </div>
-            <ul className="flex flex-wrap gap-2" aria-label="Algunos de los idiomas disponibles">
-              {languages.map((l) => (
-                <li key={l} className="rounded-full border border-line bg-card px-3.5 py-1.5 text-sm shadow-[var(--shadow-xs)]">
+            <Stagger as="ul" className="flex flex-wrap gap-2" label="Algunos de los idiomas disponibles">
+              {languages.map((l, i) => (
+                <li key={l} className="rounded-full border border-line bg-card px-3.5 py-1.5 text-sm shadow-[var(--shadow-xs)]" style={{ "--i": i } as CSSProperties}>
                   {l}
                 </li>
               ))}
-              <li className="rounded-full border border-dashed border-line-2 px-3.5 py-1.5 text-sm text-ink-2">y más…</li>
-            </ul>
+              <li className="rounded-full border border-dashed border-line-2 px-3.5 py-1.5 text-sm text-ink-2" style={{ "--i": languages.length } as CSSProperties}>
+                y más…
+              </li>
+            </Stagger>
           </div>
         </Container>
       </Section>
@@ -518,24 +517,26 @@ export default async function HomePage() {
               </CtaLink>
             </div>
             <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 md:grid-cols-3">
-              {cases.slice(0, 3).map((c) => (
-                <HoverCard key={c.slug} href={`/casos/${c.slug}`} className="flex flex-col p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <Badge>{c.sector}</Badge>
-                    {growth(c) && (
-                      <Badge tone="lime" className="tabular font-semibold">
-                        {growth(c)}
-                      </Badge>
-                    )}
-                  </div>
-                  <h3 className="mt-5 text-xl font-semibold leading-snug tracking-tight">
-                    Cómo {c.company} pasó de {num(c.metric_before ?? 0)} a {num(c.metric_after ?? 0)} {c.metric_label}
-                  </h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-2">{c.summary}</p>
-                  <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold transition-colors duration-150 group-hover:text-signal">
-                    Leer el caso <ArrowUpRight className="h-4 w-4" aria-hidden />
-                  </span>
-                </HoverCard>
+              {cases.slice(0, 3).map((c, i) => (
+                <Reveal key={c.slug} delay={i * 120}>
+                  <HoverCard href={`/casos/${c.slug}`} className="flex h-full flex-col p-6">
+                    <div className="flex items-center justify-between gap-3">
+                      <Badge>{c.sector}</Badge>
+                      {growth(c) && (
+                        <Badge tone="lime" className="tabular font-semibold">
+                          {growth(c)}
+                        </Badge>
+                      )}
+                    </div>
+                    <h3 className="mt-5 text-xl font-semibold leading-snug tracking-tight">
+                      Cómo {c.company} pasó de {num(c.metric_before ?? 0)} a {num(c.metric_after ?? 0)} {c.metric_label}
+                    </h3>
+                    <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-2">{c.summary}</p>
+                    <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold transition-colors duration-150 group-hover:text-signal">
+                      Leer el caso <ArrowUpRight className="h-4 w-4" aria-hidden />
+                    </span>
+                  </HoverCard>
+                </Reveal>
               ))}
             </div>
             <p className="mt-6 text-xs text-ink-3">Casos ilustrativos con empresas ficticias, construidos a partir de escenarios típicos.</p>
@@ -623,17 +624,19 @@ export default async function HomePage() {
           </div>
           <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 md:grid-cols-3">
             {guides.map((g, i) => (
-              <HoverCard key={g.title} href="/blog" className="flex flex-col p-5">
-                <div className={`mb-5 grid aspect-[3/2] place-items-center rounded-xl ${["bg-signal text-white", "bg-sky-soft text-ink", "bg-paper-2 text-ink"][i]}`}>
-                  <BookOpen className="h-9 w-9" aria-hidden strokeWidth={1.5} />
-                </div>
-                <Badge className="w-fit">{g.tag}</Badge>
-                <h3 className="mt-3 text-lg font-semibold leading-snug tracking-tight">{g.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-2">{g.text}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold transition-colors duration-150 group-hover:text-signal">
-                  Leer en el blog <ArrowUpRight className="h-4 w-4" aria-hidden />
-                </span>
-              </HoverCard>
+              <Reveal key={g.title} delay={i * 120}>
+                <HoverCard href="/blog" className="flex h-full flex-col p-5">
+                  <div className={`mb-5 grid aspect-[3/2] place-items-center rounded-xl ${["bg-signal text-white", "bg-sky-soft text-ink", "bg-paper-2 text-ink"][i]}`}>
+                    <BookOpen className="h-9 w-9" aria-hidden strokeWidth={1.5} />
+                  </div>
+                  <Badge className="w-fit">{g.tag}</Badge>
+                  <h3 className="mt-3 text-lg font-semibold leading-snug tracking-tight">{g.title}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-2">{g.text}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold transition-colors duration-150 group-hover:text-signal">
+                    Leer en el blog <ArrowUpRight className="h-4 w-4" aria-hidden />
+                  </span>
+                </HoverCard>
+              </Reveal>
             ))}
           </div>
         </Container>

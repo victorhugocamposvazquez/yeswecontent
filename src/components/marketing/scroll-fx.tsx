@@ -7,6 +7,7 @@
  * Con prefers-reduced-motion todo aparece en su estado final.
  */
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { Check, Globe, PenLine, Send, Sparkles, TrendingUp } from "lucide-react";
 import { cn, num } from "@/lib/utils";
 import { EngineLogo } from "./primitives";
 
@@ -15,49 +16,73 @@ const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 const reducedMotion = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+type Measure = (r: DOMRect, vh: number) => number;
+
 /**
  * Progreso 0–1 de un elemento según cruza la pantalla: 0 cuando su borde superior toca `start`
- * (fracción del alto de la ventana) y 1 cuando su borde inferior llega a `end`.
+ * (fracción del alto de la ventana) y 1 cuando su borde inferior llega a `end`. `measure` permite
+ * otra cuenta (p. ej. secciones fijas). El valor no salta con cada evento de scroll: se acerca al
+ * real con una interpolación por frame, así la rueda del ratón o el trackpad se sienten suaves.
  */
-function useScrollProgress(ref: RefObject<HTMLElement | null>, onProgress: (p: number) => void, { start = 0.9, end = 0.55 } = {}) {
+function useScrollProgress(
+  ref: RefObject<HTMLElement | null>,
+  onProgress: (p: number) => void,
+  { start = 0.9, end = 0.55, measure, smooth: smoothIn = 0.14, track = false }: { start?: number; end?: number; measure?: Measure; smooth?: number; track?: boolean } = {},
+) {
   const cb = useRef(onProgress);
   cb.current = onProgress;
+  const m = useRef(measure);
+  m.current = measure;
 
   useIsoLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (reducedMotion()) {
+    // Con reduced motion solo se siguen (sin interpolar) las secciones que dependen del scroll para
+    // enseñar su contenido, como los pasos fijos; el resto se queda en su estado final.
+    const reduced = reducedMotion();
+    if (reduced && !track) {
       cb.current(1);
       return;
     }
-    let frame = 0;
-    let visible = false;
-    const update = () => {
-      frame = 0;
+    const smooth = reduced ? 1 : smoothIn;
+    const target = () => {
       const r = el.getBoundingClientRect();
       const vh = window.innerHeight;
+      if (m.current) return clamp(m.current(r, vh));
       const from = vh * start;
       const to = vh * end - r.height;
-      cb.current(clamp((from - r.top) / Math.max(from - to, 1)));
+      return clamp((from - r.top) / Math.max(from - to, 1));
     };
-    const onScroll = () => {
-      if (visible && !frame) frame = requestAnimationFrame(update);
+    let frame = 0;
+    let visible = false;
+    let cur = target();
+    let goal = cur;
+    const tick = () => {
+      frame = 0;
+      goal = target();
+      const d = goal - cur;
+      cur = Math.abs(d) < 0.0005 ? goal : cur + d * smooth;
+      cb.current(cur);
+      if (cur !== goal) frame = requestAnimationFrame(tick);
+    };
+    const wake = () => {
+      if (visible && !frame) frame = requestAnimationFrame(tick);
     };
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting;
-      if (visible) onScroll();
+      if (visible) wake();
     });
     io.observe(el);
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    cb.current(cur);
+    window.addEventListener("scroll", wake, { passive: true });
+    window.addEventListener("resize", wake);
     return () => {
       io.disconnect();
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("scroll", wake);
+      window.removeEventListener("resize", wake);
     };
-  }, [ref, start, end]);
+  }, [ref, start, end, smoothIn, track]);
 }
 
 /** true la primera vez que el elemento entra en pantalla (o enseguida con reduced motion). */
@@ -113,7 +138,7 @@ export function ScrollStatement({ parts, className, as: Tag = "p" }: { parts: St
     for (const w of text.split(/\s+/).filter(Boolean)) words.push({ w, tone });
   }
 
-  useScrollProgress(ref, (p) => ref.current?.style.setProperty("--p", p.toFixed(4)), { start: 0.88, end: 0.5 });
+  useScrollProgress(ref, (p) => ref.current?.style.setProperty("--p", p.toFixed(4)), { start: 0.9, end: 0.45 });
 
   return (
     <Tag
@@ -216,7 +241,7 @@ export function GrowthChart({ className }: { className?: string }) {
         delta.current.style.transform = `translateY(${((1 - o) * 8).toFixed(1)}px)`;
       }
     },
-    { start: 0.95, end: 0.55 },
+    { start: 0.95, end: 0.4 },
   );
 
   return (
@@ -347,7 +372,7 @@ const engines = [
   { m: "Claude", pos: 2 },
 ];
 
-function CountUp({ to, run, duration = 1400 }: { to: number; run: boolean; duration?: number }) {
+function CountUp({ to, run, duration = 2000 }: { to: number; run: boolean; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -389,7 +414,7 @@ export function AiCitations({ className }: { className?: string }) {
       <p className="mt-4 rounded-lg border border-line bg-paper-2 px-3 py-2 text-[12.5px] text-ink-2">«¿Dónde compro una vajilla de gres hecha a mano?»</p>
       <ul className="mt-3 space-y-2">
         {engines.map((e, i) => (
-          <li key={e.m} className="flex h-9 items-center gap-2.5 rounded-lg border border-line px-3 text-[13px]" style={{ "--d": `${300 + i * 220}ms` } as CSSProperties}>
+          <li key={e.m} className="flex h-9 items-center gap-2.5 rounded-lg border border-line px-3 text-[13px]" style={{ "--d": `${400 + i * 280}ms` } as CSSProperties}>
             <EngineLogo name={e.m} size={16} alt="" />
             <span className="flex-1 truncate font-medium">{e.m}</span>
             <span className="relative grid h-6 min-w-[7.5rem] justify-items-end">
@@ -409,6 +434,270 @@ export function Reveal({ children, className, delay = 0 }: { children: ReactNode
   return (
     <div ref={ref} className={cn("sx-reveal", className)} data-on={on || undefined} style={{ "--d": `${delay}ms` } as CSSProperties}>
       {children}
+    </div>
+  );
+}
+
+/** Escalonado: los hijos directos (con --i) aparecen uno tras otro al entrar en pantalla. */
+export function Stagger({ children, className, as: Tag = "div", label }: { children: ReactNode; className?: string; as?: "div" | "ul" | "ol"; label?: string }) {
+  const [ref, on] = useInView<HTMLElement>(0.25);
+  return (
+    <Tag ref={ref as RefObject<HTMLDivElement & HTMLUListElement & HTMLOListElement>} className={cn("sx-stagger", className)} data-on={on || undefined} aria-label={label}>
+      {children}
+    </Tag>
+  );
+}
+
+/** Desplazamiento vertical suave mientras el elemento cruza la pantalla (paralaje ligero). */
+export function Parallax({ children, className, amount = 48 }: { children: ReactNode; className?: string; amount?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useScrollProgress(
+    ref,
+    (p) => {
+      if (ref.current) ref.current.style.transform = `translate3d(0, ${((0.5 - p) * amount).toFixed(2)}px, 0)`;
+    },
+    { measure: (r, vh) => (vh - r.top) / (vh + r.height), smooth: 0.1 },
+  );
+  return (
+    <div ref={ref} className={cn("will-change-transform", className)}>
+      {children}
+    </div>
+  );
+}
+
+/** Captura del panel que llega inclinada y se endereza al empezar a bajar (hero). */
+export function TiltIn({ children, className }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  useScrollProgress(
+    ref,
+    (p) => {
+      const k = easeOut(p);
+      if (inner.current) inner.current.style.transform = `rotateX(${((1 - k) * 16).toFixed(2)}deg) scale(${(0.93 + 0.07 * k).toFixed(4)}) translateZ(0)`;
+    },
+    { measure: (r, vh) => (vh * 0.95 - r.top) / (vh * 0.55), smooth: 0.1 },
+  );
+  return (
+    <div ref={ref} className={cn("[perspective:1400px]", className)}>
+      <div ref={inner} className="origin-[50%_0%] will-change-transform">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ───────── Cómo funciona: pasos fijos que avanzan con el scroll ───────── */
+
+export type Step = { n: string; title: string; text: string };
+
+const HEADER = 64;
+
+/** Opacidad de un elemento que aparece cuando el progreso local del panel (--sp) llega a k/total. */
+const at = (k: number, total: number) => ({ "--k": k, "--t": total }) as CSSProperties;
+
+function PanelRead() {
+  const facts = [
+    ["Vendes", "Vajillas y cerámica de gres hechas a mano"],
+    ["Tu tono", "Cercano, de taller, sin tecnicismos"],
+    ["Compites con", "3 tiendas y 2 marketplaces"],
+    ["Temas que puedes ganar", "Cuidado · Compra · Regalo"],
+  ];
+  return (
+    <div className="flex h-full flex-col p-4 sm:p-6">
+      <p className="text-[12px] font-medium text-ink-3">Tu web</p>
+      <div className="mt-1.5 flex h-11 items-center gap-2 rounded-xl border border-line-2 bg-card px-3 text-[14px] shadow-[var(--shadow-xs)]">
+        <Globe className="h-4 w-4 shrink-0 text-ink-3" aria-hidden />
+        <span className="relative">
+          https://tierrafina.es
+          <span aria-hidden className="sx-type absolute inset-y-0 -right-0.5 left-0 origin-right bg-card" />
+        </span>
+        <span className="sx-at ml-auto rounded-md bg-signal px-2 py-1 text-[11px] font-semibold text-white" style={at(1, 6)}>
+          Analizando…
+        </span>
+      </div>
+      <ul className="mt-4 grid flex-1 content-start gap-2">
+        {facts.map(([k, v], i) => (
+          <li key={k} className="sx-at flex items-center gap-3 rounded-xl border border-line bg-paper-2 px-3 py-2.5" style={at(i + 2, 6)}>
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ok-soft text-ok">
+              <Check className="h-3.5 w-3.5" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[11px] text-ink-3">{k}</span>
+              <span className="block truncate text-[13px] font-medium">{v}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function PanelPlan() {
+  const topics = [
+    { t: "Cómo elegir una vajilla de gres", v: "2,4k", d: "Baja", c: "bg-lime-soft" },
+    { t: "Gres o porcelana: diferencias", v: "1,9k", d: "Media", c: "bg-sky-soft" },
+    { t: "Regalos de cerámica para bodas", v: "880", d: "Baja", c: "bg-signal-soft" },
+    { t: "¿El gres va al lavavajillas?", v: "1,3k", d: "Baja", c: "bg-lime-soft" },
+    { t: "Esmaltes sin plomo: qué mirar", v: "720", d: "Media", c: "bg-sky-soft" },
+  ];
+  return (
+    <div className="flex h-full flex-col p-4 sm:p-6">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] font-semibold">Plan de noviembre · 12 artículos</p>
+        <span className="text-[11px] text-ink-3">búsquedas/mes · dificultad</span>
+      </div>
+      <ul className="mt-3 grid flex-1 content-start gap-1.5">
+        {topics.map((x, i) => (
+          <li key={x.t} className="sx-at flex items-center gap-3 rounded-lg border border-line bg-card px-3 py-2 text-[12.5px] shadow-[var(--shadow-xs)]" style={at(i + 1, 7)}>
+            <span className={cn("h-6 w-1.5 shrink-0 rounded-full", x.c)} />
+            <span className="min-w-0 flex-1 truncate font-medium">{x.t}</span>
+            <span className="tabular shrink-0 text-ink-2">{x.v}</span>
+            <span className="hidden w-12 shrink-0 text-right text-ink-3 sm:block">{x.d}</span>
+            <span className="sx-check grid h-5 w-5 shrink-0 place-items-center rounded-full border border-line-2 text-white" style={at(i + 1.5, 7)}>
+              <Check className="h-3 w-3" aria-hidden />
+            </span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <span className="text-[11px] text-ink-3">Quita, añade o cambia el orden</span>
+        <span className="sx-at rounded-lg bg-ink px-3 py-1.5 text-[12px] font-semibold text-paper" style={at(6.5, 7)}>
+          Plan aprobado ✓
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function PanelGrow() {
+  const timeline = [
+    { I: PenLine, t: "Artículo escrito con tu voz", s: "Nota de calidad 91/100" },
+    { I: Send, t: "Publicado en tu WordPress", s: "Jueves 9:00 · con FAQ y schema" },
+    { I: TrendingUp, t: "Entra en el top 3 de Google", s: "«vajilla de gres» · #3" },
+    { I: Sparkles, t: "Perplexity te cita como fuente", s: "«¿Dónde comprar gres artesanal?»" },
+  ];
+  return (
+    <div className="flex h-full flex-col p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[13px] font-semibold">Esta semana en tierrafina.es</p>
+        <span className="tabular text-[11px] text-ink-3">
+          clics <span className="sx-at font-semibold text-ok" style={at(4, 6)}>+38 %</span>
+        </span>
+      </div>
+      <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-3">
+        <span className="sx-bar block h-full origin-left rounded-full bg-signal" />
+      </div>
+      <ol className="relative mt-4 grid flex-1 content-start gap-2.5">
+        {timeline.map(({ I, t, s }, i) => (
+          <li key={t} className="sx-at flex items-center gap-3" style={at(i + 1, 5.5)}>
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-signal-soft text-signal">
+              <I className="h-4 w-4" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[13px] font-semibold">{t}</span>
+              <span className="block truncate text-[11.5px] text-ink-3">{s}</span>
+            </span>
+            <Check className="h-4 w-4 shrink-0 text-ok" aria-hidden />
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+const panels = [
+  { url: "app.yeswecontent.com/alta", P: PanelRead },
+  { url: "app.yeswecontent.com/plan", P: PanelPlan },
+  { url: "app.yeswecontent.com/resumen", P: PanelGrow },
+];
+
+/**
+ * Los tres pasos se quedan fijos en pantalla mientras haces scroll: a la izquierda avanza el
+ * paso activo y a la derecha la pantalla del producto va completándose elemento a elemento.
+ */
+export function ScrollSteps({ steps }: { steps: Step[] }) {
+  const wrap = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+  const n = steps.length;
+
+  useScrollProgress(
+    wrap,
+    (p) => {
+      const el = stage.current;
+      if (!el) return;
+      el.style.setProperty("--pp", p.toFixed(4));
+      for (let k = 0; k < n; k++) el.style.setProperty(`--sp${k}`, clamp(p * n * 1.08 - k).toFixed(4));
+      const idx = Math.min(n - 1, Math.floor(p * n * 1.0001));
+      setActive((a) => (a === idx ? a : idx));
+    },
+    {
+      measure: (r, vh) => (HEADER - r.top) / Math.max(r.height - (vh - HEADER), 1),
+      smooth: 0.16,
+      track: true,
+    },
+  );
+
+  return (
+    <div ref={wrap} className="sx-steps relative mt-10 md:mt-14" style={{ height: `${n * 95 + 20}svh` }}>
+      <div ref={stage} className="sx-steps-stage sticky top-16 flex h-[calc(100svh-4rem)] items-center">
+        <div className="grid w-full grid-cols-1 items-center gap-5 md:grid-cols-[0.85fr_1.15fr] md:gap-12">
+          {/* Pasos */}
+          <div className="order-2 md:order-1">
+            <div aria-hidden className="mb-4 flex gap-1.5 md:hidden">
+              {steps.map((s, k) => (
+                <span key={s.n} className="h-1 flex-1 overflow-hidden rounded-full bg-paper-3">
+                  <span className="sx-seg block h-full origin-left rounded-full bg-signal" style={{ "--s": `var(--sp${k}, 1)` } as CSSProperties} />
+                </span>
+              ))}
+            </div>
+            <ol className="sx-step-list relative grid md:gap-2 md:pl-6">
+              <span aria-hidden className="absolute top-2 bottom-2 left-0 hidden w-0.5 overflow-hidden rounded-full bg-paper-3 md:block">
+                <span className="sx-rail block h-full origin-top bg-signal" />
+              </span>
+              {steps.map((s, k) => (
+                <li key={s.n} className="sx-step col-start-1 row-start-1 md:col-auto md:row-auto md:py-3" data-active={active === k || undefined} aria-current={active === k ? "step" : undefined}>
+                  <span className="tabular text-sm font-semibold text-signal">{s.n}</span>
+                  <h3 className="mt-1.5 text-xl font-semibold tracking-tight md:text-2xl">{s.title}</h3>
+                  <p className="mt-2 max-w-md text-[15px] leading-relaxed text-ink-2">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {/* Pantalla del producto */}
+          <div className="order-1 md:order-2">
+            <div className="window relative">
+              <div className="window-bar">
+                <i />
+                <i />
+                <i />
+                <span className="relative ml-2 h-4 flex-1 text-[11px] text-ink-3">
+                  {panels.map((x, k) => (
+                    <span key={x.url} className="sx-url absolute inset-0 truncate" data-active={active === k || undefined}>
+                      {x.url}
+                    </span>
+                  ))}
+                </span>
+              </div>
+              <div className="relative h-[300px] bg-paper-2 sm:h-[360px] md:h-[400px]">
+                {panels.map(({ P }, k) => (
+                  <div
+                    key={k}
+                    className="sx-panel absolute inset-0"
+                    data-active={active === k || undefined}
+                    data-past={active > k || undefined}
+                    style={{ "--sp": `var(--sp${k}, 1)` } as CSSProperties}
+                    aria-hidden={active !== k}
+                  >
+                    <P />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

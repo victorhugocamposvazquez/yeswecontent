@@ -1,11 +1,11 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { Building2, Eye, Layers, Palette, Receipt, Users } from "lucide-react";
-import { volumeDiscounts } from "@/lib/demo";
 import { Card } from "@/components/ui";
 import { AgencyForm } from "@/components/marketing/agency-form";
 import { AgencyPortalMockup } from "@/components/marketing/mockups";
 import { Stagger, TiltIn } from "@/components/marketing/scroll-fx";
+import { StepStory } from "@/components/marketing/step-stories";
 import { Container, CtaLink, Eyebrow, Faq, IconBox, Lead, Section, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
@@ -31,7 +31,6 @@ const faqs = [
 ];
 
 export default function AgenciasPage() {
-  const maxPct = Math.max(...volumeDiscounts.map((d) => d.pct));
   return (
     <>
       <section className="relative overflow-hidden bg-ink text-paper">
@@ -96,21 +95,7 @@ export default function AgenciasPage() {
             <Eyebrow>Cómo empezar</Eyebrow>
             <Title className="mt-4">Tres pasos y estás vendiendo.</Title>
           </div>
-          <Stagger as="ol" className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
-            {[
-              ["1", "Llamada de 15 minutos", "Vemos cuántos clientes tienes, qué vendes y si encajamos. Sin presentaciones eternas."],
-              ["2", "Configuramos tu marca", "Logo, colores, subdominio y remitente de emails. Lo dejamos listo contigo."],
-              ["3", "Das de alta clientes", `Cada web nueva suma al descuento por volumen, hasta un ${maxPct}%.`],
-            ].map(([n, t, d], i) => (
-              <li key={n} style={{ "--i": i * 5 } as CSSProperties}>
-                <Card className="h-full p-6">
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-ink text-sm font-semibold text-paper">{n}</span>
-                  <h3 className="mt-4 text-lg font-semibold tracking-tight">{t}</h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{d}</p>
-                </Card>
-              </li>
-            ))}
-          </Stagger>
+          <StepStory name="agencias" />
         </Container>
       </Section>
 

@@ -605,17 +605,19 @@ function PanelGrow() {
   );
 }
 
-const panels = [
-  { url: "app.yeswecontent.com/alta", P: PanelRead },
-  { url: "app.yeswecontent.com/plan", P: PanelPlan },
-  { url: "app.yeswecontent.com/resumen", P: PanelGrow },
+export type StepPanel = { url: string; node: ReactNode };
+
+const homePanels: StepPanel[] = [
+  { url: "app.yeswecontent.com/alta", node: <PanelRead /> },
+  { url: "app.yeswecontent.com/plan", node: <PanelPlan /> },
+  { url: "app.yeswecontent.com/resumen", node: <PanelGrow /> },
 ];
 
 /**
  * Los tres pasos se quedan fijos en pantalla mientras haces scroll: a la izquierda avanza el
  * paso activo y a la derecha la pantalla del producto va completándose elemento a elemento.
  */
-export function ScrollSteps({ steps }: { steps: Step[] }) {
+export function ScrollSteps({ steps, panels = homePanels, className }: { steps: Step[]; panels?: StepPanel[]; className?: string }) {
   const wrap = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -639,7 +641,7 @@ export function ScrollSteps({ steps }: { steps: Step[] }) {
   );
 
   return (
-    <div ref={wrap} className="sx-steps relative mt-10 md:mt-14" style={{ height: `${n * 95 + 20}svh` }}>
+    <div ref={wrap} className={cn("sx-steps relative mt-10 md:mt-14", className)} style={{ height: `${n * 95 + 20}svh` }}>
       <div ref={stage} className="sx-steps-stage sticky top-16 flex h-[calc(100svh-4rem)] items-center">
         <div className="grid w-full grid-cols-1 items-center gap-5 md:grid-cols-[0.85fr_1.15fr] md:gap-12">
           {/* Pasos */}
@@ -681,7 +683,7 @@ export function ScrollSteps({ steps }: { steps: Step[] }) {
                 </span>
               </div>
               <div className="relative h-[300px] bg-paper-2 sm:h-[360px] md:h-[400px]">
-                {panels.map(({ P }, k) => (
+                {panels.map(({ node }, k) => (
                   <div
                     key={k}
                     className="sx-panel absolute inset-0"
@@ -690,7 +692,7 @@ export function ScrollSteps({ steps }: { steps: Step[] }) {
                     style={{ "--sp": `var(--sp${k}, 1)` } as CSSProperties}
                     aria-hidden={active !== k}
                   >
-                    <P />
+                    {node}
                   </div>
                 ))}
               </div>

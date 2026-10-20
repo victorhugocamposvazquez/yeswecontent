@@ -13,6 +13,7 @@ import { RatingPill } from "@/components/marketing/rating-pill";
 import { EngineWordmark } from "@/components/marketing/engine-wordmark";
 import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup, SocialMockup } from "@/components/marketing/mockups";
 import { ENGINES } from "@/lib/marketing/social-proof";
+import { StepStory } from "@/components/marketing/step-stories";
 import { AiCitations, GrowthChart, RankClimb, Reveal, ScrollStatement, ScrollSteps, Stagger, StickyShowcase, TiltIn, Watch, type StatementPart } from "@/components/marketing/scroll-fx";
 import { Container, CtaBand, CtaLink, EngineLogo, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Title } from "@/components/marketing/primitives";
 
@@ -278,6 +279,19 @@ export default async function HomePage() {
         </Container>
       </Section>
 
+      {/* ───────── ASÍ NACE UN ARTÍCULO ───────── */}
+      <Section>
+        <Container>
+          <div className="max-w-2xl">
+            <Eyebrow>Por dentro</Eyebrow>
+            <Title className="mt-4">
+              Así nace <span className="marker">un artículo</span>, de la búsqueda a tu web.
+            </Title>
+          </div>
+          <StepStory name="articulo" />
+        </Container>
+      </Section>
+
       {/* ───────── FRASE: TU NEGOCIO ───────── */}
       <Statement
         parts={[
@@ -305,6 +319,7 @@ export default async function HomePage() {
             </div>
             <SocialMockup />
           </div>
+          <StepStory name="social" className="mt-16 md:mt-24" />
         </Container>
       </Section>
 

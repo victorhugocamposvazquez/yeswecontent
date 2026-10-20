@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui";
 import { ProductMockup } from "@/components/marketing/mockups";
 import { ScrollRail, Stagger, TiltIn, Watch } from "@/components/marketing/scroll-fx";
+import { StepStory, storyForProduct } from "@/components/marketing/step-stories";
 import { Container, CtaBand, CtaLink, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Ticket, Title } from "@/components/marketing/primitives";
 
 export const dynamicParams = false;
@@ -31,6 +32,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!p) notFound();
   const related = p.related.map(getProduct).filter((x) => !!x);
   const wide = p.slug === "agente-seo";
+  const story = storyForProduct[p.slug];
 
   return (
     <>
@@ -88,32 +90,46 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </Container>
       </Section>
 
-      <Section tone="paper-2">
-        <Container>
-          <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-            <div>
+      {story ? (
+        <Section>
+          <Container>
+            <div className="max-w-2xl">
               <Eyebrow>Cómo funciona</Eyebrow>
-              <Title className="mt-4">En tres pasos.</Title>
-              <div className="mt-8 hidden lg:block">
-                <Ticket {...p.sample} className="max-w-sm" />
-              </div>
+              <Title className="mt-4">
+                Paso a paso, <span className="marker">sin que hagas nada</span>.
+              </Title>
             </div>
-            <ScrollRail className="grid grid-cols-1 gap-4">
-              {p.steps.map((s, i) => (
-                <li key={s.title}>
-                  <Card className="flex gap-5 p-6">
-                    <span className="sx-dot grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-paper">{i + 1}</span>
-                    <div>
-                      <h3 className="text-lg font-semibold tracking-tight">{s.title}</h3>
-                      <p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">{s.text}</p>
-                    </div>
-                  </Card>
-                </li>
-              ))}
-            </ScrollRail>
-          </div>
-        </Container>
-      </Section>
+            <StepStory name={story} />
+          </Container>
+        </Section>
+      ) : (
+        <Section tone="paper-2">
+          <Container>
+            <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+              <div>
+                <Eyebrow>Cómo funciona</Eyebrow>
+                <Title className="mt-4">En tres pasos.</Title>
+                <div className="mt-8 hidden lg:block">
+                  <Ticket {...p.sample} className="max-w-sm" />
+                </div>
+              </div>
+              <ScrollRail className="grid grid-cols-1 gap-4">
+                {p.steps.map((s, i) => (
+                  <li key={s.title}>
+                    <Card className="flex gap-5 p-6">
+                      <span className="sx-dot grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-paper">{i + 1}</span>
+                      <div>
+                        <h3 className="text-lg font-semibold tracking-tight">{s.title}</h3>
+                        <p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">{s.text}</p>
+                      </div>
+                    </Card>
+                  </li>
+                ))}
+              </ScrollRail>
+            </div>
+          </Container>
+        </Section>
+      )}
 
       <Section>
         <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">

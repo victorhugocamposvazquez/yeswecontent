@@ -58,8 +58,8 @@ export default async function HostedBlogIndex({ params, searchParams }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(ld) }} />
       <div className="mb-10">
-        <h1 className="b-head text-3xl font-semibold leading-tight sm:text-4xl">{tag ? `Artículos sobre «${tag}»` : ctx.title}</h1>
-        {ctx.tagline && !tag && <p className="mt-3 text-lg" style={{ color: "var(--b-muted)" }}>{ctx.tagline}</p>}
+        <h1 className="b-head text-[2rem] font-semibold leading-[1.1] sm:text-[2.75rem]">{tag ? `Artículos sobre «${tag}»` : ctx.title}</h1>
+        {ctx.tagline && !tag && <p className="mt-4 max-w-xl text-lg leading-relaxed" style={{ color: "var(--b-muted)" }}>{ctx.tagline}</p>}
         {tag && (
           <Link href={href(1).replace(/\?.*$/, "") || "/"} className="mt-3 inline-flex min-h-11 items-center text-sm underline underline-offset-4" style={{ color: "var(--b-accent)" }}>
             ← Todos los artículos
@@ -70,14 +70,14 @@ export default async function HostedBlogIndex({ params, searchParams }: Props) {
       {items.length ? (
         <ul className="divide-y" style={{ borderColor: "var(--b-line)" }}>
           {items.map((a) => (
-            <li key={a.id} className="py-7 first:pt-0" style={{ borderColor: "var(--b-line)" }}>
+            <li key={a.id} className="py-8 first:pt-0" style={{ borderColor: "var(--b-line)" }}>
               <article>
                 <p className="text-sm" style={{ color: "var(--b-muted)" }}>
                   <time dateTime={a.published_at ?? undefined}>{fmtLongDate(a.published_at, a.language)}</time>
                   {" · "}
                   {Math.max(1, Math.round(a.word_count / 220))} min de lectura
                 </p>
-                <h2 className="b-head mt-1.5 text-xl font-semibold leading-snug sm:text-2xl">
+                <h2 className="b-head mt-2 text-xl font-semibold leading-snug sm:text-[1.6rem]">
                   <Link href={`${ctx.base}/${a.slug}`} className="hover:underline hover:underline-offset-4">
                     {a.title}
                   </Link>
@@ -86,7 +86,7 @@ export default async function HostedBlogIndex({ params, searchParams }: Props) {
                 {!!a.tags?.length && (
                   <p className="mt-3 flex flex-wrap gap-2">
                     {a.tags.map((t) => (
-                      <Link key={t} href={`${ctx.base || "/"}?tag=${encodeURIComponent(t)}`} className="rounded-full border px-2.5 py-1 text-xs" style={{ borderColor: "var(--b-line)" }}>
+                      <Link key={t} href={`${ctx.base || "/"}?tag=${encodeURIComponent(t)}`} className="b-tag">
                         {t}
                       </Link>
                     ))}

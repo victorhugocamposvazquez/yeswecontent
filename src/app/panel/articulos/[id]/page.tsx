@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { ArticleEditor } from "@/components/panel/article-editor";
 import { ArticleStatusBadge } from "@/components/panel/status";
 import { getArticle, getCurrentSite, listContentItems } from "@/lib/data";
@@ -25,23 +25,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
 
   return (
     <>
-      <Link href="/panel/articulos" className="mb-2 -mt-2 inline-flex min-h-10 items-center gap-1.5 text-sm text-ink-3 hover:text-ink sm:mt-0 sm:mb-4 sm:min-h-0">
-        <ArrowLeft className="h-4 w-4" aria-hidden /> Artículos
-      </Link>
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <ArticleStatusBadge status={article.status} />
-        <span className="text-sm text-ink-3">
-          Actualizado el {fmtDate(article.updated_at, { day: "numeric", month: "long" })}
-          {article.published_url && (
-            <>
-              {" · "}
-              <a href={article.published_url} target="_blank" rel="noreferrer" className="text-signal underline">
-                Ver publicado
-              </a>
-            </>
-          )}
-        </span>
-      </div>
       <ArticleEditor
         article={article}
         keyword={item?.keyword ?? ""}
@@ -50,6 +33,21 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
         cmsLabel={cms ? cms.provider.charAt(0).toUpperCase() + cms.provider.slice(1) : null}
         actions={{ save: saveArticle, regenerate: regenerateArticle, publish: publishNow, schedule: scheduleArticle }}
         imageAction={regenerateArticleImage}
+        header={
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
+            <Link href="/panel/articulos" className="-ml-1 inline-flex h-8 items-center gap-1 rounded-lg px-1.5 text-[13px] text-ink-3 transition-colors hover:bg-paper-2 hover:text-ink">
+              <ArrowLeft className="h-4 w-4" aria-hidden /> Artículos
+            </Link>
+            <span className="hidden h-4 w-px bg-line sm:block" aria-hidden />
+            <ArticleStatusBadge status={article.status} />
+            <span className="text-[13px] text-ink-3">Actualizado el {fmtDate(article.updated_at, { day: "numeric", month: "long" })}</span>
+            {article.published_url && (
+              <a href={article.published_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[13px] font-medium text-signal hover:underline">
+                Ver publicado <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+              </a>
+            )}
+          </div>
+        }
       />
     </>
   );

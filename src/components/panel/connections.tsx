@@ -14,7 +14,7 @@ type ProviderKey = "google" | "meta" | "reddit" | "quora";
 const NAMES: Record<string, string> = { google: "Google", meta: "Instagram y Facebook", reddit: "Reddit" };
 
 const connectCls =
-  "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition hover:bg-ink-2 sm:min-h-0 sm:w-auto";
+  "inline-flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-ink px-4.5 text-sm font-semibold text-paper shadow-[var(--shadow-xs)] transition-colors hover:bg-ink-2 sm:h-10 sm:w-auto";
 const disabledCls = "pointer-events-none opacity-50";
 
 export function startUrl(provider: string, siteId: string | null, returnTo: string) {
@@ -26,7 +26,7 @@ export function OAuthNotice({ provider, estado, motivo, demo }: { provider?: str
   if (!provider || !NAMES[provider] || !estado) return null;
   const okState = estado === "ok";
   return (
-    <p role="status" className={cn("mb-4 flex items-start gap-2 rounded-xl px-3.5 py-2.5 text-sm", okState ? "bg-lime/60 text-ink" : "bg-bad/10 text-bad")}>
+    <p role="status" className={cn("mb-4 flex items-start gap-2 rounded-xl px-3.5 py-2.5 text-[13px]", okState ? "bg-ok-soft text-ok" : "bg-bad-soft text-bad")}>
       {!okState && <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />}
       <span>
         {okState
@@ -41,13 +41,13 @@ export function OAuthNotice({ provider, estado, motivo, demo }: { provider?: str
 
 function Row({ title, desc, badge, account, actions, children }: { title: string; desc: string; badge?: React.ReactNode; account?: string | null; actions?: React.ReactNode; children?: React.ReactNode }) {
   return (
-    <li className="rounded-xl border border-line bg-paper p-4">
+    <li className="rounded-xl border border-line bg-card p-4 shadow-[var(--shadow-xs)] transition-shadow hover:shadow-[var(--shadow-sm)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="min-w-0 flex-1">
-          <p className="flex flex-wrap items-center gap-2 font-medium">
+          <p className="flex flex-wrap items-center gap-2 text-[15px] font-semibold tracking-tight">
             {title} {badge}
           </p>
-          <p className="text-sm text-ink-3">{desc}</p>
+          <p className="mt-0.5 text-[13px] text-ink-3">{desc}</p>
           {account && (
             <p className="mt-1 text-sm text-ink-2">
               Conectado como <strong className="break-all font-medium text-ink">{account}</strong>
@@ -64,7 +64,7 @@ function Row({ title, desc, badge, account, actions, children }: { title: string
 function PickSelect({ id, name, label, options, value, empty }: { id: string; name: string; label: string; options: Option[]; value: string | null; empty: string }) {
   return (
     <div className="min-w-0">
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink-2">
+      <label htmlFor={id} className="mb-1.5 block text-[13px] font-medium text-ink-2">
         {label}
       </label>
       <Select id={id} name={name} defaultValue={value ?? ""} className="truncate">
@@ -131,7 +131,7 @@ export function ConnectionsList({
               <Badge tone="bad">Reconectar</Badge>
             ) : google.connected ? (
               google.gscProperty || google.ga4Property ? (
-                <Badge tone="ok">Conectado</Badge>
+                <Badge tone="ok" dot>Conectado</Badge>
               ) : (
                 <Badge tone="warn">Elige propiedad</Badge>
               )
@@ -160,7 +160,7 @@ export function ConnectionsList({
                 </div>
               </ActionForm>
               {(google.gscProperty || google.ga4Property) && (
-                <div className="mt-4 flex flex-col gap-2 rounded-lg bg-paper-2 px-3 py-2.5 text-xs text-ink-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mt-4 flex flex-col gap-2 rounded-lg border border-line bg-paper-2/60 px-3 py-2.5 text-xs text-ink-3 sm:flex-row sm:items-center sm:justify-between">
                   <span>
                     {google.lastSync ? `Última sincronización: ${fmtDate(google.lastSync, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}.` : "Aún no hemos sincronizado."} Se actualiza cada noche.
                   </span>
@@ -180,7 +180,7 @@ export function ConnectionsList({
           title="Instagram y Facebook"
           desc="Publicamos en tu página de Facebook y los carruseles en tu cuenta profesional de Instagram vinculada."
           account={meta.connected ? meta.account : null}
-          badge={meta.status === "error" ? <Badge tone="bad">Reconectar</Badge> : meta.connected ? meta.pageId ? <Badge tone="ok">Conectado</Badge> : <Badge tone="warn">Elige página</Badge> : null}
+          badge={meta.status === "error" ? <Badge tone="bad">Reconectar</Badge> : meta.connected ? meta.pageId ? <Badge tone="ok" dot>Conectado</Badge> : <Badge tone="warn">Elige página</Badge> : null}
           actions={
             meta.connected ? (
               <>
@@ -224,7 +224,7 @@ export function ConnectionsList({
           title="Reddit"
           desc="Respondemos desde tu usuario en conversaciones de tu sector, solo cuando tú lo apruebas."
           account={reddit.connected ? reddit.account : null}
-          badge={reddit.status === "error" ? <Badge tone="bad">Reconectar</Badge> : reddit.connected ? <Badge tone="ok">Conectado</Badge> : null}
+          badge={reddit.status === "error" ? <Badge tone="bad">Reconectar</Badge> : reddit.connected ? <Badge tone="ok" dot>Conectado</Badge> : null}
           actions={
             reddit.connected ? (
               <>

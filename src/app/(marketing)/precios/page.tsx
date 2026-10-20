@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Check, Minus, ShieldCheck, Timer } from "lucide-react";
+import { Check, Minus, ShieldCheck, Timer, XCircle } from "lucide-react";
 import { listPlans } from "@/lib/data";
 import { volumeDiscounts } from "@/lib/demo";
 import type { Plan } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui";
 import { Pricing } from "@/components/marketing/pricing";
-import { Container, CtaBand, CtaLink, Eyebrow, Faq, Section, Title } from "@/components/marketing/primitives";
+import { AgencyPortalMockup } from "@/components/marketing/mockups";
+import { Container, CtaBand, CtaLink, Eyebrow, Faq, Lead, Section, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
   title: "Precios",
@@ -92,26 +94,28 @@ export default async function PreciosPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-line">
-        <Container className="relative py-16 text-center md:py-24">
-          <Eyebrow>Precios</Eyebrow>
-          <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl leading-[1.05] tracking-tight sm:text-6xl">
+      <section className="glow relative overflow-hidden">
+        <Container className="relative pt-14 pb-10 text-center sm:pt-20 md:pt-24 md:pb-12">
+          <Eyebrow className="rise">Precios</Eyebrow>
+          <Title as="h1" size="lg" className="rise rise-2 mx-auto mt-5 max-w-4xl">
             Más tráfico orgánico en 60 días <span className="marker">o te devolvemos el dinero</span>.
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-2">Un precio por web, todo incluido. Empieza con 3 días gratis y decide con datos.</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5">
-              <Timer className="h-3.5 w-3.5" aria-hidden /> 3 días de prueba
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Garantía de 60 días
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5">Sin permanencia</span>
+          </Title>
+          <Lead className="rise rise-2 mx-auto mt-6 max-w-2xl">Un precio por web, todo incluido. Empieza con 3 días gratis y decide con datos.</Lead>
+          <div className="rise rise-3 mt-6 flex flex-wrap justify-center gap-2">
+            <Badge className="bg-card px-3 py-1 text-[13px]">
+              <Timer className="h-3.5 w-3.5 text-signal" aria-hidden /> 3 días de prueba
+            </Badge>
+            <Badge className="bg-card px-3 py-1 text-[13px]">
+              <ShieldCheck className="h-3.5 w-3.5 text-ok" aria-hidden /> Garantía de 60 días
+            </Badge>
+            <Badge className="bg-card px-3 py-1 text-[13px]">
+              <XCircle className="h-3.5 w-3.5 text-ink-3" aria-hidden /> Sin permanencia
+            </Badge>
           </div>
         </Container>
       </section>
 
-      <Section className="pt-14 md:pt-16">
+      <Section className="pt-4 sm:pt-6 md:pt-8 lg:pt-10">
         <Container>
           {plans.length ? (
             <Pricing plans={plans} discounts={volumeDiscounts} />
@@ -122,38 +126,44 @@ export default async function PreciosPage() {
       </Section>
 
       {/* Agencias */}
-      <Section className="pt-0 md:pt-0">
+      <Section tone="paper-2">
         <Container>
-          <div className="grid grid-cols-1 gap-10 rounded-2xl border border-line bg-ink p-8 text-paper md:grid-cols-[1.1fr_1fr] md:p-14">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
             <div>
-              <Eyebrow tone="paper">Agencias y reventa</Eyebrow>
-              <h2 className="mt-4 font-display text-3xl leading-[1.1] sm:text-4xl md:text-5xl">
-                Véndelo con <span className="text-lime">tu marca</span>. Nosotros hacemos el trabajo.
-              </h2>
-              <CtaLink href="/agencias#contacto" tone="lime" className="mt-8">
+              <Eyebrow>Agencias y reventa</Eyebrow>
+              <Title className="mt-4">
+                Véndelo con <span className="marker">tu marca</span>. Nosotros hacemos el trabajo.
+              </Title>
+              <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {[
+                  ["Revende con tu marca", "Panel, informes y emails con tu logo, tus colores y tu dominio."],
+                  ["Tú controlas qué se ve", "Decide qué módulos y datos ve cada cliente."],
+                  ["Todos tus clientes juntos", "Un solo panel para todas las webs, con descuento por volumen."],
+                  ["Ejecución en automático", "Plan, artículos, publicación y enlaces, sin ampliar plantilla."],
+                ].map(([t, d]) => (
+                  <li key={t} className="flex gap-3">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-signal-soft text-signal">
+                      <Check className="h-3 w-3" aria-hidden />
+                    </span>
+                    <span>
+                      <p className="font-semibold tracking-tight">{t}</p>
+                      <p className="mt-0.5 text-sm text-ink-2">{d}</p>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <CtaLink href="/agencias#contacto" className="mt-8">
                 Reservar una llamada de 15 min
               </CtaLink>
             </div>
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {[
-                ["Revende con tu marca", "Panel, informes y emails con tu logo, tus colores y tu dominio."],
-                ["Tú controlas qué se ve", "Decide qué módulos y datos ve cada cliente."],
-                ["Todos tus clientes juntos", "Un solo panel para todas las webs, con descuento por volumen."],
-                ["Ejecución en automático", "Plan, artículos, publicación y enlaces, sin ampliar plantilla."],
-              ].map(([t, d]) => (
-                <li key={t} className="rounded-2xl border border-paper/20 p-5">
-                  <p className="font-semibold">{t}</p>
-                  <p className="mt-1 text-sm text-paper/70">{d}</p>
-                </li>
-              ))}
-            </ul>
+            <AgencyPortalMockup />
           </div>
         </Container>
       </Section>
 
       {/* Comparativa */}
       {plans.length > 0 && (
-        <Section className="pt-0 md:pt-0" id="comparativa">
+        <Section id="comparativa">
           <Container>
             <div className="max-w-2xl">
               <Eyebrow>Comparativa</Eyebrow>
@@ -162,16 +172,16 @@ export default async function PreciosPage() {
               </Title>
             </div>
             {/* Con 1–2 planes cabe en móvil: sin contenedor de scroll, así la cabecera puede quedarse fija bajo el menú. */}
-            <div className={cn("mt-12 rounded-2xl border border-line bg-card", plans.length > 2 ? "scroll-x" : "overflow-clip")}>
+            <div className={cn("mt-10 rounded-2xl border border-line bg-card shadow-[var(--shadow-xs)] md:mt-12", plans.length > 2 ? "scroll-x" : "overflow-clip")}>
               <table className="w-full text-sm" style={{ minWidth: plans.length > 2 ? `${200 + plans.length * 96}px` : undefined }}>
                 <caption className="sr-only">Comparativa de planes</caption>
                 <thead className="sticky top-16 z-[2]">
-                  <tr className="border-b border-line bg-card">
-                    <th scope="col" className="sticky left-0 z-[1] w-1/2 bg-card px-4 py-4 text-left font-mono sm:px-5 sm:py-5 text-[11px] font-normal uppercase tracking-[0.16em] text-ink-3">
+                  <tr className="border-b border-line bg-card/95 backdrop-blur">
+                    <th scope="col" className="sticky left-0 z-[1] w-1/2 bg-card px-4 py-4 text-left text-[13px] font-medium text-ink-3 sm:px-5">
                       Funcionalidad
                     </th>
                     {plans.map((p) => (
-                      <th key={p.id} scope="col" className="px-2 py-4 text-center font-display text-xl font-normal sm:px-4 sm:py-5 sm:text-2xl">
+                      <th key={p.id} scope="col" className="px-2 py-4 text-center text-base font-semibold tracking-tight sm:px-4 sm:text-lg">
                         {p.name}
                       </th>
                     ))}
@@ -180,26 +190,28 @@ export default async function PreciosPage() {
                 {groups.map((g) => (
                   <tbody key={g.title}>
                     <tr className="bg-paper-2">
-                      <th colSpan={plans.length + 1} scope="colgroup" className="px-4 py-3 text-left font-mono text-[11px] uppercase tracking-[0.2em] text-signal sm:px-5">
+                      <th colSpan={plans.length + 1} scope="colgroup" className="px-4 py-2.5 text-left text-[13px] font-semibold text-ink sm:px-5">
                         <span className="sticky left-4 sm:left-5">{g.title}</span>
                       </th>
                     </tr>
                     {g.rows.map((r) => (
                       <tr key={r.label} className="border-t border-line">
-                        <th scope="row" className="sticky left-0 z-[1] bg-card px-4 py-3.5 text-left font-normal sm:px-5">
+                        <th scope="row" className="sticky left-0 z-[1] bg-card px-4 py-3 text-left font-normal text-ink-2 sm:px-5">
                           {r.label}
                           {r.hint && <span className="block text-xs text-ink-3">{r.hint}</span>}
                         </th>
                         {plans.map((p, t) => {
                           const v = r.value(p, t);
                           return (
-                            <td key={p.id} className="px-2 py-3.5 text-center sm:px-4">
+                            <td key={p.id} className="px-2 py-3 text-center sm:px-4">
                               {v === true ? (
-                                <Check className="mx-auto h-5 w-5 text-ok" aria-label="Incluido" />
+                                <span className="mx-auto grid h-5 w-5 place-items-center rounded-full bg-ok-soft text-ok">
+                                  <Check className="h-3 w-3" aria-label="Incluido" />
+                                </span>
                               ) : v === false ? (
-                                <Minus className="mx-auto h-5 w-5 text-ink-3" aria-label="No incluido" />
+                                <Minus className="mx-auto h-4 w-4 text-ink-3" aria-label="No incluido" />
                               ) : (
-                                <span className="font-semibold tabular-nums">{v}</span>
+                                <span className="tabular font-semibold">{v}</span>
                               )}
                             </td>
                           );
@@ -214,8 +226,8 @@ export default async function PreciosPage() {
         </Section>
       )}
 
-      <Section className="pt-0 md:pt-0">
-        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+      <Section tone="paper-2">
+        <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <Eyebrow>Preguntas frecuentes</Eyebrow>
             <Title className="mt-4">
@@ -226,7 +238,9 @@ export default async function PreciosPage() {
         </Container>
       </Section>
 
-      <CtaBand title="Tres días para verlo con tus propios ojos." text="No se cobra nada hasta el cuarto día y cancelas con un clic desde el panel." />
+      <div className="pt-14 sm:pt-16 md:pt-24 lg:pt-28">
+        <CtaBand title="Tres días para verlo con tus propios ojos." text="No se cobra nada hasta el cuarto día y cancelas con un clic desde el panel." />
+      </div>
     </>
   );
 }

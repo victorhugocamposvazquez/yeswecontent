@@ -19,8 +19,8 @@ export function CopyButton({ text, dark = false, label = "Copiar" }: { text: str
         }
       }}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold",
-        dark ? "border border-paper/40 hover:bg-paper/10" : "border border-line bg-card hover:bg-paper-2",
+        "inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors duration-150",
+        dark ? "border border-paper/25 hover:bg-paper/10" : "border border-line-2 bg-card hover:bg-paper-2",
       )}
     >
       {done ? <Check className="h-3.5 w-3.5" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}

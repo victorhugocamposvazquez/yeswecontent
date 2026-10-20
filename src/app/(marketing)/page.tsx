@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, Check, Globe, Minus, Quote, Search, Star, X } from "lucide-react";
+import { ArrowUpRight, BookOpen, Check, Globe, Quote, Search } from "lucide-react";
 import { listPlans } from "@/lib/data";
 import { eur, num } from "@/lib/utils";
 import { getProduct } from "@/lib/marketing/products";
 import { growth, listPublishedCases } from "@/lib/marketing/cases";
+import { Badge, Button, Card, Input } from "@/components/ui";
 import { HeroVisual } from "@/components/marketing/hero-visual";
 import { RotatingWord } from "@/components/marketing/rotating-word";
-import { BrandLogo } from "@/components/marketing/brand-logo";
-import { ENGINES, RATING } from "@/lib/marketing/social-proof";
-import { Container, CtaBand, CtaLink, Eyebrow, Faq, ProductGlyph, Section, Ticket, Title } from "@/components/marketing/primitives";
+import { RatingPill } from "@/components/marketing/rating-pill";
+import { EngineWordmark } from "@/components/marketing/engine-wordmark";
+import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup, SocialMockup } from "@/components/marketing/mockups";
+import { ENGINES } from "@/lib/marketing/social-proof";
+import { Container, CtaBand, CtaLink, EngineLogo, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
   title: { absolute: "yeswecontent · Tráfico orgánico desde Google y la IA, en piloto automático" },
@@ -44,14 +47,6 @@ const featureRows = [
   { slug: "auditoria-geo", eyebrow: "Técnica", title: "Arreglamos lo que te frena", text: "Rastreo, etiquetas, velocidad, datos estructurados y preparación para IA, ordenados por impacto y con su solución." },
 ];
 
-const prompts = [
-  { q: "mejor tienda de cerámica artesanal online", r: ["#2", "#3", null, "fuente"] },
-  { q: "vajilla de gres apta para lavavajillas", r: ["#1", "#2", "#4", "#1"] },
-  { q: "regalo hecho a mano para una boda", r: [null, "#5", null, null] },
-  { q: "cómo cuidar piezas de barro esmaltado", r: ["fuente", "#1", "#2", "fuente"] },
-];
-const models = ["ChatGPT", "Claude", "Gemini", "Perplexity"];
-
 const languages = [
   "Español", "English", "Català", "Euskara", "Galego", "Português", "Français", "Deutsch", "Italiano", "Nederlands", "Polski", "Svenska",
   "Dansk", "Norsk", "Suomi", "Čeština", "Română", "Magyar", "Ελληνικά", "Türkçe", "Русский", "Українська", "العربية", "עברית",
@@ -79,78 +74,64 @@ export default async function HomePage() {
   return (
     <>
       {/* ───────── HERO ───────── */}
-      <section className="relative overflow-hidden border-b border-line">
-        <Container className="relative flex flex-col items-center py-16 text-center md:py-24">
-          <Eyebrow>SEO + GEO · en piloto automático</Eyebrow>
-          <h1 className="mt-6 font-display text-[2.125rem] leading-[1.08] tracking-tight min-[400px]:text-4xl sm:text-6xl lg:text-7xl">
+      <section className="glow relative overflow-hidden">
+        <div aria-hidden className="grid-bg pointer-events-none absolute inset-x-0 top-0 h-[36rem]" />
+        <Container className="relative flex flex-col items-center pt-14 text-center sm:pt-20 md:pt-24">
+          <Eyebrow className="rise">SEO + GEO · en piloto automático</Eyebrow>
+          <h1 className="rise rise-2 mt-5 w-full max-w-[1100px] font-display text-[clamp(2.125rem,6.4vw,4.75rem)]">
             <span className="sr-only">Automatiza que te encuentren cuando buscan en Google, ChatGPT, Gemini, Perplexity o Claude.</span>
             <span aria-hidden className="block">Automatiza que te encuentren</span>
-            <span aria-hidden className="block">
-              cuando buscan en <RotatingWord className="max-sm:grid max-sm:justify-items-center" />
+            <span aria-hidden className="block md:whitespace-nowrap">
+              cuando buscan en <RotatingWord className="max-sm:mx-auto max-sm:block" />
             </span>
           </h1>
-          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-ink-2 md:text-xl">
+          <Lead className="rise rise-2 mt-6 max-w-2xl md:text-xl">
             Escribimos, publicamos y posicionamos el contenido de tu web para que Google y los asistentes de IA te recomienden, sin que tengas que montar un equipo de SEO.
-          </p>
-          <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
-            <CtaLink href="/registro" size="lg">
+          </Lead>
+          <div className="rise rise-3 mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
+            <CtaLink href="/registro" size="lg" className="w-full sm:w-auto">
               Prueba gratis 3 días
             </CtaLink>
-            <CtaLink href="#como-funciona" tone="paper" size="lg" arrow={false}>
+            <CtaLink href="#como-funciona" tone="paper" size="lg" arrow={false} className="w-full sm:w-auto">
               Ver cómo funciona
             </CtaLink>
           </div>
-          <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
-            <div className="flex -space-x-2" aria-hidden>
-              {RATING.avatars.map((a, i) => (
-                <span
-                  key={a}
-                  className={`grid h-9 w-9 place-items-center rounded-full border border-line font-mono text-[10px] font-bold ${["bg-lime", "bg-sky", "bg-signal text-white", "bg-paper-2", "bg-card"][i % 5]}`}
-                >
-                  {a}
-                </span>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="flex text-signal" aria-hidden>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
-              </span>
-              <span className="font-semibold tabular-nums">
-                {RATING.score.toLocaleString("es-ES")}/{RATING.outOf}
-              </span>
-              <span className="text-ink-2">{RATING.label}</span>
-            </div>
+          <div className="rise rise-3 mt-7">
+            <RatingPill />
+          </div>
+
+          <div className="rise rise-3 relative mt-12 w-full max-w-[1100px] sm:mt-16">
+            <div aria-hidden className="pointer-events-none absolute -inset-x-10 -top-10 h-40 rounded-full bg-signal/10 blur-3xl" />
+            <PanelMockup className="relative" />
           </div>
         </Container>
-      </section>
 
-      {/* ───────── TICKER DE MOTORES ───────── */}
-      <section aria-label="Dónde te posicionamos" className="overflow-hidden border-b border-line bg-paper-2 py-4">
-        <p className="sr-only">Te posicionamos en {ENGINES.map((e) => e.name).join(", ")}.</p>
-        <div aria-hidden className="ticker flex w-max gap-3 whitespace-nowrap">
-          {Array.from({ length: 4 }).flatMap((_, k) =>
-            ENGINES.map((e) => (
-              <span key={`${k}-${e.name}`} className="inline-flex items-center gap-2.5 rounded-full border border-line bg-card px-4 py-2 text-ink-2">
-                <BrandLogo src={e.logo} className="h-5 w-5 text-ink" />
-                <span className="text-sm font-semibold">{e.name}</span>
-              </span>
-            )),
-          )}
+        {/* Plataformas */}
+        <div aria-label="Dónde te posicionamos" className="relative mt-10 overflow-hidden border-y border-line bg-paper/70 py-4 backdrop-blur sm:mt-14">
+          <p className="sr-only">Te posicionamos en {ENGINES.map((e) => e.name).join(", ")}.</p>
+          <div aria-hidden className="ticker flex w-max gap-3 whitespace-nowrap">
+            {Array.from({ length: 4 }).flatMap((_, k) =>
+              ENGINES.map((e) => (
+                <span key={`${k}-${e.name}`} className="inline-flex items-center rounded-full border border-line bg-card px-4 py-2 text-[1.125rem] shadow-[var(--shadow-xs)]">
+                  <EngineWordmark name={e.name} decorative />
+                </span>
+              )),
+            )}
+          </div>
         </div>
       </section>
 
-      {/* ───────── FRANJA DE SECTORES (marcas de ejemplo) ───────── */}
+      {/* ───────── MARCAS DE EJEMPLO ───────── */}
       {cases.length > 0 && (
-        <section aria-label="Sectores de ejemplo" className="border-b border-line bg-card">
-          <Container className="flex flex-col items-center gap-4 py-7 md:flex-row md:justify-between">
-            <p className="shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">Funciona en sectores como · marcas de ejemplo</p>
-            <ul className="flex flex-wrap justify-center gap-x-8 gap-y-3">
-              {cases.map((c) => (
-                <li key={c.slug} className="flex items-baseline gap-2">
-                  <span className="font-display text-2xl">{c.company}</span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-3">{c.sector}</span>
+        <section aria-label="Sectores de ejemplo" className="border-b border-line bg-paper">
+          <Container className="py-10 md:py-12">
+            <p className="text-center text-xs font-medium text-ink-3">Funciona en sectores como estos · marcas de ejemplo</p>
+            <ul className="mt-6 grid grid-cols-2 items-center gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
+              {cases.slice(0, 6).map((c) => (
+                <li key={c.slug} className="flex h-8 items-center justify-center">
+                  <span className="truncate text-[1.125rem] font-semibold tracking-tight text-ink-3 sm:text-xl" title={c.sector ?? undefined}>
+                    {c.company}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -168,26 +149,28 @@ export default async function HomePage() {
                 Crecer en <span className="marker">tres pasos</span>, y ninguno es una reunión.
               </Title>
             </div>
-            <p className="max-w-sm text-ink-2">Configuras una vez. A partir de ahí, el sistema trabaja cada semana y tú decides cuánto quieres supervisar.</p>
+            <Lead className="max-w-sm text-base">Configuras una vez. A partir de ahí, el sistema trabaja cada semana y tú decides cuánto quieres supervisar.</Lead>
           </div>
-          <ol className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <ol className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
             {steps.map((s) => (
-              <li key={s.n} className="relative rounded-2xl border border-line bg-card p-7">
-                <span className="font-mono text-sm font-semibold text-signal">{s.n}</span>
-                <h3 className="mt-5 text-xl font-semibold">{s.title}</h3>
-                <p className="mt-2 text-ink-2 leading-relaxed">{s.text}</p>
+              <li key={s.n}>
+                <Card className="h-full p-6 sm:p-7">
+                  <span className="tabular text-sm font-semibold text-signal">{s.n}</span>
+                  <h3 className="mt-4 text-lg font-semibold tracking-tight sm:text-xl">{s.title}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{s.text}</p>
+                </Card>
               </li>
             ))}
           </ol>
-          <div className="mt-14 grid grid-cols-1 items-center gap-12 rounded-2xl border border-line bg-paper-2 p-6 sm:p-10 lg:grid-cols-[1fr_1.1fr]">
+          <div className="mt-6 grid grid-cols-1 items-center gap-10 rounded-3xl border border-line bg-paper-2 p-6 sm:p-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:p-14">
             <div>
               <Eyebrow tone="ink">Lo que pasa cada semana</Eyebrow>
-              <p className="mt-4 font-display text-3xl leading-[1.1] md:text-4xl">
+              <Title size="sm" className="mt-4">
                 Un artículo se escribe, se publica… y <span className="marker">la IA lo cita</span>.
-              </p>
-              <p className="mt-4 max-w-md text-ink-2">
+              </Title>
+              <Lead className="mt-4 max-w-md text-base">
                 Ejemplo con una marca ficticia: el artículo sale con nota de calidad, FAQ y schema, se publica a su hora y acaba como fuente en la respuesta de un asistente.
-              </p>
+              </Lead>
             </div>
             <HeroVisual />
           </div>
@@ -195,47 +178,51 @@ export default async function HomePage() {
       </Section>
 
       {/* ───────── VISIBILIDAD SIN TRABAJO MANUAL ───────── */}
-      <Section className="border-y border-line bg-paper-2">
+      <Section tone="paper-2">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             <Eyebrow>El sistema completo</Eyebrow>
             <Title className="mt-4">
               Visibilidad <span className="marker">sin trabajo manual</span>
             </Title>
-            <p className="mt-5 text-lg text-ink-2">Cinco piezas que normalmente necesitan cinco proveedores. Aquí funcionan juntas y se hablan entre sí.</p>
+            <Lead className="mt-5">Cinco piezas que normalmente necesitan cinco proveedores. Aquí funcionan juntas y se hablan entre sí.</Lead>
           </div>
-          <div className="mt-16 space-y-20 md:space-y-28">
+          <div className="mt-14 space-y-16 md:mt-20 md:space-y-24 lg:space-y-28">
             {featureRows.map((f, i) => {
               const p = getProduct(f.slug)!;
               return (
-                <div key={f.slug} className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
-                  <div className={i % 2 ? "md:order-2" : ""}>
+                <div key={f.slug} className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16">
+                  <div className={i % 2 ? "lg:order-2" : ""}>
                     <div className="flex items-center gap-3">
-                      <span className="grid h-11 w-11 place-items-center rounded-xl border border-line bg-card">
-                        <ProductGlyph icon={p.icon} className="h-5 w-5" />
-                      </span>
+                      <IconBox>
+                        <ProductGlyph icon={p.icon} />
+                      </IconBox>
                       <Eyebrow tone="ink">
                         {String(i + 1).padStart(2, "0")} · {f.eyebrow}
                       </Eyebrow>
                     </div>
-                    <h3 className="mt-5 font-display text-3xl leading-[1.1] md:text-4xl">{f.title}</h3>
-                    <p className="mt-4 max-w-md text-lg leading-relaxed text-ink-2">{f.text}</p>
-                    <ul className="mt-5 space-y-2">
+                    <Title as="h3" size="sm" className="mt-5">
+                      {f.title}
+                    </Title>
+                    <Lead className="mt-4 max-w-md text-base">{f.text}</Lead>
+                    <ul className="mt-5 space-y-2.5">
                       {p.features.slice(0, 3).map((x) => (
-                        <li key={x.title} className="flex gap-2 text-ink-2">
-                          <Check className="mt-1 h-4 w-4 shrink-0 text-signal" aria-hidden />
+                        <li key={x.title} className="flex gap-2.5 text-[15px] text-ink-2">
+                          <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-signal-soft text-signal">
+                            <Check className="h-3 w-3" aria-hidden />
+                          </span>
                           <span>
                             <strong className="font-semibold text-ink">{x.title}.</strong> {x.text}
                           </span>
                         </li>
                       ))}
                     </ul>
-                    <Link href={`/producto/${p.slug}`} className="mt-6 inline-flex items-center gap-1 font-semibold underline decoration-2 underline-offset-4 hover:text-signal">
-                      Ver {p.name.toLowerCase()} <ArrowUpRight className="h-4 w-4" aria-hidden />
-                    </Link>
+                    <TextLink href={`/producto/${p.slug}`} className="mt-6">
+                      Ver {p.name.toLowerCase()}
+                    </TextLink>
                   </div>
-                  <div className={i % 2 ? "md:order-1" : ""}>
-                    <Ticket {...p.sample} />
+                  <div className={i % 2 ? "lg:order-1" : ""}>
+                    <ProductMockup slug={f.slug} />
                   </div>
                 </div>
               );
@@ -247,210 +234,121 @@ export default async function HomePage() {
       {/* ───────── SOCIAL ───────── */}
       <Section>
         <Container>
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-16">
             <div>
               <Eyebrow>Visibilidad social</Eyebrow>
               <Title className="mt-4">
                 También donde la gente <span className="marker">pregunta en voz alta</span>.
               </Title>
-              <p className="mt-5 max-w-lg text-lg text-ink-2">
+              <Lead className="mt-5 max-w-lg">
                 Reddit y Quora son de las fuentes que más consultan los asistentes. Te proponemos respuestas útiles basadas en tus artículos, y convertimos cada artículo en un carrusel para tus redes.
-              </p>
+              </Lead>
               <CtaLink href="/producto/social" tone="paper" className="mt-8">
                 Cómo funciona
               </CtaLink>
             </div>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <div className="rounded-2xl border border-line bg-card p-5 sm:col-span-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">Agente de Reddit · r/Ceramics</p>
-                  <span className="rounded-full bg-paper-2 px-2 py-0.5 text-xs">Borrador</span>
-                </div>
-                <p className="mt-3 font-semibold">«¿Qué esmalte es seguro para tazas de uso diario?»</p>
-                <p className="mt-2 border-l-4 border-signal pl-3 text-sm leading-relaxed text-ink-2">
-                  Lo importante es que el esmalte esté certificado sin plomo y que la pieza esté vitrificada. Escribimos una guía con las pruebas que hacemos en el taller, por si te sirve…
-                </p>
-              </div>
-              <div className="rounded-2xl border border-line bg-card p-5">
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">Agente de Quora</p>
-                <p className="mt-3 text-sm font-semibold">«¿Merece la pena la cerámica artesanal frente a la industrial?»</p>
-                <p className="mt-2 text-xs text-ink-3">Respuesta lista para revisar</p>
-              </div>
-              <div className="relative rounded-2xl border border-line bg-signal p-5 text-signal-ink">
-                <span className="absolute -top-3 right-4 rounded-full border border-line bg-lime px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-ink">Nuevo</span>
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/80">Carrusel · Instagram y Facebook</p>
-                <div className="mt-3 flex gap-1.5" aria-hidden>
-                  {["01", "02", "03", "04"].map((n, i) => (
-                    <span key={n} className={`grid h-14 w-11 place-items-center rounded-md border border-line font-display text-lg ${i === 0 ? "bg-paper text-ink" : "bg-white/20"}`}>
-                      {n}
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-3 text-xs text-white/85">8 diapositivas a partir del último artículo</p>
-              </div>
-            </div>
+            <SocialMockup />
           </div>
         </Container>
       </Section>
 
       {/* ───────── VISIBILIDAD IA ───────── */}
-      <section className="border-y border-line bg-ink py-20 text-paper md:py-28">
-        <Container>
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-end">
+      <Section tone="ink" className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundImage: "radial-gradient(40% 50% at 80% 10%, rgba(255,79,31,0.22), transparent 70%), radial-gradient(30% 40% at 10% 90%, rgba(212,245,90,0.12), transparent 70%)" }}
+        />
+        <Container className="relative">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.3fr] lg:items-end">
             <div>
               <Eyebrow tone="paper">Visibilidad en IA</Eyebrow>
-              <h2 className="mt-4 font-display text-3xl leading-[1.1] sm:text-4xl md:text-5xl">
+              <Title className="mt-4 text-paper">
                 Entérate de cuándo la IA <span className="text-lime">te recomienda</span>.
-              </h2>
+              </Title>
             </div>
-            <p className="text-lg text-paper/75">
+            <p className="text-pretty text-base leading-relaxed text-paper/70 sm:text-lg">
               Eliges las preguntas que haría tu cliente. Cada día se las hacemos a cuatro asistentes y apuntamos si sales, en qué posición, con qué fuentes y junto a qué competidores.
             </p>
           </div>
-          <div className="scroll-x mt-12 rounded-2xl border border-paper/20 [--scroll-bg:var(--ink)] [--scroll-shadow:rgba(255,255,255,0.22)]">
-            <table className="w-full min-w-[560px] text-left text-sm sm:min-w-[640px]">
-              <caption className="sr-only">Ejemplo de seguimiento de menciones en asistentes de IA</caption>
-              <thead>
-                <tr className="border-b border-paper/20 font-mono text-[11px] uppercase tracking-[0.16em] text-paper/60">
-                  <th className="sticky left-0 z-[1] bg-ink px-5 py-4 font-normal sm:static">Pregunta seguida</th>
-                  {models.map((m) => (
-                    <th key={m} className="px-4 py-4 text-center font-normal">
-                      {m}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {prompts.map((p) => (
-                  <tr key={p.q} className="border-b border-paper/10 last:border-0">
-                    <td className="sticky left-0 z-[1] w-44 bg-ink px-5 py-4 font-display text-lg leading-snug sm:static sm:w-auto sm:text-xl">«{p.q}»</td>
-                    {p.r.map((r, i) => (
-                      <td key={i} className="px-4 py-4 text-center">
-                        {r === null ? (
-                          <span className="inline-flex items-center gap-1 text-paper/40">
-                            <X className="h-4 w-4" aria-hidden /> <span className="sr-only">No aparece</span>
-                          </span>
-                        ) : r === "fuente" ? (
-                          <span className="rounded-full border border-lime px-2.5 py-1 font-mono text-[11px] text-lime">fuente</span>
-                        ) : (
-                          <span className="rounded-full bg-lime px-2.5 py-1 font-mono text-[11px] font-bold text-ink">{r}</span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-10 flex flex-wrap items-center gap-2 md:mt-12">
+            {["ChatGPT", "Claude", "Gemini", "Perplexity"].map((m) => (
+              <span key={m} className="inline-flex items-center gap-2 rounded-full border border-paper/15 bg-paper/5 px-3 py-1.5 text-[13px] font-medium text-paper">
+                <EngineLogo name={m} size={16} alt="" /> {m}
+              </span>
+            ))}
           </div>
+          <AiMatrixMockup className="mt-5" />
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-paper/50">Ejemplo con una marca ficticia · #n = posición en la respuesta</p>
-            <Link href="/producto/visibilidad-ia" className="inline-flex items-center gap-1 font-semibold text-lime underline decoration-2 underline-offset-4">
+            <p className="text-xs text-paper/50">Ejemplo con una marca ficticia · #n = posición en la respuesta</p>
+            <Link href="/producto/visibilidad-ia" className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-lime transition-colors duration-150 hover:text-paper sm:min-h-0">
               Más sobre visibilidad en IA <ArrowUpRight className="h-4 w-4" aria-hidden />
             </Link>
           </div>
         </Container>
-      </section>
+      </Section>
 
       {/* ───────── IDIOMAS ───────── */}
       <Section>
         <Container>
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16">
             <div>
               <Eyebrow>Idiomas</Eyebrow>
               <Title className="mt-4">
                 Más de <span className="marker">50 idiomas</span>, cada uno con su acento.
               </Title>
-              <p className="mt-5 max-w-md text-lg text-ink-2">
+              <Lead className="mt-5 max-w-md">
                 No traducimos: investigamos las búsquedas de cada mercado y escribimos para ese lector. Ideal si vendes fuera o si tu público es bilingüe.
-              </p>
+              </Lead>
               <p className="mt-5 inline-flex items-center gap-2 text-sm text-ink-3">
                 <Globe className="h-4 w-4" aria-hidden /> Con hreflang y versiones enlazadas entre sí.
               </p>
             </div>
             <ul className="flex flex-wrap gap-2" aria-label="Algunos de los idiomas disponibles">
               {languages.map((l) => (
-                <li
-                  key={l}
-                  className="rounded-full border border-line bg-card px-3.5 py-1.5 text-sm"
-                >
+                <li key={l} className="rounded-full border border-line bg-card px-3.5 py-1.5 text-sm shadow-[var(--shadow-xs)]">
                   {l}
                 </li>
               ))}
-              <li className="rounded-full border border-dashed border-line px-3.5 py-1.5 text-sm text-ink-2">y más…</li>
+              <li className="rounded-full border border-dashed border-line-2 px-3.5 py-1.5 text-sm text-ink-2">y más…</li>
             </ul>
           </div>
         </Container>
       </Section>
 
       {/* ───────── ARTÍCULO DE MUESTRA ───────── */}
-      <Section className="border-y border-line bg-paper-2">
+      <Section tone="paper-2">
         <Container>
           <div className="max-w-2xl">
             <Eyebrow>Un artículo de muestra</Eyebrow>
             <Title className="mt-4">
               Así queda un texto <span className="marker">recién salido</span> del horno.
             </Title>
-            <p className="mt-5 text-lg text-ink-2">Ejemplo ficticio para una clínica de fisioterapia. Fíjate en la respuesta directa arriba, las preguntas frecuentes y los enlaces internos.</p>
+            <Lead className="mt-5">Ejemplo ficticio para una clínica de fisioterapia. Fíjate en la respuesta directa arriba, las preguntas frecuentes y los enlaces internos.</Lead>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-[1.6fr_1fr]">
-            <article className="rounded-2xl border border-line bg-card p-6 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-10">
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">Blog · Clínica Azahar · 6 min</p>
-              <h3 className="mt-3 font-display text-3xl leading-[1.1] md:text-4xl">¿Frío o calor para el dolor de espalda? Depende de cuándo empezó</h3>
-              <div className="mt-6 rounded-xl border-l-4 border-signal bg-paper p-4">
-                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-signal">Respuesta corta</p>
-                <p className="mt-1 leading-relaxed">
-                  Si el dolor apareció hace menos de 48 horas tras un golpe o un esfuerzo, frío. Si es una molestia que arrastras desde hace semanas, calor. Ante dolor intenso u hormigueo, consulta.
-                </p>
-              </div>
-              <h4 className="mt-7 text-xl font-semibold">Por qué el frío funciona en las primeras horas</h4>
-              <p className="mt-2 leading-relaxed text-ink-2">
-                El frío reduce el flujo de sangre en la zona y calma la inflamación inicial. Aplica una bolsa envuelta en un paño durante 15 minutos, nunca directamente sobre la piel. Si quieres entender qué pasa en una{" "}
-                <span className="font-medium text-ink underline decoration-signal decoration-2 underline-offset-2">contractura lumbar</span>, te lo contamos en detalle.
-              </p>
-              <h4 className="mt-6 text-xl font-semibold">Preguntas frecuentes</h4>
-              <ul className="mt-3 space-y-2">
-                {["¿Puedo alternar frío y calor?", "¿Cuánto tiempo aplico el calor?", "¿Cuándo debo pedir cita?"].map((q) => (
-                  <li key={q} className="flex items-center justify-between rounded-lg border border-line px-4 py-2.5 text-sm">
-                    {q} <span aria-hidden className="font-mono">+</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-            <aside className="space-y-4">
-              <div className="rounded-2xl border border-line bg-card p-6">
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">Nota de calidad</p>
-                <p className="mt-2 font-display text-6xl leading-none">
-                  91<span className="text-2xl text-ink-3">/100</span>
-                </p>
-                <dl className="mt-5 space-y-2.5 text-sm">
-                  {[
-                    ["Legibilidad", 94],
-                    ["Cobertura del tema", 88],
-                    ["Estructura", 95],
-                    ["Señales SEO", 90],
-                  ].map(([k, v]) => (
-                    <div key={k as string}>
-                      <div className="flex justify-between">
-                        <dt className="text-ink-2">{k}</dt>
-                        <dd className="font-mono">{v}</dd>
-                      </div>
-                      <div className="mt-1 h-2 rounded-full bg-paper-2">
-                        <div className="h-full rounded-full bg-ink" style={{ width: `${v}%` }} />
-                      </div>
-                    </div>
+          <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 lg:grid-cols-[1.7fr_1fr]">
+            <EditorMockup />
+            <aside className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-1">
+              <Card className="p-5">
+                <p className="text-[13px] font-medium text-ink-3">Preguntas frecuentes incluidas</p>
+                <ul className="mt-3 space-y-2">
+                  {["¿Puedo alternar frío y calor?", "¿Cuánto tiempo aplico el calor?", "¿Cuándo debo pedir cita?"].map((q) => (
+                    <li key={q} className="flex items-center justify-between rounded-lg border border-line px-3 py-2 text-[13px]">
+                      {q} <span aria-hidden className="text-ink-3">+</span>
+                    </li>
                   ))}
-                </dl>
-              </div>
-              <div className="rounded-2xl border border-line bg-ink p-6 font-mono text-[12px] leading-relaxed text-paper">
-                <p className="text-lime">{"<script type=\"application/ld+json\">"}</p>
-                <p className="pl-3">{'"@type": "FAQPage",'}</p>
-                <p className="pl-3">{'"mainEntity": [ … 3 ]'}</p>
+                </ul>
+              </Card>
+              <div className="rounded-2xl border border-line bg-ink p-5 font-mono text-[12px] leading-relaxed text-paper shadow-[var(--shadow-xs)]">
+                <p className="text-lime">{'<script type="application/ld+json">'}</p>
+                <p className="pl-3 text-paper/80">{'"@type": "FAQPage",'}</p>
+                <p className="pl-3 text-paper/80">{'"mainEntity": [ … 3 ]'}</p>
                 <p className="text-lime">{"</script>"}</p>
               </div>
-              <div className="rounded-2xl border border-line bg-lime p-6">
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em]">Incluido</p>
-                <p className="mt-2 text-sm">Meta descripción · 4 enlaces internos · imagen de portada con alt · programado para el jueves 9:00</p>
-              </div>
+              <Card className="bg-lime-soft p-5 sm:col-span-2 lg:col-span-1">
+                <p className="text-[13px] font-medium text-ink-2">Incluido</p>
+                <p className="mt-1.5 text-sm leading-relaxed">Meta descripción · 4 enlaces internos · imagen de portada con alt · programado para el jueves 9:00</p>
+              </Card>
             </aside>
           </div>
         </Container>
@@ -459,27 +357,29 @@ export default async function HomePage() {
       {/* ───────── RED DE ENLACES ───────── */}
       <Section>
         <Container>
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
             <div className="order-2 lg:order-1">
-              <NetworkDiagram />
+              <NetworkGraphMockup />
             </div>
             <div className="order-1 lg:order-2">
               <Eyebrow>Red de enlaces</Eyebrow>
               <Title className="mt-4">
                 Una red que se hace <span className="marker">más fuerte</span> con cada web que entra.
               </Title>
-              <p className="mt-5 max-w-lg text-lg text-ink-2">
+              <Lead className="mt-5 max-w-lg">
                 Cada cliente aporta enlaces desde sus artículos y recibe enlaces de webs de su temática. Cuantas más webs se suman, más opciones relevantes hay para todos. Sin granjas, sin reciprocidad obvia y con tu visto bueno.
-              </p>
+              </Lead>
               <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {[
                   ["Afinidad", "solo webs de temática relacionada"],
                   ["Contexto", "enlaces dentro de artículos útiles"],
                   ["Control", "apruebas o rechazas cada uno"],
                 ].map(([k, v]) => (
-                  <li key={k} className="rounded-xl border border-line bg-card p-4">
-                    <p className="font-semibold">{k}</p>
-                    <p className="mt-1 text-sm text-ink-2">{v}</p>
+                  <li key={k}>
+                    <Card className="h-full p-4">
+                      <p className="font-semibold tracking-tight">{k}</p>
+                      <p className="mt-1 text-sm text-ink-2">{v}</p>
+                    </Card>
                   </li>
                 ))}
               </ul>
@@ -489,49 +389,58 @@ export default async function HomePage() {
       </Section>
 
       {/* ───────── DOS RESULTADOS ───────── */}
-      <Section className="pt-0 md:pt-0">
+      <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
         <Container>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-line bg-sky/50 p-8 md:p-10">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <Card className="bg-sky-soft p-7 md:p-10">
               <Eyebrow tone="ink">Resultado 1</Eyebrow>
-              <h3 className="mt-4 font-display text-3xl leading-[1.1] md:text-4xl">Aparece en las respuestas de la IA</h3>
-              <p className="mt-4 text-ink-2">
+              <Title as="h3" size="sm" className="mt-4">
+                Aparece en las respuestas de la IA
+              </Title>
+              <p className="mt-4 text-[15px] leading-relaxed text-ink-2">
                 Contenido con respuestas directas, datos estructurados, fuentes citadas y presencia en las conversaciones que leen los modelos. Todo lo que facilita que te mencionen.
               </p>
-              <div className="mt-6 rounded-xl border border-line bg-card p-4 text-sm">
-                <p className="text-ink-3">«¿Qué fisio me recomiendas en Valencia para la espalda?»</p>
+              <div className="mt-6 rounded-xl border border-line bg-card p-4 text-sm shadow-[var(--shadow-xs)]">
+                <p className="flex items-center gap-2 text-ink-3">
+                  <EngineLogo name="ChatGPT" size={14} alt="" /> «¿Qué fisio me recomiendas en Valencia para la espalda?»
+                </p>
                 <p className="mt-2">
-                  …entre las opciones mejor valoradas está <mark className="bg-lime px-1">Clínica Azahar</mark>, que además publica guías…
+                  …entre las opciones mejor valoradas está <mark className="rounded bg-lime px-1">Clínica Azahar</mark>, que además publica guías…
                 </p>
               </div>
-            </div>
-            <div className="rounded-2xl border border-line bg-card p-8 md:p-10">
+            </Card>
+            <Card className="p-7 md:p-10">
               <Eyebrow tone="ink">Resultado 2</Eyebrow>
-              <h3 className="mt-4 font-display text-3xl leading-[1.1] md:text-4xl">Sube posiciones en Google</h3>
-              <p className="mt-4 text-ink-2">Publicación constante, clústeres temáticos, enlazado interno y enlaces externos de calidad: la receta de siempre, sin tener que cocinarla tú.</p>
+              <Title as="h3" size="sm" className="mt-4">
+                Sube posiciones en Google
+              </Title>
+              <p className="mt-4 text-[15px] leading-relaxed text-ink-2">Publicación constante, clústeres temáticos, enlazado interno y enlaces externos de calidad: la receta de siempre, sin tener que cocinarla tú.</p>
               <div className="mt-6 space-y-2" aria-hidden>
                 {[
                   ["fisioterapia espalda valencia", 14, 3],
                   ["contractura lumbar qué hacer", 38, 6],
                   ["frío o calor dolor espalda", 0, 2],
                 ].map(([k, from, to]) => (
-                  <div key={k as string} className="flex items-center justify-between rounded-lg border border-line bg-paper px-3 py-2 text-sm">
-                    <span className="truncate">{k}</span>
-                    <span className="ml-3 shrink-0 font-mono text-xs">
-                      <span className="text-ink-3">{from ? `#${from}` : "—"}</span> → <span className="rounded bg-lime px-1.5 font-bold">#{to}</span>
+                  <div key={k as string} className="flex items-center justify-between rounded-lg border border-line bg-paper-2 px-3 py-2 text-sm">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <EngineLogo name="Google" size={14} alt="" />
+                      <span className="truncate">{k}</span>
+                    </span>
+                    <span className="tabular ml-3 shrink-0 text-xs">
+                      <span className="text-ink-3">{from ? `#${from}` : "—"}</span> → <Badge tone="lime" className="px-1.5 font-semibold">#{to}</Badge>
                     </span>
                   </div>
                 ))}
-                <p className="pt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Ejemplo ilustrativo</p>
+                <p className="pt-1 text-xs text-ink-3">Ejemplo ilustrativo</p>
               </div>
-            </div>
+            </Card>
           </div>
         </Container>
       </Section>
 
       {/* ───────── CASOS ───────── */}
       {cases.length > 0 && (
-        <Section className="border-y border-line bg-paper-2">
+        <Section tone="paper-2">
           <Container>
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div className="max-w-2xl">
@@ -544,24 +453,28 @@ export default async function HomePage() {
                 Ver todos los casos
               </CtaLink>
             </div>
-            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 md:grid-cols-3">
               {cases.slice(0, 3).map((c) => (
-                <Link key={c.slug} href={`/casos/${c.slug}`} className="group flex flex-col rounded-2xl border border-line bg-card p-6 transition hover:shadow-md">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{c.sector}</span>
-                    {growth(c) && <span className="rounded-full bg-lime px-2.5 py-0.5 font-mono text-xs font-bold">{growth(c)}</span>}
+                <HoverCard key={c.slug} href={`/casos/${c.slug}`} className="flex flex-col p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <Badge>{c.sector}</Badge>
+                    {growth(c) && (
+                      <Badge tone="lime" className="tabular font-semibold">
+                        {growth(c)}
+                      </Badge>
+                    )}
                   </div>
-                  <h3 className="mt-4 font-display text-3xl leading-[1.05]">
+                  <h3 className="mt-5 text-xl font-semibold leading-snug tracking-tight">
                     Cómo {c.company} pasó de {num(c.metric_before ?? 0)} a {num(c.metric_after ?? 0)} {c.metric_label}
                   </h3>
-                  <p className="mt-3 flex-1 text-sm text-ink-2">{c.summary}</p>
-                  <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold group-hover:text-signal">
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-2">{c.summary}</p>
+                  <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold transition-colors duration-150 group-hover:text-signal">
                     Leer el caso <ArrowUpRight className="h-4 w-4" aria-hidden />
                   </span>
-                </Link>
+                </HoverCard>
               ))}
             </div>
-            <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Casos ilustrativos con empresas ficticias, construidos a partir de escenarios típicos.</p>
+            <p className="mt-6 text-xs text-ink-3">Casos ilustrativos con empresas ficticias, construidos a partir de escenarios típicos.</p>
           </Container>
         </Section>
       )}
@@ -569,70 +482,61 @@ export default async function HomePage() {
       {/* ───────── PRECIOS (teaser) ───────── */}
       <Section>
         <Container>
-          <div className="grid grid-cols-1 gap-10 rounded-2xl border border-line bg-card p-8 md:grid-cols-[1.2fr_1fr] md:items-center md:p-14">
+          <Card className="grid grid-cols-1 gap-10 p-7 md:grid-cols-[1.2fr_1fr] md:items-center md:p-12 lg:p-14">
             <div>
               <Eyebrow>Precios</Eyebrow>
               <Title className="mt-4">
                 Menos que un freelance, <span className="marker">más constante</span> que nadie.
               </Title>
-              <p className="mt-5 max-w-lg text-lg text-ink-2">Un precio por web, todo incluido. Pagando al año ahorras en torno a la mitad. Y si gestionas varias webs, hay descuento por volumen.</p>
+              <Lead className="mt-5 max-w-lg">Un precio por web, todo incluido. Pagando al año ahorras en torno a la mitad. Y si gestionas varias webs, hay descuento por volumen.</Lead>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <CtaLink href="/precios">Ver planes</CtaLink>
-                <Link href="/agencias" className="font-semibold underline decoration-2 underline-offset-4">
-                  ¿Eres agencia?
-                </Link>
+                <TextLink href="/agencias">¿Eres agencia?</TextLink>
               </div>
             </div>
             <div className="space-y-3">
-              {plans.map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-xl border border-line bg-paper px-5 py-4">
+              {plans.map((p, i) => (
+                <div key={p.id} className={`flex items-center justify-between rounded-xl border px-5 py-4 ${i === plans.length - 1 && plans.length > 1 ? "border-ink bg-ink text-paper" : "border-line bg-paper-2"}`}>
                   <div>
-                    <p className="font-display text-3xl">{p.name}</p>
-                    <p className="text-sm text-ink-2">
+                    <p className="text-lg font-semibold tracking-tight">{p.name}</p>
+                    <p className={`text-[13px] ${i === plans.length - 1 && plans.length > 1 ? "text-paper/65" : "text-ink-2"}`}>
                       {p.articles_per_month} artículos/mes · {p.tracked_prompts} preguntas en IA
                     </p>
                   </div>
                   <p className="text-right">
-                    <span className="block text-2xl font-semibold">{eur(p.yearly_price_eur || p.monthly_price_eur)}</span>
-                    <span className="block text-xs text-ink-3">/mes, pago anual</span>
+                    <span className="tabular block text-2xl font-semibold tracking-tight">{eur(p.yearly_price_eur || p.monthly_price_eur)}</span>
+                    <span className={`block text-xs ${i === plans.length - 1 && plans.length > 1 ? "text-paper/65" : "text-ink-3"}`}>/mes, pago anual</span>
                   </p>
                 </div>
               ))}
-              {cheapest !== null && <p className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">Desde {eur(cheapest)}/mes · 3 días gratis</p>}
+              {cheapest !== null && <p className="text-center text-xs text-ink-3">Desde {eur(cheapest)}/mes · 3 días gratis</p>}
             </div>
-          </div>
+          </Card>
         </Container>
       </Section>
 
       {/* ───────── CHECK GRATIS ───────── */}
-      <Section className="pt-0 md:pt-0">
+      <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
         <Container>
-          <div className="relative overflow-hidden rounded-2xl border border-line bg-lime p-8 md:p-14">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
+          <div className="relative overflow-hidden rounded-3xl border border-line bg-lime-soft p-7 md:p-12 lg:p-14">
+            <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-lime/60 blur-3xl" />
+            <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
               <div>
                 <Eyebrow tone="ink">Gratis, en un minuto</Eyebrow>
-                <h2 className="mt-4 font-display text-3xl leading-[1.1] sm:text-4xl md:text-5xl">¿Está tu web lista para que la IA te recomiende?</h2>
+                <Title className="mt-4">¿Está tu web lista para que la IA te recomiende?</Title>
               </div>
-              <form action="/herramientas/auditoria-ia" method="get" className="rounded-2xl border border-line bg-card p-4 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-5">
-                <label htmlFor="home-url" className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
+              <form action="/herramientas/auditoria-ia" method="get" className="surface p-4 sm:p-5">
+                <label htmlFor="home-url" className="mb-1.5 block text-[13px] font-medium text-ink-2">
                   Tu web
                 </label>
-                <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="relative flex-1">
                     <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-3" aria-hidden />
-                    <input
-                      id="home-url"
-                      name="url"
-                      required
-                      placeholder="tuweb.com"
-                      inputMode="url"
-                      autoComplete="url"
-                      className="w-full rounded-lg border border-line bg-paper py-3 pr-4 pl-9 outline-none focus:ring-4 focus:ring-signal/30"
-                    />
+                    <Input id="home-url" name="url" required placeholder="tuweb.com" inputMode="url" autoComplete="url" className="h-11 pl-9" />
                   </div>
-                  <button type="submit" className="rounded-lg border border-line bg-signal px-6 py-3 font-semibold text-signal-ink shadow-sm">
+                  <Button type="submit" size="lg" className="h-11">
                     Analizar
-                  </button>
+                  </Button>
                 </div>
                 <p className="mt-3 text-xs text-ink-3">Revisamos robots.txt, sitemap, etiquetas, datos estructurados y llms.txt. No hace falta registrarse.</p>
               </form>
@@ -642,121 +546,56 @@ export default async function HomePage() {
       </Section>
 
       {/* ───────── GUÍAS ───────── */}
-      <Section className="pt-0 md:pt-0">
+      <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
         <Container>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div className="max-w-2xl">
-              <Eyebrow>Guías gratuitas</Eyebrow>
-              <Title className="mt-4">
-                Para quien prefiere <span className="marker">entenderlo</span> primero.
-              </Title>
-            </div>
+          <div className="max-w-2xl">
+            <Eyebrow>Guías gratuitas</Eyebrow>
+            <Title className="mt-4">
+              Para quien prefiere <span className="marker">entenderlo</span> primero.
+            </Title>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 md:grid-cols-3">
             {guides.map((g, i) => (
-              <Link key={g.title} href="/blog" className="group relative flex flex-col rounded-2xl border border-line bg-card p-6 transition hover:shadow-md">
-                <div className={`mb-6 grid aspect-[3/2] place-items-center rounded-xl border border-line ${["bg-signal", "bg-sky/60", "bg-paper-2"][i]}`}>
-                  <BookOpen className={`h-10 w-10 ${i === 0 ? "text-white" : "text-ink"}`} aria-hidden />
+              <HoverCard key={g.title} href="/blog" className="flex flex-col p-5">
+                <div className={`mb-5 grid aspect-[3/2] place-items-center rounded-xl ${["bg-signal text-white", "bg-sky-soft text-ink", "bg-paper-2 text-ink"][i]}`}>
+                  <BookOpen className="h-9 w-9" aria-hidden strokeWidth={1.5} />
                 </div>
-                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{g.tag}</span>
-                <h3 className="mt-2 font-display text-2xl leading-tight">{g.title}</h3>
-                <p className="mt-2 flex-1 text-sm text-ink-2">{g.text}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold group-hover:text-signal">
+                <Badge className="w-fit">{g.tag}</Badge>
+                <h3 className="mt-3 text-lg font-semibold leading-snug tracking-tight">{g.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-2">{g.text}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold transition-colors duration-150 group-hover:text-signal">
                   Leer en el blog <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </span>
-              </Link>
+              </HoverCard>
             ))}
           </div>
         </Container>
       </Section>
 
       {/* ───────── FAQ ───────── */}
-      <Section className="pt-0 md:pt-0">
-        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+      <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
+        <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
             <Eyebrow>Preguntas frecuentes</Eyebrow>
             <Title className="mt-4">
               Lo que <span className="marker">todo el mundo</span> pregunta.
             </Title>
-            <div className="mt-8 rounded-2xl border border-line bg-card p-5">
-              <Quote className="h-6 w-6 text-signal" aria-hidden />
-              <p className="mt-2 text-ink-2">¿Te queda alguna duda? Escríbenos a hola@yeswecontent.com y te responde una persona.</p>
-            </div>
+            <Card className="mt-8 p-5">
+              <IconBox>
+                <Quote />
+              </IconBox>
+              <p className="mt-3 text-sm leading-relaxed text-ink-2">¿Te queda alguna duda? Escríbenos a hola@yeswecontent.com y te responde una persona.</p>
+            </Card>
           </div>
           <Faq items={faqs} />
         </Container>
       </Section>
 
       <CtaBand
-        title={
-          <>
-            Tu próximo cliente ya está preguntando. <span className="">Que te encuentre.</span>
-          </>
-        }
+        title={<>Tu próximo cliente ya está preguntando. Que te encuentre.</>}
         text="Tres días gratis, sin permanencia y con garantía de 60 días. Si no te convence, no pagas."
         secondary={{ label: "Ver precios", href: "/precios" }}
       />
     </>
-  );
-}
-
-function NetworkDiagram() {
-  const nodes = [
-    { x: 200, y: 160, r: 34, label: "tu web", main: true },
-    { x: 70, y: 70, r: 20, label: "cerámica" },
-    { x: 330, y: 60, r: 22, label: "decoración" },
-    { x: 360, y: 210, r: 18, label: "regalos" },
-    { x: 60, y: 250, r: 22, label: "hogar" },
-    { x: 210, y: 300, r: 16, label: "artesanía" },
-    { x: 150, y: 30, r: 14, label: "" },
-    { x: 380, y: 130, r: 12, label: "" },
-    { x: 20, y: 160, r: 12, label: "" },
-    { x: 300, y: 300, r: 14, label: "" },
-  ];
-  const edges = [
-    [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [2, 3], [4, 5], [1, 4], [3, 5], [6, 1], [6, 2], [7, 2], [7, 3], [8, 1], [8, 4], [9, 3], [9, 5],
-  ];
-  return (
-    <div className="rounded-2xl border border-line bg-card p-4 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-6">
-      <svg viewBox="0 0 400 330" className="h-auto w-full" role="img" aria-label="Diagrama de la red de enlaces entre webs afines">
-        {edges.map(([a, b], i) => (
-          <line
-            key={i}
-            x1={nodes[a].x}
-            y1={nodes[a].y}
-            x2={nodes[b].x}
-            y2={nodes[b].y}
-            stroke="var(--ink)"
-            strokeWidth={a === 0 ? 2.5 : 1.25}
-            strokeDasharray={a === 0 ? undefined : "4 4"}
-            opacity={a === 0 ? 1 : 0.45}
-          />
-        ))}
-        {nodes.map((n, i) => (
-          <g key={i}>
-            <circle cx={n.x} cy={n.y} r={n.r} fill={n.main ? "var(--signal)" : n.label ? "var(--lime)" : "var(--paper-2)"} stroke="var(--ink)" strokeWidth="2.5" />
-            {n.label && (
-              <text
-                x={n.x}
-                y={n.main ? n.y + 5 : n.y + n.r + 14}
-                textAnchor="middle"
-                fontSize={n.main ? 14 : 11}
-                fontWeight={n.main ? 700 : 500}
-                fill={n.main ? "#fff" : "var(--ink)"}
-                fontFamily="var(--font-mono), monospace"
-              >
-                {n.label}
-              </text>
-            )}
-          </g>
-        ))}
-      </svg>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-dashed border-line pt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
-        <span className="flex items-center gap-1.5">
-          <Minus className="h-3 w-3" aria-hidden /> enlace activo
-        </span>
-        <span>esquema ilustrativo</span>
-      </div>
-    </div>
   );
 }

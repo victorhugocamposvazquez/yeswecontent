@@ -17,18 +17,18 @@ export default async function ClientInvoicesPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight sm:text-3xl">Facturas</h1>
-        <p className="mt-1.5 text-[15px] text-ink-2">Las facturas que te emite {name} por el servicio de contenidos.</p>
+        <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight md:text-[1.9rem]">Facturas</h1>
+        <p className="mt-1 text-sm text-ink-2">Las facturas que te emite {name} por el servicio de contenidos.</p>
       </header>
 
       <div className="grid grid-cols-2 gap-3 lg:max-w-xl">
-        <Card className="p-4">
-          <p className="text-[13px] text-ink-3">Cuota mensual</p>
-          <p className="mt-1 text-xl font-semibold tabular-nums">{money(client.price_cents, client.currency)}</p>
+        <Card className="p-4 sm:p-5">
+          <p className="text-[13px] font-medium text-ink-3">Cuota mensual</p>
+          <p className="tabular mt-2 text-[1.75rem] font-semibold leading-none tracking-tight">{money(client.price_cents, client.currency)}</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-[13px] text-ink-3">Pendiente de pago</p>
-          <p className={pendingTotal ? "mt-1 text-xl font-semibold tabular-nums text-warn" : "mt-1 text-xl font-semibold tabular-nums"}>{money(pendingTotal, client.currency)}</p>
+        <Card className="p-4 sm:p-5">
+          <p className="text-[13px] font-medium text-ink-3">Pendiente de pago</p>
+          <p className={pendingTotal ? "tabular mt-2 text-[1.75rem] font-semibold leading-none tracking-tight text-warn" : "tabular mt-2 text-[1.75rem] font-semibold leading-none tracking-tight"}>{money(pendingTotal, client.currency)}</p>
         </Card>
       </div>
 
@@ -39,11 +39,11 @@ export default async function ClientInvoicesPage() {
               const st = INVOICE_STATUS[inv.status];
               return (
                 <li key={inv.id} className="flex items-center gap-2 pr-2 sm:pr-3">
-                  <Link href={`/clientes/facturas/${inv.id}`} className="flex min-h-16 min-w-0 flex-1 items-center gap-3 px-4 py-3 hover:bg-paper/70 sm:px-5">
+                  <Link href={`/clientes/facturas/${inv.id}`} className="flex min-h-16 min-w-0 flex-1 items-center gap-3 px-4 py-3 transition-colors hover:bg-paper-2 sm:px-5">
                     <span className="min-w-0 flex-1">
                       <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <span className="font-mono text-sm font-medium">{inv.number}</span>
-                        <Badge tone={st.tone}>{st.label}</Badge>
+                        <Badge tone={st.tone} dot>{st.label}</Badge>
                       </span>
                       <span className="mt-0.5 block truncate text-sm text-ink-2 first-letter:uppercase">{inv.concept}</span>
                       <span className="text-xs text-ink-3">

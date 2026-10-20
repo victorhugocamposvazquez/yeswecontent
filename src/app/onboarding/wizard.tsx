@@ -208,20 +208,25 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
       ];
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <div className="mb-6">
+    <div className="mx-auto w-full max-w-[640px]">
+      <div className="mb-5">
         <div className="mb-2 flex items-center justify-between text-xs text-ink-3">
           <span>
-            Paso {idx + 1} de {steps.length} · {STEP_LABEL[step]}
+            Paso <span className="tabular font-medium text-ink">{idx + 1}</span> de {steps.length} · <span className="font-medium text-ink">{STEP_LABEL[step]}</span>
           </span>
-          <span>{progress}%</span>
+          <span className="tabular">{progress}%</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-paper-2" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso del alta">
-          <div className="h-full rounded-full bg-signal transition-all duration-500" style={{ width: `${progress}%` }} />
-        </div>
+        <ol className="flex gap-1" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso del alta">
+          {steps.map((st, k) => (
+            <li key={st} className="group relative min-w-0 flex-1" title={STEP_LABEL[st]}>
+              <span className={cn("block h-1.5 rounded-full transition-colors duration-300", k < idx ? "bg-signal" : k === idx ? "bg-signal/60" : "bg-line-2/70")} />
+              <span className={cn("mt-1.5 hidden truncate text-[10px] sm:block", k === idx ? "font-medium text-ink" : "text-ink-3")}>{STEP_LABEL[st]}</span>
+            </li>
+          ))}
+        </ol>
       </div>
 
-      <Card className="p-5 sm:p-6 md:p-8">
+      <Card elevated className="rise p-5 sm:p-6 md:p-8">
         {step === "web" && (
           <StepHead title="Empecemos por tu web" intro="Dinos dónde vive tu negocio en internet. A partir de ahí, nosotros nos encargamos.">
             <div className="space-y-5">
@@ -240,11 +245,14 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                       ["agency", "Soy una agencia", "Gestiono webs de clientes y quiero marca blanca.", Users],
                     ] as const
                   ).map(([v, l, d, Icon]) => (
-                    <label key={v} className={cn("cursor-pointer rounded-2xl border p-4 transition", s.kind === v ? "border-ink bg-lime/30" : "border-line bg-paper hover:border-ink")}>
+                    <label key={v} className={cn("relative cursor-pointer rounded-2xl border p-4 transition-all duration-150", s.kind === v ? "border-signal bg-signal-soft/50 ring-1 ring-signal" : "border-line bg-card hover:border-line-2 hover:shadow-[var(--shadow-sm)]")}>
                       <input type="radio" name="kind" className="sr-only" checked={s.kind === v} onChange={() => set("kind", v)} />
-                      <Icon className="mb-2 h-5 w-5" aria-hidden />
-                      <span className="block font-semibold">{l}</span>
-                      <span className="text-sm text-ink-3">{d}</span>
+                      <span className={cn("mb-3 grid h-9 w-9 place-items-center rounded-lg", s.kind === v ? "bg-signal text-signal-ink" : "bg-signal-soft text-signal")}>
+                        <Icon className="h-[18px] w-[18px]" aria-hidden />
+                      </span>
+                      {s.kind === v && <Check className="absolute right-3 top-3 h-4 w-4 text-signal" aria-hidden />}
+                      <span className="block text-[15px] font-semibold tracking-tight">{l}</span>
+                      <span className="text-[13px] text-ink-3">{d}</span>
                     </label>
                   ))}
                 </div>
@@ -282,8 +290,8 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
               <Input value={s.agency.domain} onChange={(e) => setAgency({ domain: e.target.value })} placeholder="panel.tuagencia.com" />
             </Field>
             <div className="scroll-x mt-5 rounded-xl border border-line">
-              <table className="w-full min-w-[420px] text-sm">
-                <thead className="bg-paper text-left text-xs uppercase tracking-wide text-ink-3">
+              <table className="w-full min-w-[420px] text-[13px]">
+                <thead className="bg-paper-2 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
                   <tr>
                     <th className="px-4 py-2 font-medium">Tipo</th>
                     <th className="px-4 py-2 font-medium">Nombre</th>
@@ -309,7 +317,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
               <legend className="mb-2 text-sm font-medium text-ink-2">Elige cuándo te viene bien</legend>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {nextSlots().map((slot) => (
-                  <label key={slot} className={cn("cursor-pointer rounded-xl border px-3 py-2.5 text-center text-sm", s.agency.callSlot === slot ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}>
+                  <label key={slot} className={cn("cursor-pointer rounded-xl border px-3 py-2.5 text-center text-[13px] font-medium transition-colors", s.agency.callSlot === slot ? "border-signal bg-signal-soft text-signal ring-1 ring-signal" : "border-line bg-card hover:bg-paper-2")}>
                     <input type="radio" name="slot" className="sr-only" checked={s.agency.callSlot === slot} onChange={() => setAgency({ callSlot: slot })} />
                     {slot}
                   </label>
@@ -327,9 +335,12 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
 
         {step === "negocio" && (
           <StepHead title={s.kind === "agency" ? "Tu primer cliente" : "Cuéntanos de tu negocio"} intro="Con esto elegimos los temas y el enfoque de cada artículo.">
-            <div className="mb-5 rounded-2xl border border-dashed border-ink/30 bg-lime/20 p-4">
+            <div className="mb-5 rounded-2xl border border-signal/20 bg-signal-soft/60 p-4">
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex-1">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-signal text-signal-ink">
+                  <WandSparkles className="h-4 w-4" aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold">¿Te ahorramos el trabajo?</p>
                   <p className="text-xs text-ink-2">Leemos {domainOf(s.url) || "tu web"} y rellenamos los campos por ti.</p>
                 </div>
@@ -383,7 +394,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                       type="button"
                       aria-pressed={on}
                       onClick={() => set("extra_languages", on ? s.extra_languages.filter((x) => x !== v) : [...s.extra_languages, v])}
-                      className={cn("min-h-10 rounded-full border px-3.5 py-1.5 text-sm sm:min-h-0", on ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}
+                      className={cn("inline-flex h-9 items-center rounded-full border px-3.5 text-[13px] font-medium transition-colors max-sm:h-10", on ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-line-2 hover:bg-paper-2")}
                     >
                       {on && <Check className="mr-1 inline h-3.5 w-3.5" aria-hidden />}
                       {l}
@@ -402,7 +413,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
               <legend className="mb-2 text-sm font-medium text-ink-2">Tono</legend>
               <div className="flex flex-wrap gap-2">
                 {TONES.map((t) => (
-                  <button key={t} type="button" aria-pressed={s.tone === t} onClick={() => set("tone", t)} className={cn("min-h-10 rounded-full border px-3.5 py-1.5 text-sm sm:min-h-0", s.tone === t ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}>
+                  <button key={t} type="button" aria-pressed={s.tone === t} onClick={() => set("tone", t)} className={cn("inline-flex h-9 items-center rounded-full border px-3.5 text-[13px] font-medium transition-colors max-sm:h-10", s.tone === t ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-line-2 hover:bg-paper-2")}>
                     {t}
                   </button>
                 ))}
@@ -469,7 +480,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                       aria-pressed={on}
                       aria-label={v}
                       onClick={() => set("days", on ? s.days.filter((d) => d !== v) : [...s.days, v])}
-                      className={cn("h-10 w-10 rounded-full border text-sm font-semibold", on ? "border-ink bg-ink text-paper" : "border-line bg-paper")}
+                      className={cn("h-10 w-10 rounded-full border text-sm font-semibold transition-colors", on ? "border-signal bg-signal text-signal-ink" : "border-line bg-card text-ink-2 hover:bg-paper-2")}
                     >
                       {l}
                     </button>
@@ -499,7 +510,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                 <legend className="mb-2 mt-3 text-sm font-medium text-ink-2">¿Dónde está tu blog?</legend>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {["WordPress", "Shopify", "Webflow", "Ghost", "Webhook", "Otro"].map((c) => (
-                    <button key={c} type="button" aria-pressed={s.cms === c} onClick={() => set("cms", s.cms === c ? null : c)} className={cn("rounded-xl border px-3 py-2.5 text-sm", s.cms === c ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}>
+                    <button key={c} type="button" aria-pressed={s.cms === c} onClick={() => set("cms", s.cms === c ? null : c)} className={cn("min-h-11 rounded-xl border px-3 py-2.5 text-[13px] font-medium transition-colors", s.cms === c ? "border-signal bg-signal-soft text-signal ring-1 ring-signal" : "border-line bg-card hover:bg-paper-2")}>
                       {c}
                     </button>
                   ))}
@@ -512,21 +523,21 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
 
         {step === "plan" && (
           <StepHead title="Elige tu plan" intro="Prueba 3 días gratis. Cancela cuando quieras desde tu panel.">
-            <div className="mb-4 inline-flex rounded-full border border-line bg-paper p-1" role="radiogroup" aria-label="Periodicidad del pago">
+            <div className="mb-4 inline-flex rounded-full border border-line bg-paper-2 p-1" role="radiogroup" aria-label="Periodicidad del pago">
               {(
                 [
                   ["year", "Anual · ahorra hasta 50%"],
                   ["month", "Mensual"],
                 ] as const
               ).map(([v, l]) => (
-                <button key={v} type="button" role="radio" aria-checked={s.interval === v} onClick={() => set("interval", v)} className={cn("min-h-9 rounded-full px-4 py-1.5 text-sm", s.interval === v ? "bg-ink text-paper" : "text-ink-2")}>
+                <button key={v} type="button" role="radio" aria-checked={s.interval === v} onClick={() => set("interval", v)} className={cn("min-h-9 rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors", s.interval === v ? "bg-card text-ink shadow-[var(--shadow-xs)]" : "text-ink-2 hover:text-ink")}>
                   {l}
                 </button>
               ))}
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {plans.map((p, k) => (
-                <label key={p.id} className={cn("relative cursor-pointer rounded-2xl border p-5 transition", s.planId === p.id ? "border-ink bg-lime/25 shadow-sm" : "border-line bg-paper hover:border-ink")}>
+                <label key={p.id} className={cn("relative cursor-pointer rounded-2xl border p-5 transition-all duration-150", s.planId === p.id ? "border-signal bg-signal-soft/50 ring-1 ring-signal" : "border-line bg-card hover:border-line-2 hover:shadow-[var(--shadow-sm)]")}>
                   <input type="radio" name="plan" className="sr-only" checked={s.planId === p.id} onChange={() => set("planId", p.id)} />
                   {k === plans.length - 1 && plans.length > 1 && (
                     <Badge tone="signal" className="absolute right-4 top-4">
@@ -566,7 +577,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
           <StepHead title="¿Cómo nos has conocido?" intro="Nos ayuda a saber dónde contar lo que hacemos. Es opcional.">
             <div className="grid grid-cols-2 gap-2">
               {SOURCES.map((src) => (
-                <button key={src} type="button" aria-pressed={s.survey === src} onClick={() => set("survey", src)} className={cn("rounded-xl border px-3 py-3 text-left text-sm", s.survey === src ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}>
+                <button key={src} type="button" aria-pressed={s.survey === src} onClick={() => set("survey", src)} className={cn("min-h-11 rounded-xl border px-3 py-3 text-left text-[13px] font-medium transition-colors", s.survey === src ? "border-signal bg-signal-soft text-signal ring-1 ring-signal" : "border-line bg-card hover:bg-paper-2")}>
                   {src}
                 </button>
               ))}
@@ -574,18 +585,18 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
             {s.survey === "Otro" && <Input className="mt-3" value={s.surveyOther} onChange={(e) => set("surveyOther", e.target.value)} placeholder="Cuéntanos" aria-label="Otro origen" />}
             <div className="mt-6 flex items-start gap-3 rounded-2xl bg-ink p-4 text-paper">
               <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-lime" aria-hidden />
-              <p className="text-sm">Al terminar prepararemos tu primer plan de contenidos y lanzaremos la auditoría de tu web. Tardamos unos minutos: puedes ir explorando el panel.</p>
+              <p className="text-[13px] leading-relaxed">Al terminar prepararemos tu primer plan de contenidos y lanzaremos la auditoría de tu web. Tardamos unos minutos: puedes ir explorando el panel.</p>
             </div>
           </StepHead>
         )}
 
         {error && (
-          <p role="alert" className="mt-5 rounded-lg bg-bad/10 px-3 py-2 text-sm text-bad">
+          <p role="alert" className="mt-5 rounded-lg bg-bad-soft px-3 py-2 text-[13px] text-bad">
             {error}
           </p>
         )}
 
-        <div className="sticky bottom-0 z-10 -mx-5 -mb-5 mt-8 flex items-center justify-between gap-2 rounded-b-2xl border-t border-line bg-card/95 px-5 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur sm:static sm:mx-0 sm:mb-0 sm:flex-wrap sm:gap-3 sm:rounded-none sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:backdrop-blur-none">
+        <div className="sticky bottom-0 z-10 -mx-5 -mb-5 mt-8 flex items-center justify-between gap-2 rounded-b-2xl border-t border-line bg-card/90 px-5 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-md sm:static sm:-mx-6 sm:-mb-6 sm:flex-wrap sm:gap-3 sm:bg-paper-2/70 sm:px-6 sm:py-4 sm:backdrop-blur-none md:-mx-8 md:-mb-8 md:px-8">
           <Button type="button" variant="ghost" className="max-sm:min-h-11 max-sm:px-3" onClick={() => setI(Math.max(0, idx - 1))} disabled={idx === 0 || pending}>
             <ArrowLeft className="h-4 w-4" aria-hidden /> Atrás
           </Button>
@@ -610,8 +621,8 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
 function StepHead({ title, intro, children }: { title: string; intro: string; children: React.ReactNode }) {
   return (
     <section>
-      <h1 className="text-2xl font-semibold tracking-tight leading-tight">{title}</h1>
-      <p className="mb-6 mt-2 text-ink-2">{intro}</p>
+      <h1 className="text-[1.5rem] font-semibold leading-tight tracking-tight md:text-[1.75rem]">{title}</h1>
+      <p className="mb-6 mt-2 text-[15px] text-ink-2">{intro}</p>
       {children}
     </section>
   );
@@ -619,7 +630,7 @@ function StepHead({ title, intro, children }: { title: string; intro: string; ch
 
 function CheckCard({ checked, onChange, title, desc }: { checked: boolean; onChange: (v: boolean) => void; title: string; desc: string }) {
   return (
-    <label className={cn("flex cursor-pointer items-start gap-3 rounded-2xl border p-4", checked ? "border-ink bg-lime/25" : "border-line bg-paper")}>
+    <label className={cn("flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-all duration-150", checked ? "border-signal bg-signal-soft/50 ring-1 ring-signal" : "border-line bg-card hover:border-line-2")}>
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-1 h-4 w-4 accent-[var(--signal)]" />
       <span>
         <span className="block font-medium">{title}</span>
@@ -649,7 +660,7 @@ function TeamStep({ invites, onChange }: { invites: string[]; onChange: (v: stri
       </div>
       <ul className="mt-4 flex flex-wrap gap-2">
         {invites.map((e) => (
-          <li key={e} className="inline-flex items-center gap-1 rounded-full bg-paper-2 py-1 pl-3 pr-1 text-sm">
+          <li key={e} className="inline-flex items-center gap-1 rounded-full border border-line bg-card py-1 pl-3 pr-1 text-[13px]">
             {e}
             <button type="button" onClick={() => onChange(invites.filter((x) => x !== e))} className="grid h-8 w-8 place-items-center rounded-full hover:bg-line" aria-label={`Quitar ${e}`}>
               <X className="h-3.5 w-3.5" />
@@ -675,7 +686,7 @@ function CompetitorsStep({ list, suggestions, onChange }: { list: { name: string
             type="button"
             onClick={() => (has(c.url) ? onChange(list.filter((x) => domainOf(x.url) !== domainOf(c.url))) : add(c))}
             aria-pressed={has(c.url)}
-            className={cn("min-h-10 rounded-full border px-3.5 py-1.5 text-sm sm:min-h-0", has(c.url) ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}
+            className={cn("inline-flex h-9 items-center rounded-full border px-3.5 text-[13px] font-medium transition-colors max-sm:h-10", has(c.url) ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-line-2 hover:bg-paper-2")}
           >
             {has(c.url) ? <Check className="mr-1 inline h-3.5 w-3.5" aria-hidden /> : <Plus className="mr-1 inline h-3.5 w-3.5" aria-hidden />}
             {c.name} <span className="opacity-60">· {domainOf(c.url)}</span>
@@ -712,9 +723,9 @@ function CompetitorsStep({ list, suggestions, onChange }: { list: { name: string
         </Button>
       </div>
       {list.length > 0 && (
-        <ul className="mt-4 divide-y divide-line rounded-xl border border-line">
+        <ul className="mt-4 divide-y divide-line rounded-xl border border-line bg-card">
           {list.map((c) => (
-            <li key={c.url} className="flex items-center justify-between px-4 py-2 text-sm">
+            <li key={c.url} className="flex items-center justify-between px-4 py-2 text-[13px]">
               <span>
                 {c.name} <span className="text-ink-3">· {domainOf(c.url)}</span>
               </span>

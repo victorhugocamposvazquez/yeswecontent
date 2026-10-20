@@ -17,21 +17,21 @@ export default async function RegistroPage({ searchParams }: { searchParams: Pro
   const next = q.size ? `/onboarding?${q}` : "/onboarding";
   return (
     <>
-      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-signal">3 días gratis</p>
-      <h1 className="mt-3 font-display text-5xl leading-tight">
+      <p className="eyebrow">3 días gratis</p>
+      <h1 className="mt-3 font-display text-[1.75rem] sm:text-[2rem]">
         Vamos a ponerle <span className="marker">piloto automático</span> a tu web.
       </h1>
-      <ul className="mt-5 mb-8 space-y-1.5 text-sm text-ink-2">
+      <ul className="mt-4 mb-6 space-y-1.5 text-[13px] text-ink-2">
         {["Plan de contenidos y primeros artículos en la prueba", "Sin permanencia, cancelas desde el panel", "Garantía de 60 días"].map((t) => (
           <li key={t} className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-ok" aria-hidden /> {t}
+            <Check className="h-4 w-4 shrink-0 text-ok" aria-hidden /> {t}
           </li>
         ))}
       </ul>
       <SignUpForm next={next} />
-      <p className="mt-8 text-center text-sm text-ink-2">
+      <p className="mt-6 text-center text-sm text-ink-2">
         ¿Ya tienes cuenta?{" "}
-        <Link href="/entrar" className="font-semibold text-ink underline decoration-signal decoration-2 underline-offset-4">
+        <Link href="/entrar" className="inline-block py-1 font-semibold text-ink underline decoration-signal decoration-2 underline-offset-4">
           Entra
         </Link>
       </p>

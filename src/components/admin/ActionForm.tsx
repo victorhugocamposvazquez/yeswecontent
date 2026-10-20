@@ -2,6 +2,7 @@
 
 import { useActionState, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
+import { Button } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import type { ActionResult } from "@/lib/admin/types";
 
@@ -17,16 +18,20 @@ export function ActionForm({
   className,
   confirm,
   inline = false,
+  id,
 }: {
   action: Action;
   children: ReactNode;
   className?: string;
   confirm?: string;
   inline?: boolean;
+  /** Permite que controles fuera del formulario lo referencien con `form={id}`. */
+  id?: string;
 }) {
   const [state, formAction] = useActionState(action, null);
   return (
     <form
+      id={id}
       action={formAction}
       className={cn(inline && "inline-flex flex-wrap items-center gap-2", className)}
       onSubmit={(e) => {
@@ -41,16 +46,13 @@ export function ActionForm({
   );
 }
 
-type Variant = "primary" | "ink" | "outline" | "ghost" | "danger";
-const variants: Record<Variant, string> = {
-  primary: "bg-signal text-signal-ink hover:brightness-95",
-  ink: "bg-ink text-paper hover:bg-ink-2",
-  outline: "border border-line bg-card text-ink hover:border-ink",
-  ghost: "text-ink-2 hover:bg-paper-2 hover:text-ink",
-  danger: "border border-bad/40 text-bad hover:bg-bad hover:text-white",
-};
+type Variant = "primary" | "ink" | "outline" | "ghost" | "soft" | "danger";
 
-/** Botón de envío compacto que se deshabilita mientras la acción está en curso. */
+/**
+ * Botón de envío que se deshabilita mientras la acción está en curso.
+ * Usa el `Button` compartido; `size="icon"` es un botón fantasma cuadrado para acciones de fila
+ * (32px en escritorio, 44px en móvil) y requiere `aria-label`.
+ */
 export function SubmitButton({
   children,
   variant = "ink",
@@ -58,32 +60,50 @@ export function SubmitButton({
   className,
   name,
   value,
+  title,
   "aria-label": ariaLabel,
 }: {
   children: ReactNode;
   variant?: Variant;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "icon";
   className?: string;
   name?: string;
   value?: string;
+  title?: string;
   "aria-label"?: string;
 }) {
   const { pending } = useFormStatus();
+  if (size === "icon")
+    return (
+      <button
+        type="submit"
+        name={name}
+        value={value}
+        aria-label={ariaLabel}
+        title={title ?? ariaLabel}
+        disabled={pending}
+        className={cn(
+          "inline-flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors disabled:pointer-events-none disabled:opacity-50 sm:size-8",
+          variant === "danger" ? "text-ink-3 hover:bg-bad-soft hover:text-bad" : "text-ink-3 hover:bg-paper-2 hover:text-ink",
+          className,
+        )}
+      >
+        {pending ? <span className="text-xs">…</span> : children}
+      </button>
+    );
   return (
-    <button
+    <Button
       type="submit"
       name={name}
       value={value}
       aria-label={ariaLabel}
+      title={title}
       disabled={pending}
-      className={cn(
-        "inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-        size === "sm" ? "min-h-9 px-3 py-1 text-xs sm:min-h-0" : "min-h-10 px-4 py-2 text-sm sm:min-h-0",
-        variants[variant],
-        className,
-      )}
+      variant={variant}
+      size={size}
+      className={cn(size === "sm" && "min-h-11 sm:min-h-0", className)}
     >
       {pending ? "…" : children}
-    </button>
+    </Button>
   );
 }

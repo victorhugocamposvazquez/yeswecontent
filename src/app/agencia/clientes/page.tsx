@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, Eye } from "lucide-react";
-import { Badge, Card, EmptyState, PageHeader, Stat } from "@/components/ui";
+import { Users } from "lucide-react";
+import { Badge, Card, CardHeader, EmptyState, PageHeader, Stat } from "@/components/ui";
 import { agencyName, getAgencyContext, listAgencyClients, safeColor } from "@/lib/clientes/data";
 import { INVOICE_STATUS, VISIBILITY_MODE, host, money } from "@/lib/clientes/format";
 import { pButton } from "../../clientes/_components/button-class";
@@ -35,9 +36,9 @@ export default async function AgencyClientsPage({ searchParams }: { searchParams
           </a>
         }
       />
-      {sp.error && ERRORS[sp.error] && <p className="mb-6 rounded-xl border border-bad/30 bg-bad/10 px-4 py-3 text-sm text-bad">{ERRORS[sp.error]}</p>}
+      {sp.error && ERRORS[sp.error] && <p className="mb-5 rounded-xl border border-bad/20 bg-bad-soft px-4 py-3 text-[13px] text-bad">{ERRORS[sp.error]}</p>}
 
-      <section className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+      <section className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         <Stat label="Clientes activos" value={rows.length} />
         <Stat label="Facturación mensual" value={money(mrr)} />
         <Stat label="Facturas pendientes" value={pending} />
@@ -45,31 +46,32 @@ export default async function AgencyClientsPage({ searchParams }: { searchParams
       </section>
 
       {rows.length ? (
-        <Card className="mb-10">
+        <Card className="mb-6 overflow-hidden md:mb-8">
+          <CardHeader title="Tus clientes" intro={`${rows.length} webs gestionadas`} />
           <ul className="divide-y divide-line">
             {rows.map((r) => (
-              <li key={r.site_id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:px-5">
+              <li key={r.site_id} className="flex flex-col gap-3 p-4 transition-colors hover:bg-paper-2 sm:flex-row sm:items-center sm:px-5">
                 <Link href={`/agencia/clientes/${r.site_id}`} className="group flex min-w-0 flex-1 items-center gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-paper-2 text-sm font-bold text-ink-2" aria-hidden>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-signal-soft text-[13px] font-semibold text-signal" aria-hidden>
                     {r.client_name[0]}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium group-hover:underline">{r.client_name}</span>
+                    <span className="block truncate text-[13px] font-medium group-hover:underline">{r.client_name}</span>
                     <span className="block truncate text-xs text-ink-3">
                       {host(r.site.url)} · {r.members} {r.members === 1 ? "persona" : "personas"}
                     </span>
                   </span>
                 </Link>
-                <div className="flex flex-wrap items-center gap-2 text-sm sm:justify-end">
+                <div className="flex flex-wrap items-center gap-2 text-[13px] sm:justify-end">
                   <Badge tone={r.visibility_mode === "completo" ? "sky" : "neutral"}>{VISIBILITY_MODE[r.visibility_mode].label}</Badge>
                   <span className="font-semibold tabular-nums">{money(r.price_cents, r.currency)}/mes</span>
-                  {r.last_invoice && <Badge tone={INVOICE_STATUS[r.last_invoice.status].tone}>{INVOICE_STATUS[r.last_invoice.status].label}</Badge>}
+                  {r.last_invoice && <Badge tone={INVOICE_STATUS[r.last_invoice.status].tone} dot>{INVOICE_STATUS[r.last_invoice.status].label}</Badge>}
                 </div>
                 <div className="flex gap-2">
-                  <a href={`/clientes/previsualizar?as=${r.site_id}`} className={pButton("outline", "flex-1 px-3 sm:flex-none")} aria-label={`Ver el portal como ${r.client_name}`}>
+                  <a href={`/clientes/previsualizar?as=${r.site_id}`} className={pButton("outline", "flex-1 px-3 sm:min-h-9 sm:flex-none sm:text-[13px]")} aria-label={`Ver el portal como ${r.client_name}`}>
                     <Eye className="h-4 w-4" aria-hidden /> <span className="sm:hidden lg:inline">Ver portal</span>
                   </a>
-                  <Link href={`/agencia/clientes/${r.site_id}`} className={pButton("ghost", "px-3")} aria-label={`Gestionar ${r.client_name}`}>
+                  <Link href={`/agencia/clientes/${r.site_id}`} className={pButton("ghost", "px-2.5 sm:min-h-9")} aria-label={`Gestionar ${r.client_name}`}>
                     <ChevronRight className="h-5 w-5" aria-hidden />
                   </Link>
                 </div>
@@ -78,15 +80,15 @@ export default async function AgencyClientsPage({ searchParams }: { searchParams
           </ul>
         </Card>
       ) : (
-        <div className="mb-10">
-          <EmptyState title="Aún no tienes clientes">Añade el primero: crearemos su sitio y le enviaremos una invitación a su portal.</EmptyState>
+        <div className="mb-6 md:mb-8">
+          <EmptyState title="Aún no tienes clientes" icon={<Users className="h-5 w-5" />}>Añade el primero: crearemos su sitio y le enviaremos una invitación a su portal.</EmptyState>
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card id="nuevo" className="scroll-mt-24 p-4 sm:p-6">
-          <h2 className="font-semibold">Añadir cliente</h2>
-          <p className="mb-5 text-sm text-ink-3">Creamos su sitio en tu agencia y le invitamos por email a su portal.</p>
+      <div className="grid gap-4 md:gap-5 lg:grid-cols-2">
+        <Card id="nuevo" className="scroll-mt-24">
+          <CardHeader title="Añadir cliente" intro="Creamos su sitio en tu agencia y le invitamos por email a su portal." />
+          <div className="p-4 sm:p-5">
           <PForm action={addAgencyClient} submitLabel="Añadir e invitar" pendingLabel="Creando…" resetOnSuccess>
             <PField label="Nombre del cliente" htmlFor="c_name">
               <PInput id="c_name" name="name" required placeholder="Clínica Ejemplo" autoComplete="organization" />
@@ -109,18 +111,19 @@ export default async function AgencyClientsPage({ searchParams }: { searchParams
               </PField>
             </div>
           </PForm>
+          </div>
         </Card>
 
-        <Card className="p-4 sm:p-6">
-          <h2 className="font-semibold">Tu marca blanca</h2>
-          <p className="mb-5 text-sm text-ink-3">Así se verá el portal de todos tus clientes: tu nombre, tu logotipo y tu color.</p>
+        <Card>
+          <CardHeader title="Tu marca blanca" intro="Así se verá el portal de todos tus clientes: tu nombre, tu logotipo y tu color." />
+          <div className="p-4 sm:p-5">
           <PForm action={saveWhiteLabel} submitLabel="Guardar marca">
             <PField label="Nombre comercial" htmlFor="wl_name">
               <PInput id="wl_name" name="brand_name" defaultValue={wl.brand_name ?? agency.name} />
             </PField>
             <PField label="Color principal" htmlFor="wl_color" hint="Botones, enlaces y gráficos del portal.">
               <div className="flex gap-3">
-                <span aria-hidden className="h-11 w-14 shrink-0 rounded-xl border border-line" style={{ background: safeColor(wl.primary_color) }} />
+                <span aria-hidden className="h-11 w-14 shrink-0 rounded-[10px] border border-line shadow-[var(--shadow-xs)] sm:h-10" style={{ background: safeColor(wl.primary_color) }} />
                 <PInput id="wl_color" name="primary_color" defaultValue={safeColor(wl.primary_color)} pattern="#[0-9a-fA-F]{6}" required />
               </div>
             </PField>
@@ -134,6 +137,7 @@ export default async function AgencyClientsPage({ searchParams }: { searchParams
               <PInput id="wl_support" name="support_email" type="email" defaultValue={wl.support_email ?? ""} placeholder="hola@tuagencia.es" />
             </PField>
           </PForm>
+          </div>
         </Card>
       </div>
     </>

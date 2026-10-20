@@ -1,4 +1,5 @@
-import { AreaChart, Bars, ScoreRing } from "@/components/charts";
+import { AreaChart, ScoreRing } from "@/components/charts";
+import { ModelLogo } from "@/components/panel/model-logo";
 import { PrintButton } from "@/components/panel/print-button";
 import { Button, Logo, PageHeader, Select } from "@/components/ui";
 import { getCurrentSite, getLatestAudit, getVisibility, listArticles } from "@/lib/data";
@@ -47,7 +48,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                 <label htmlFor="mes" className="sr-only">
                   Mes del informe
                 </label>
-                <Select id="mes" name="mes" defaultValue={month.value} className="w-48 capitalize">
+                <Select id="mes" name="mes" defaultValue={month.value} className="w-48">
                   {months.map((m) => (
                     <option key={m.value} value={m.value}>
                       {m.label}
@@ -64,12 +65,12 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         />
       </div>
 
-      <article className="space-y-6 rounded-2xl border border-line bg-card p-6 md:p-10 print:border-0 print:p-0">
+      <article className="space-y-7 rounded-2xl border border-line bg-card p-6 shadow-[var(--shadow-xs)] md:p-10 print:border-0 print:p-0 print:shadow-none">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-6">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-signal">Informe mensual</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight capitalize">{month.label}</h1>
-            <p className="text-ink-2">
+            <p className="eyebrow">Informe mensual</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight first-letter:uppercase md:text-3xl">{month.label}</h1>
+            <p className="mt-0.5 text-[13px] text-ink-2">
               {site.name} · {site.url.replace(/^https?:\/\//, "")}
             </p>
           </div>
@@ -83,27 +84,40 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             ["Visitas desde IA", num(ai)],
             ["Artículos publicados", String(published.length)],
           ].map(([l, v]) => (
-            <div key={l} className="rounded-xl bg-paper p-4">
-              <p className="text-xs text-ink-3">{l}</p>
-              <p className="text-2xl font-semibold">{v}</p>
+            <div key={l} className="rounded-xl border border-line bg-paper-2/60 p-4">
+              <p className="text-xs font-medium text-ink-3">{l}</p>
+              <p className="tabular mt-1 text-2xl font-semibold tracking-tight">{v}</p>
             </div>
           ))}
         </section>
 
         <section className="break-inside-avoid">
-          <h2 className="mb-2 font-semibold">Tráfico orgánico diario</h2>
-          {series.length ? <AreaChart data={series.map((p) => p.clicks)} /> : <p className="text-sm text-ink-3">Sin datos de Search Console.</p>}
+          <h2 className="mb-3 text-[15px] font-semibold tracking-tight">Tráfico orgánico diario</h2>
+          {series.length ? <AreaChart data={series.map((p) => p.clicks)} labels={[fmtDate(series[0].date), fmtDate(series[series.length - 1].date)]} height={180} className="h-44" /> : <p className="text-sm text-ink-3">Sin datos de Search Console.</p>}
         </section>
 
         <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="break-inside-avoid">
-            <h2 className="mb-3 font-semibold">Visibilidad en IA · {overallShare(vis.checks)}%</h2>
-            <Bars data={shareByModel(vis.checks).map((m) => ({ label: m.label, value: m.share }))} />
+            <h2 className="mb-3 text-[15px] font-semibold tracking-tight">
+              Visibilidad en IA · <span className="tabular">{overallShare(vis.checks)}%</span>
+            </h2>
+            <ul className="space-y-2.5">
+              {shareByModel(vis.checks).map((m) => (
+                <li key={m.model} className="grid grid-cols-[auto_minmax(4rem,6rem)_minmax(0,1fr)_2.5rem] items-center gap-2.5 text-[13px]">
+                  <ModelLogo model={m.model} size={16} />
+                  <span className="truncate text-ink-2">{m.label}</span>
+                  <span className="h-1.5 min-w-0 overflow-hidden rounded-full bg-paper-3">
+                    <span className="block h-full rounded-full bg-ink" style={{ width: `${m.share}%` }} />
+                  </span>
+                  <span className="tabular text-right font-medium">{m.share}%</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="flex items-center gap-4 break-inside-avoid">
-            {audit?.score != null && <ScoreRing score={audit.score} size={96} />}
+          <div className="flex items-center gap-4 break-inside-avoid rounded-xl border border-line p-4">
+            {audit?.score != null && <ScoreRing score={audit.score} size={88} label="/ 100" />}
             <div>
-              <h2 className="font-semibold">Salud técnica</h2>
+              <h2 className="text-[15px] font-semibold tracking-tight">Salud técnica</h2>
               <p className="text-sm text-ink-2">{audit ? `${audit.results.filter((r) => r.status === "fail").length} fallos y ${audit.results.filter((r) => r.status === "warn").length} mejoras pendientes.` : "Sin auditoría."}</p>
               <p className="mt-1 text-sm text-ink-2">{newLinks.length} enlaces nuevos recibidos este mes.</p>
             </div>
@@ -111,15 +125,22 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         </section>
 
         <section className="break-inside-avoid">
-          <h2 className="mb-2 font-semibold">Publicado este mes</h2>
+          <h2 className="mb-2 text-[15px] font-semibold tracking-tight">Publicado este mes</h2>
           {published.length ? (
-            <table className="w-full text-sm">
-              <tbody className="divide-y divide-line">
+            <table className="w-full text-[13px]">
+              <thead className="text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
+                <tr>
+                  <th className="py-2 font-semibold">Artículo</th>
+                  <th className="py-2 pl-3 text-right font-semibold">Fecha</th>
+                  <th className="py-2 pl-3 text-right font-semibold">Calidad</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line border-t border-line">
                 {published.map((a) => (
                   <tr key={a.id}>
-                    <td className="py-2">{a.title}</td>
-                    <td className="whitespace-nowrap py-2 pl-3 text-right text-ink-3">{fmtDate(a.published_at!)}</td>
-                    <td className="whitespace-nowrap py-2 pl-3 text-right tabular-nums">{a.quality_score}/100</td>
+                    <td className="py-2.5 font-medium">{a.title}</td>
+                    <td className="whitespace-nowrap py-2.5 pl-3 text-right text-ink-3">{fmtDate(a.published_at!)}</td>
+                    <td className="tabular whitespace-nowrap py-2.5 pl-3 text-right">{a.quality_score}/100</td>
                   </tr>
                 ))}
               </tbody>

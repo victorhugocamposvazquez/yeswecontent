@@ -10,10 +10,10 @@ export const metadata: Metadata = { title: "Configura tu cuenta", robots: { inde
 export default async function OnboardingPage() {
   const plans = await listPlans();
   return (
-    <div className="grain min-h-screen bg-paper">
+    <div className="glow min-h-screen bg-paper-2">
       {isDemo && (
-        <div className="bg-ink px-4 py-1.5 text-center text-xs text-paper">
-          <span className="mr-2 rounded-full bg-lime px-2 py-0.5 font-semibold text-ink">Modo demo</span>
+        <div className="flex h-7 items-center justify-center gap-2 bg-ink px-4 text-[11px] text-paper/90">
+          <span className="rounded-full bg-lime px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-ink">Demo</span>
           Puedes recorrer el alta completa; no se guarda nada.
         </div>
       )}
@@ -21,7 +21,7 @@ export default async function OnboardingPage() {
         <Link href="/" aria-label="Volver a la portada">
           <Logo />
         </Link>
-        <Link href="/panel" className="-mr-2 inline-flex min-h-11 items-center px-2 text-sm text-ink-3 hover:text-ink">
+        <Link href="/panel" className="-mr-2 inline-flex min-h-11 items-center rounded-lg px-2 text-[13px] text-ink-3 transition-colors hover:text-ink">
           Terminar más tarde
         </Link>
       </header>

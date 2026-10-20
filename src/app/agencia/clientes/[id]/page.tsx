@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Eye } from "lucide-react";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, CardHeader } from "@/components/ui";
 import { getAgencyClient, getAgencyContext, getPortalResults, listClientInvoices, listClientMembers, listClientMessages } from "@/lib/clientes/data";
 import { INVOICE_STATUS, VISIBILITY_MODE, host, money } from "@/lib/clientes/format";
 import { cn, fmtDate } from "@/lib/utils";
@@ -37,7 +37,7 @@ export default async function AgencyClientPage({ params }: { params: Promise<{ i
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <h1 className="truncate text-2xl font-semibold tracking-tight">{client.client_name}</h1>
+          <h1 className="truncate text-[1.65rem] font-semibold tracking-tight md:text-[1.9rem]">{client.client_name}</h1>
           <a href={site.url} target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center gap-1 text-sm text-ink-2 hover:underline">
             {host(site.url)} <ExternalLink className="h-3.5 w-3.5" aria-hidden />
           </a>
@@ -59,22 +59,22 @@ export default async function AgencyClientPage({ params }: { params: Promise<{ i
           ["Publicados este mes", String(published)],
           ["Clics (30 días)", new Intl.NumberFormat("es-ES").format(clicks)],
         ].map(([l, v]) => (
-          <Card key={l} className="p-4">
-            <p className="text-[13px] text-ink-3">{l}</p>
-            <p className="mt-1 text-lg font-semibold tabular-nums sm:text-xl">{v}</p>
+          <Card key={l} className="p-4 sm:p-5">
+            <p className="text-[13px] font-medium text-ink-3">{l}</p>
+            <p className="tabular mt-2 text-[1.5rem] font-semibold leading-none tracking-tight">{v}</p>
           </Card>
         ))}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="p-4 sm:p-6">
-          <h2 className="font-semibold">Acceso y precio</h2>
-          <p className="mb-5 text-sm text-ink-3">Decide qué ve tu cliente en su portal y cuánto le cobras.</p>
+      <div className="grid gap-4 md:gap-5 lg:grid-cols-2">
+        <Card>
+          <CardHeader title="Acceso y precio" intro="Decide qué ve tu cliente en su portal y cuánto le cobras." />
+          <div className="p-4 sm:p-5">
           <PForm action={saveAgencyClientSettings.bind(null, site.id)}>
             <fieldset className="space-y-2">
               <legend className="mb-1.5 text-sm font-medium text-ink-2">Qué verá en el portal</legend>
               {(["resultados", "completo"] as const).map((m) => (
-                <label key={m} className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-line p-3 has-[:checked]:border-signal has-[:checked]:bg-signal/5">
+                <label key={m} className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-line bg-card p-3 transition-colors has-[:checked]:border-signal has-[:checked]:bg-signal-soft has-[:checked]:ring-1 has-[:checked]:ring-signal">
                   <input type="radio" name="visibility_mode" value={m} defaultChecked={client.visibility_mode === m} className="mt-1 h-4 w-4 accent-[var(--signal)]" />
                   <span>
                     <span className="block text-[15px] font-medium">{VISIBILITY_MODE[m].label}</span>
@@ -95,11 +95,12 @@ export default async function AgencyClientPage({ params }: { params: Promise<{ i
               <PInput id="booking_url" name="booking_url" type="url" defaultValue={client.booking_url ?? ""} placeholder="https://cal.com/tuagencia/seguimiento" />
             </PField>
           </PForm>
+          </div>
         </Card>
 
-        <Card className="p-4 sm:p-6">
-          <h2 className="font-semibold">Nueva factura</h2>
-          <p className="mb-5 text-sm text-ink-3">Numeración correlativa automática. En borrador, el cliente aún no la ve.</p>
+        <Card>
+          <CardHeader title="Nueva factura" intro="Numeración correlativa automática. En borrador, el cliente aún no la ve." />
+          <div className="p-4 sm:p-5">
           <PForm action={createClientInvoice.bind(null, site.id)} submitLabel="Crear factura" pendingLabel="Creando…" resetOnSuccess>
             <PField label="Concepto" htmlFor="concept">
               <PInput id="concept" name="concept" defaultValue={`Contenidos y posicionamiento · ${new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date())}`} />
@@ -122,26 +123,27 @@ export default async function AgencyClientPage({ params }: { params: Promise<{ i
               </PSelect>
             </PField>
           </PForm>
+          </div>
         </Card>
       </div>
 
-      <Card className="p-4 sm:p-6">
-        <h2 className="mb-3 font-semibold">Facturas</h2>
+      <Card className="overflow-hidden">
+        <CardHeader title="Facturas" intro={`${invoices.length} emitidas`} />
         {invoices.length ? (
           <ul className="divide-y divide-line">
             {invoices.map((inv) => (
-              <li key={inv.id} className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center">
+              <li key={inv.id} className="flex flex-col gap-3 px-4 py-3 transition-colors hover:bg-paper-2 sm:px-5 lg:flex-row lg:items-center">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-sm font-medium">{inv.number}</span>
-                    <Badge tone={INVOICE_STATUS[inv.status].tone}>{INVOICE_STATUS[inv.status].label}</Badge>
+                    <Badge tone={INVOICE_STATUS[inv.status].tone} dot>{INVOICE_STATUS[inv.status].label}</Badge>
                   </div>
                   <p className="truncate text-sm text-ink-2 first-letter:uppercase">{inv.concept}</p>
                   <p className="text-xs text-ink-3">
                     {fmtDate(inv.issued_at, { day: "numeric", month: "short", year: "numeric" })} · {money(inv.amount_cents, inv.currency)}
                   </p>
                 </div>
-                <PForm action={setClientInvoiceStatus.bind(null, site.id)} submitLabel="Cambiar" pendingLabel="…" variant="outline" className="flex flex-col gap-2 space-y-0 sm:flex-row sm:items-start">
+                <PForm action={setClientInvoiceStatus.bind(null, site.id)} submitLabel="Cambiar" pendingLabel="…" variant="outline" className="flex flex-col gap-2 space-y-0 sm:flex-row sm:items-start [&>div]:border-0 [&>div]:pt-0">
                   <input type="hidden" name="invoice_id" value={inv.id} />
                   <label htmlFor={`st_${inv.id}`} className="sr-only">
                     Estado de {inv.number}
@@ -158,20 +160,21 @@ export default async function AgencyClientPage({ params }: { params: Promise<{ i
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-ink-3">Aún no has emitido facturas a este cliente.</p>
+          <p className="p-5 text-sm text-ink-3">Aún no has emitido facturas a este cliente.</p>
         )}
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <Card className="p-4 sm:p-6 lg:col-span-3">
-          <h2 className="mb-4 font-semibold">Conversación con el cliente</h2>
+      <div className="grid gap-4 md:gap-5 lg:grid-cols-5">
+        <Card className="lg:col-span-3">
+          <CardHeader title="Conversación con el cliente" />
+          <div className="p-4 sm:p-5">
           {messages.length ? (
             <ol className="space-y-3">
               {messages.map((m) => {
                 const own = m.author_side === "agency";
                 return (
                   <li key={m.id} className={cn("flex", own ? "justify-end" : "justify-start")}>
-                    <div className={cn("max-w-[85%] rounded-2xl px-4 py-2.5", own ? "rounded-br-md bg-ink text-paper" : "rounded-bl-md bg-paper-2")}>
+                    <div className={cn("max-w-[85%] rounded-2xl px-4 py-2.5 shadow-[var(--shadow-xs)]", own ? "rounded-br-md bg-ink text-paper" : "rounded-bl-md border border-line bg-paper-2")}>
                       <p className="mb-0.5 text-xs font-semibold opacity-80">{m.author_name}</p>
                       <p className="whitespace-pre-line text-[15px] leading-relaxed">{m.body}</p>
                       <p className="mt-1 text-[11px] opacity-60">{fmtDate(m.created_at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
@@ -191,10 +194,12 @@ export default async function AgencyClientPage({ params }: { params: Promise<{ i
               <PTextarea id="reply" name="body" rows={3} required placeholder="Escribe tu respuesta…" />
             </PForm>
           </div>
+          </div>
         </Card>
 
-        <Card className="p-4 sm:p-6 lg:col-span-2">
-          <h2 className="mb-3 font-semibold">Personas del cliente</h2>
+        <Card className="lg:col-span-2">
+          <CardHeader title="Personas del cliente" />
+          <div className="p-4 sm:p-5">
           <ul className="divide-y divide-line">
             {members.map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-3 py-2.5">
@@ -208,6 +213,7 @@ export default async function AgencyClientPage({ params }: { params: Promise<{ i
             {!members.length && <li className="py-2.5 text-sm text-ink-3">Nadie todavía.</li>}
           </ul>
           <p className="mt-3 text-xs text-ink-3">Las personas administradoras del cliente pueden invitar a su equipo desde su portal.</p>
+          </div>
         </Card>
       </div>
     </div>

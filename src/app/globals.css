@@ -5,37 +5,70 @@
  * Editorial: papel cálido, tinta, un naranja "señal" y un lima de apoyo.
  */
 :root {
+  /* Superficies */
   --paper: #ffffff;
-  --paper-2: #f5f4f1;
+  --paper-2: #f6f6f4;
+  --paper-3: #eeeeeb;
   --card: #ffffff;
-  --ink: #15130f;
-  --ink-2: #4a453c;
-  --ink-3: #8a8375;
-  --line: #e6e3dc;
+  /* Tinta */
+  --ink: #121212;
+  --ink-2: #4b4b48;
+  --ink-3: #8a8a85;
+  --line: #e7e6e2;
+  --line-2: #d6d5d0;
+  /* Acentos */
   --signal: #ff4f1f;
+  --signal-2: #e8420f;
+  --signal-soft: #fff0ea;
   --signal-ink: #ffffff;
-  --lime: #c8f03c;
+  --lime: #d4f55a;
+  --lime-soft: #f3fbd6;
   --sky: #9fd3ff;
+  --sky-soft: #eaf5ff;
   --ok: #1f8a4c;
+  --ok-soft: #e8f6ee;
   --warn: #b7791f;
+  --warn-soft: #fbf3e2;
   --bad: #c2341b;
+  --bad-soft: #fdeceb;
+  /* Profundidad */
+  --shadow-xs: 0 1px 2px rgba(18, 18, 18, 0.05);
+  --shadow-sm: 0 1px 2px rgba(18, 18, 18, 0.06), 0 2px 8px rgba(18, 18, 18, 0.04);
+  --shadow-md: 0 2px 4px rgba(18, 18, 18, 0.05), 0 12px 32px -8px rgba(18, 18, 18, 0.12);
+  --shadow-lg: 0 8px 16px -4px rgba(18, 18, 18, 0.08), 0 32px 64px -16px rgba(18, 18, 18, 0.18);
+  --ring: 0 0 0 3px rgba(255, 79, 31, 0.18);
+  --radius: 12px;
+  --radius-lg: 16px;
 }
 
 @theme inline {
   --color-paper: var(--paper);
   --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
   --color-card: var(--card);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-line: var(--line);
+  --color-line-2: var(--line-2);
   --color-signal: var(--signal);
+  --color-signal-2: var(--signal-2);
+  --color-signal-soft: var(--signal-soft);
   --color-signal-ink: var(--signal-ink);
   --color-lime: var(--lime);
+  --color-lime-soft: var(--lime-soft);
   --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
   --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
   --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
   --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
   --font-sans: var(--font-body);
   --font-display: var(--font-body);
   --font-logo: var(--font-serif);
@@ -46,13 +79,32 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11", "tnum" 0;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+/* Foco visible y coherente en toda la app */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 .font-display {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: balance;
 }
+.text-balance { text-wrap: balance; }
+.text-pretty { text-wrap: pretty; }
+.tabular { font-variant-numeric: tabular-nums; }
 .font-display.italic,
 .font-display .italic,
 .font-display em {
@@ -69,9 +121,88 @@ body {
   color: var(--signal);
 }
 
+/* Etiqueta pequeña sobre un titular (sustituye al mono en mayúsculas) */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--signal);
+}
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* Fondo con halo suave de marca (hero, onboarding, auth) */
+.glow {
+  background-image:
+    radial-gradient(60% 50% at 50% 0%, rgba(255, 79, 31, 0.10), transparent 70%),
+    radial-gradient(40% 40% at 85% 20%, rgba(212, 245, 90, 0.28), transparent 70%),
+    radial-gradient(40% 40% at 10% 30%, rgba(159, 211, 255, 0.22), transparent 70%);
+}
+
+/* Cuadrícula tenue para fondos de producto */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(18, 18, 18, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(18, 18, 18, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, #000 40%, transparent 75%);
+}
+
+/* Compatibilidad: el antiguo punteado ahora es un fondo liso */
 .grain {
-  background-image: radial-gradient(rgba(21, 19, 15, 0.06) 1px, transparent 1px);
-  background-size: 14px 14px;
+  background: var(--paper-2);
+}
+
+/* Tarjeta elevada estándar */
+.surface {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Mockup de ventana de producto */
+.window {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.window-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper-2);
+}
+.window-bar i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--line-2);
+}
+
+/* Aparición suave al cargar (respeta reduced motion) */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.rise { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.rise-2 { animation-delay: 0.1s; }
+.rise-3 { animation-delay: 0.2s; }
+@media (prefers-reduced-motion: reduce) {
+  .rise, .rise-2, .rise-3 { animation: none; }
 }
 
 .ticker {

@@ -28,7 +28,9 @@ export default async function HostedBlogLayout({ children, params }: { children:
       <style>{`
 .ywc-blog{background:var(--b-bg);color:var(--b-text);font-family:var(--font-body),system-ui,sans-serif}
 .ywc-blog a:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;border-radius:4px}
-.ywc-blog .b-head{font-family:var(--b-font);letter-spacing:-.02em}
+.ywc-blog .b-head{font-family:var(--b-font);letter-spacing:-.025em;text-wrap:balance}
+.ywc-blog .b-tag{display:inline-flex;align-items:center;min-height:2rem;padding:0 .7rem;border-radius:999px;border:1px solid var(--b-line);font-size:.75rem;font-weight:500;transition:background-color .15s}
+.ywc-blog .b-tag:hover{background:var(--b-surface)}
 .ywc-prose{font-size:1.0625rem;line-height:1.75;color:var(--b-text);overflow-wrap:anywhere}
 .ywc-prose>*+*{margin-top:1.1em}
 .ywc-prose h2{font-family:var(--b-font);font-size:1.6rem;line-height:1.25;margin-top:2em;font-weight:600;letter-spacing:-.02em}
@@ -42,17 +44,17 @@ export default async function HostedBlogLayout({ children, params }: { children:
 .ywc-prose img{max-width:100%;height:auto;border-radius:12px}
 .ywc-prose .ywc-faq{margin-top:3em;padding-top:1.5em;border-top:1px solid var(--b-line)}
 `}</style>
-      <header className="border-b" style={{ borderColor: "var(--b-line)" }}>
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <header className="sticky top-0 z-10 border-b backdrop-blur" style={{ borderColor: "var(--b-line)", background: "color-mix(in srgb, var(--b-bg) 90%, transparent)" }}>
+        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href={base || "/"} className="b-head min-w-0 truncate text-lg font-semibold">
             {title}
           </Link>
-          <a href={site.url} className="inline-flex min-h-11 shrink-0 items-center text-sm font-medium" style={{ color: "var(--b-accent)" }}>
+          <a href={site.url} className="inline-flex min-h-11 shrink-0 items-center text-sm font-medium underline-offset-4 hover:underline" style={{ color: "var(--b-accent)" }}>
             Ir a {site.name.length > 18 ? "la web" : site.name} →
           </a>
         </div>
       </header>
-      <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">{children}</main>
+      <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">{children}</main>
       <footer className="border-t" style={{ borderColor: "var(--b-line)" }}>
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm sm:px-6" style={{ color: "var(--b-muted)" }}>
           <span>

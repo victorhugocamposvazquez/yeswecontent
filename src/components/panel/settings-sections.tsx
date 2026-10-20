@@ -1,21 +1,20 @@
 import { randomBytes } from "node:crypto";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, FileDown } from "lucide-react";
+import { DataTable, TableCount, rowIconBtn } from "@/components/panel/data-table";
 import { ActionForm } from "@/components/panel/action-form";
 import { ChoosePlanButton, PortalButton } from "@/components/panel/billing-actions";
 import { CopyButton } from "@/components/panel/copy-button";
 import { Toggle } from "@/components/panel/toggle";
-import { Badge, Card, Field, Input, Select, Textarea } from "@/components/ui";
+import { Badge, Card, CardHeader, Field, Input, Select, Textarea } from "@/components/ui";
 import { addCompetitor, connectIntegration, disconnectIntegration, inviteMember, removeCompetitor, saveSettings } from "@/app/panel/actions";
 import type { Article, Integration, Plan, Profile, Site, Subscription } from "@/lib/types";
 import { cn, eur, fmtDate } from "@/lib/utils";
 
-export function Section({ title, intro, children, className }: { title: string; intro?: string; children: React.ReactNode; className?: string }) {
+export function Section({ title, intro, children, className, action, flush = false }: { title: string; intro?: string; children: React.ReactNode; className?: string; action?: React.ReactNode; flush?: boolean }) {
   return (
-    <Card className={cn("p-5 md:p-6", className)}>
-      <h2 className="text-lg font-semibold">{title}</h2>
-      {intro && <p className="mb-5 mt-0.5 text-sm text-ink-3">{intro}</p>}
-      {!intro && <div className="mb-5" />}
-      {children}
+    <Card className={cn("overflow-hidden", className)}>
+      <CardHeader title={title} intro={intro} action={action} />
+      {flush ? children : <div className="p-5 md:p-6">{children}</div>}
     </Card>
   );
 }
@@ -39,14 +38,15 @@ const DAYS: [string, string][] = [
   ["sun", "Dom"],
 ];
 
-const chip = "cursor-pointer rounded-full border border-line bg-card px-3 py-1.5 text-sm has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-lime";
+const chip =
+  "inline-flex h-9 cursor-pointer items-center rounded-full border border-line bg-card px-3.5 text-[13px] font-medium text-ink-2 transition-colors duration-150 hover:border-line-2 hover:bg-paper-2 has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-signal/30";
 
 /* ───────── Cuenta ───────── */
 export function CuentaSection({ profile }: { profile: Profile }) {
   return (
     <div className="space-y-6">
       <Section title="Tu cuenta" intro="Cómo te ve tu equipo dentro de yeswecontent.">
-        <ActionForm action={saveSettings.bind(null, "cuenta")}>
+        <ActionForm action={saveSettings.bind(null, "cuenta")} bar>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="Nombre">
               <Input name="full_name" defaultValue={profile.full_name ?? ""} autoComplete="name" />
@@ -70,7 +70,7 @@ export function CuentaSection({ profile }: { profile: Profile }) {
 export function NegocioSection({ site }: { site: Site }) {
   return (
     <Section title="Tu negocio" intro="Con esto decidimos de qué escribir y para quién.">
-      <ActionForm action={saveSettings.bind(null, "negocio")}>
+      <ActionForm action={saveSettings.bind(null, "negocio")} bar>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Nombre de la marca">
             <Input name="name" defaultValue={site.name} required />
@@ -122,12 +122,12 @@ export function EquipoSection({ team, seats }: { team: { email: string; name: st
       <Section title="Equipo" intro={seats ? `Tu plan incluye ${seats} usuario(s).` : "Tu plan incluye usuarios ilimitados."}>
         <ul className="divide-y divide-line">
           {team.map((m) => (
-            <li key={m.email} className="flex items-center gap-3 py-3">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-paper-2 text-xs font-bold" aria-hidden>
+            <li key={m.email} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-paper-3 text-xs font-semibold text-ink-2" aria-hidden>
                 {(m.name ?? m.email).slice(0, 2).toUpperCase()}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{m.name ?? m.email}</p>
+                <p className="truncate text-[13px] font-medium">{m.name ?? m.email}</p>
                 <p className="truncate text-xs text-ink-3">{m.email}</p>
               </div>
               <Badge>{roles[m.role] ?? m.role}</Badge>
@@ -136,7 +136,7 @@ export function EquipoSection({ team, seats }: { team: { email: string; name: st
         </ul>
       </Section>
       <Section title="Invitar a alguien" intro="Le llegará un email con un enlace para unirse.">
-        <ActionForm action={inviteMember} submitLabel="Enviar invitación">
+        <ActionForm action={inviteMember} submitLabel="Enviar invitación" bar>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_200px]">
             <Field label="Email">
               <Input name="email" type="email" required placeholder="nombre@empresa.com" />
@@ -160,7 +160,7 @@ export function EscrituraSection({ site }: { site: Site }) {
   const v = site.brand_voice ?? {};
   return (
     <Section title="Voz de marca" intro="Así escribiremos en tu nombre. Cuanto más concreto, mejor.">
-      <ActionForm action={saveSettings.bind(null, "escritura")}>
+      <ActionForm action={saveSettings.bind(null, "escritura")} bar>
         <Field label="Tono" hint="Ej.: cercano y experto, con humor suave; nada de tecnicismos.">
           <Input name="tone" defaultValue={v.tone ?? ""} />
         </Field>
@@ -187,7 +187,7 @@ export function ArticuloSection({ site }: { site: Site }) {
   const s = (site.seo_settings ?? {}) as Site["seo_settings"] & { toc?: boolean; cta?: string; external_links?: boolean };
   return (
     <Section title="Formato de artículo" intro="Estructura y elementos SEO que tendrá cada artículo.">
-      <ActionForm action={saveSettings.bind(null, "articulo")}>
+      <ActionForm action={saveSettings.bind(null, "articulo")} bar>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Longitud mínima (palabras)">
             <Input name="min_words" type="number" min={600} max={5000} step={100} defaultValue={s.min_words ?? 1200} />
@@ -196,7 +196,7 @@ export function ArticuloSection({ site }: { site: Site }) {
             <Input name="internal_links" type="number" min={0} max={15} defaultValue={s.internal_links ?? 3} />
           </Field>
         </div>
-        <div className="space-y-4 rounded-xl border border-line bg-paper p-4">
+        <div className="divide-y divide-line rounded-xl border border-line bg-paper-2/50 px-4 [&>*]:py-3.5">
           <Toggle name="faq" defaultChecked={s.faq !== false} label="Preguntas frecuentes" hint="Bloque FAQ al final, ideal para respuestas de IA." />
           <Toggle name="schema" defaultChecked={s.schema !== false} label="Datos estructurados JSON-LD" hint="Article + FAQPage." />
           <Toggle name="toc" defaultChecked={s.toc ?? false} label="Índice de contenidos" />
@@ -216,7 +216,7 @@ export function VisualSection({ site }: { site: Site }) {
   const styles = ["Fotografía cálida de producto", "Ilustración plana", "Fotografía editorial", "Collage", "Minimalista con tipografía"];
   return (
     <Section title="Estilo visual" intro="Las imágenes que generamos para portadas y artículos.">
-      <ActionForm action={saveSettings.bind(null, "visual")}>
+      <ActionForm action={saveSettings.bind(null, "visual")} bar>
         <fieldset>
           <legend className="mb-1.5 text-sm font-medium text-ink-2">Estilo</legend>
           <div className="flex flex-wrap gap-2">
@@ -231,7 +231,7 @@ export function VisualSection({ site }: { site: Site }) {
           <Input name="palette" defaultValue={v.palette ?? ""} placeholder="terracota, crema y verde oliva" />
         </Field>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-line bg-paper p-4">
+          <div className="rounded-xl border border-line bg-paper-2/50 p-4">
             <Toggle name="cover" defaultChecked={v.cover ?? true} label="Imagen de portada" />
           </div>
           <Field label="Imágenes dentro del artículo">
@@ -248,7 +248,7 @@ export function CalendarioSection({ site }: { site: Site }) {
   const s = site.schedule ?? { days: ["mon", "wed", "fri"], time: "09:00", mode: "drip" };
   return (
     <Section title="Calendario de publicación" intro="Cuándo salen tus artículos (hora en UTC).">
-      <ActionForm action={saveSettings.bind(null, "calendario")}>
+      <ActionForm action={saveSettings.bind(null, "calendario")} bar>
         <fieldset>
           <legend className="mb-1.5 text-sm font-medium text-ink-2">Días</legend>
           <div className="flex flex-wrap gap-2">
@@ -269,7 +269,7 @@ export function CalendarioSection({ site }: { site: Site }) {
               ["drip", "Goteo", "Repartimos los artículos del mes en tus días de publicación."],
               ["batch", "Todo de golpe", "Publicamos todos los artículos del mes el primer día disponible."],
             ].map(([v, l, d]) => (
-              <label key={v} className="cursor-pointer rounded-xl border border-line bg-paper p-4 has-[:checked]:border-ink has-[:checked]:bg-lime/30">
+              <label key={v} className="cursor-pointer rounded-xl border border-line bg-card p-4 transition-colors has-[:checked]:border-signal has-[:checked]:bg-signal-soft has-[:checked]:ring-1 has-[:checked]:ring-signal">
                 <input type="radio" name="mode" value={v} defaultChecked={s.mode === v} className="mr-2 accent-[var(--signal)]" />
                 <span className="font-medium">{l}</span>
                 <span className="mt-1 block text-sm text-ink-3">{d}</span>
@@ -287,8 +287,8 @@ export function MejorasSection({ site }: { site: Site }) {
   const r = ((site.seo_settings as Record<string, unknown>)?.refresh ?? {}) as { enabled?: boolean; min_age_months?: number; drop_pct?: number; per_month?: number };
   return (
     <Section title="Mejoras automáticas" intro="Renovamos los artículos que empiezan a perder tráfico antes de que caigan del todo.">
-      <ActionForm action={saveSettings.bind(null, "mejoras")}>
-        <div className="rounded-xl border border-line bg-paper p-4">
+      <ActionForm action={saveSettings.bind(null, "mejoras")} bar>
+        <div className="rounded-xl border border-line bg-paper-2/50 p-4">
           <Toggle name="enabled" defaultChecked={r.enabled ?? true} label="Detectar y renovar artículos" hint="Aparecerán en Plan de contenidos › Mejoras." />
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -311,11 +311,11 @@ export function MejorasSection({ site }: { site: Site }) {
 export function CompetidoresSection({ competitors }: { competitors: { id: string; url: string; name: string | null }[] }) {
   return (
     <Section title="Competidores" intro="Los vigilamos en tu visibilidad IA y analizamos sus temas para encontrar huecos.">
-      <ul className="mb-5 divide-y divide-line rounded-xl border border-line">
+      <ul className="divide-y divide-line rounded-xl border border-line bg-card">
         {competitors.map((c) => (
-          <li key={c.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5">
+          <li key={c.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5 transition-colors hover:bg-paper-2">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">{c.name ?? c.url}</p>
+              <p className="text-[13px] font-medium">{c.name ?? c.url}</p>
               <p className="truncate text-xs text-ink-3">{c.url}</p>
             </div>
             <ActionForm action={removeCompetitor} submitLabel="Quitar" variant="ghost" inline>
@@ -325,7 +325,7 @@ export function CompetidoresSection({ competitors }: { competitors: { id: string
         ))}
         {!competitors.length && <li className="px-4 py-3 text-sm text-ink-3">Aún no has añadido competidores.</li>}
       </ul>
-      <ActionForm action={addCompetitor} submitLabel="Añadir competidor" variant="ink">
+      <ActionForm action={addCompetitor} submitLabel="Añadir competidor" variant="ink" bar>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Web">
             <Input name="url" placeholder="competidor.com" required />
@@ -403,7 +403,7 @@ export function PublicacionSection({ site, integrations, articles }: { site: Sit
       <Section title="Dónde publicamos" intro="Conecta tu CMS y publicaremos cada artículo en su fecha. Guardamos las credenciales cifradas.">
         <div className="space-y-3">
           {CMS.map((c) => (
-            <details key={c.id} className="group rounded-xl border border-line bg-paper">
+            <details key={c.id} className="group rounded-xl border border-line bg-card transition-shadow open:shadow-[var(--shadow-sm)]">
               <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
                 <span className="font-medium">{c.name}</span>
                 {connected.has(c.id) && (
@@ -411,7 +411,7 @@ export function PublicacionSection({ site, integrations, articles }: { site: Sit
                     <CircleCheck className="h-3 w-3" aria-hidden /> Conectado
                   </Badge>
                 )}
-                <span className="ml-auto text-sm text-ink-3 group-open:hidden">Configurar</span>
+                <span className="ml-auto text-[13px] font-medium text-signal group-open:hidden">Configurar</span>
               </summary>
               <div className="border-t border-line p-4">
                 <p className="mb-4 text-sm text-ink-3">{c.help}</p>
@@ -430,11 +430,11 @@ export function PublicacionSection({ site, integrations, articles }: { site: Sit
               </div>
             </details>
           ))}
-          <details className="group rounded-xl border border-line bg-paper">
+          <details className="group rounded-xl border border-line bg-card transition-shadow open:shadow-[var(--shadow-sm)]">
             <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
               <span className="font-medium">Webhook propio</span>
               {connected.has("webhook") && <Badge tone="ok">Conectado</Badge>}
-              <span className="ml-auto text-sm text-ink-3 group-open:hidden">Configurar</span>
+              <span className="ml-auto text-[13px] font-medium text-signal group-open:hidden">Configurar</span>
             </summary>
             <div className="space-y-3 border-t border-line p-4">
               <p className="text-sm text-ink-3">
@@ -466,7 +466,7 @@ export function PublicacionSection({ site, integrations, articles }: { site: Sit
           <a
             href={`data:text/plain;charset=utf-8,${encodeURIComponent(llms)}`}
             download="llms.txt"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper hover:bg-ink-2"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-[10px] bg-ink px-4.5 text-sm font-semibold text-paper shadow-[var(--shadow-xs)] transition-colors hover:bg-ink-2"
           >
             Descargar llms.txt
           </a>
@@ -488,16 +488,16 @@ export function CatalogoSection({ shopifyConnected }: { shopifyConnected: boolea
     <Section title="Catálogo de productos" intro="Sincronizamos tus productos de Shopify para enlazarlos de forma natural en los artículos.">
       {shopifyConnected ? (
         <>
-          <ul className="mb-5 divide-y divide-line rounded-xl border border-line">
+          <ul className="mb-5 divide-y divide-line rounded-xl border border-line bg-card">
             {products.map((p) => (
-              <li key={p.sku} className="flex items-center gap-3 px-4 py-2.5 text-sm">
+              <li key={p.sku} className="flex items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-paper-2">
                 <span className="flex-1 font-medium">{p.name}</span>
                 <span className="font-mono text-xs text-ink-3">{p.sku}</span>
                 <Badge tone={p.stock > 10 ? "ok" : "warn"}>{p.stock} uds.</Badge>
               </li>
             ))}
           </ul>
-          <ActionForm action={saveSettings.bind(null, "catalogo")} submitLabel="Guardar y sincronizar">
+          <ActionForm action={saveSettings.bind(null, "catalogo")} submitLabel="Guardar y sincronizar" bar>
             <Toggle name="mention_products" defaultChecked label="Mencionar productos en los artículos" hint="Hasta 3 por artículo, solo cuando encajen." />
             <Toggle name="skip_out_of_stock" defaultChecked label="Ignorar productos sin stock" />
           </ActionForm>
@@ -514,7 +514,7 @@ export function MarcaBlancaSection({ whiteLabel }: { whiteLabel: Record<string, 
   return (
     <div className="space-y-6">
       <Section title="Marca blanca" intro="Para agencias: tus clientes verán tu marca en el panel, los informes y los emails.">
-        <ActionForm action={saveSettings.bind(null, "marca-blanca")}>
+        <ActionForm action={saveSettings.bind(null, "marca-blanca")} bar>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="Nombre de tu marca">
               <Input name="brand_name" defaultValue={whiteLabel.brand_name ?? ""} placeholder="Nido Studio" />
@@ -542,8 +542,8 @@ export function DnsInstructions({ domain }: { domain?: string }) {
   return (
     <Section title="Configurar el dominio" intro="Añade este registro en el proveedor de tu dominio. La propagación puede tardar hasta 24 horas.">
       <div className="scroll-x rounded-xl border border-line">
-        <table className="w-full min-w-[480px] text-sm">
-          <thead className="bg-paper text-left text-xs uppercase tracking-wide text-ink-3">
+        <table className="w-full min-w-[480px] text-[13px]">
+          <thead className="bg-paper-2 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
             <tr>
               <th className="px-4 py-2 font-medium">Tipo</th>
               <th className="px-4 py-2 font-medium">Nombre</th>
@@ -587,9 +587,9 @@ export function ReferidosSection({ code, baseUrl }: { code: string; baseUrl: str
           ["Altas", "3"],
           ["Ganado", eur(11200)],
         ].map(([l, v]) => (
-          <div key={l} className="rounded-xl bg-paper p-4">
-            <p className="text-2xl font-semibold">{v}</p>
-            <p className="text-xs text-ink-3">{l}</p>
+          <div key={l} className="rounded-xl border border-line bg-paper-2/60 p-4">
+            <p className="tabular text-2xl font-semibold tracking-tight">{v}</p>
+            <p className="mt-0.5 text-xs text-ink-3">{l}</p>
           </div>
         ))}
       </div>
@@ -619,7 +619,7 @@ export function FacturacionSection({
             <div className="flex-1">
               <p className="font-semibold tracking-tight text-xl">{plan.name}</p>
               <p className="text-sm text-ink-2">
-                {eur(sub.interval === "year" ? plan.yearly_price_eur : plan.monthly_price_eur)}/mes · pago {sub.interval === "year" ? "anual" : "mensual"} · <Badge tone={sub.status === "active" ? "ok" : sub.status === "trialing" ? "lime" : "warn"}>{statusLabel[sub.status]}</Badge>
+                {eur(sub.interval === "year" ? plan.yearly_price_eur : plan.monthly_price_eur)}/mes · pago {sub.interval === "year" ? "anual" : "mensual"} · <Badge tone={sub.status === "active" ? "ok" : sub.status === "trialing" ? "lime" : "warn"} dot>{statusLabel[sub.status]}</Badge>
               </p>
               <p className="mt-1 text-xs text-ink-3">
                 {sub.status === "trialing" && sub.trial_ends_at
@@ -641,10 +641,10 @@ export function FacturacionSection({
           {plans.map((p) => {
             const current = p.id === sub?.plan_id;
             return (
-              <div key={p.id} className={cn("rounded-2xl border p-5", current ? "border-ink bg-lime/20" : "border-line bg-paper")}>
+              <div key={p.id} className={cn("rounded-2xl border p-5 transition-colors", current ? "border-signal bg-signal-soft/60 ring-1 ring-signal" : "border-line bg-card hover:border-line-2")}>
                 <div className="flex items-center justify-between">
                   <p className="text-lg font-semibold">{p.name}</p>
-                  {current && <Badge tone="lime">Tu plan</Badge>}
+                  {current && <Badge tone="signal" dot>Tu plan</Badge>}
                 </div>
                 <p className="mt-1 text-sm text-ink-2">
                   {eur(p.yearly_price_eur)}/mes en anual · {eur(p.monthly_price_eur)} en mensual
@@ -664,18 +664,34 @@ export function FacturacionSection({
         </div>
       </Section>
 
-      <Section title="Facturas">
+      <Section title="Facturas" flush={invoices.length > 0}>
         {invoices.length ? (
-          <ul className="divide-y divide-line">
-            {invoices.map((i) => (
-              <li key={i.id} className="flex flex-wrap items-center gap-3 py-3 text-sm">
-                <span className="font-mono text-xs">{i.id}</span>
-                <span className="flex-1 text-ink-2">{fmtDate(i.date, { day: "numeric", month: "long", year: "numeric" })}</span>
-                <span className="tabular-nums">{eur(i.amount)}</span>
-                <Badge tone={i.status === "pagada" ? "ok" : "warn"}>{i.status}</Badge>
-              </li>
-            ))}
-          </ul>
+          <DataTable
+            flat
+            mobile="scroll"
+            minWidth={420}
+            rows={invoices}
+            rowKey={(i) => i.id}
+            columns={[
+              { key: "id", header: "Factura", cell: (i) => <span className="font-mono text-xs">{i.id}</span> },
+              { key: "date", header: "Fecha", cell: (i) => <span className="text-ink-2">{fmtDate(i.date, { day: "numeric", month: "long", year: "numeric" })}</span> },
+              { key: "amount", header: "Importe", numeric: true, cell: (i) => <span className="font-medium">{eur(i.amount)}</span> },
+              { key: "status", header: "Estado", cell: (i) => <Badge tone={i.status === "pagada" ? "ok" : "warn"} dot>{i.status}</Badge> },
+              {
+                key: "pdf",
+                header: "PDF",
+                srOnly: true,
+                className: "w-12",
+                cell: (i) =>
+                  i.url ? (
+                    <a href={i.url} target="_blank" rel="noreferrer" className={rowIconBtn} aria-label={`Descargar ${i.id}`}>
+                      <FileDown className="h-4 w-4" aria-hidden />
+                    </a>
+                  ) : null,
+              },
+            ]}
+            footer={<TableCount shown={invoices.length} total={invoices.length} unit="facturas" />}
+          />
         ) : (
           <p className="text-sm text-ink-3">Tus facturas aparecerán aquí y en el portal de pago.</p>
         )}

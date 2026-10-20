@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { isDemo } from "@/lib/env";
+import { hasClaude, hasStripe, isDemo } from "@/lib/env";
 import { getAdmin } from "@/lib/admin/guard";
 import { IMPERSONATE_COOKIE } from "@/lib/admin/constants";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -20,20 +20,27 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   const impersonating = (await cookies()).get(IMPERSONATE_COOKIE)?.value;
   const banner = impersonating ? (
-    <div role="status" className="flex flex-wrap items-center justify-between gap-2 bg-signal px-4 py-2 text-sm font-medium text-signal-ink sm:px-6 lg:px-10">
+    <div role="status" className="flex flex-wrap items-center justify-between gap-2 border-b border-signal-2 bg-signal px-4 py-2 text-[13px] font-medium text-signal-ink sm:px-6 lg:px-8">
       <span>
-        Suplantación activa: <code className="font-mono">{impersonating}</code>. Todo lo que hagas en /panel se hará como ese usuario.
+        Suplantación activa: <code className="rounded bg-black/15 px-1 font-mono">{impersonating}</code>. Todo lo que hagas en /panel se hará como ese usuario.
       </span>
       <form action={stopImpersonation}>
-        <button type="submit" className="rounded-full bg-ink px-3 py-2 text-xs font-semibold text-paper hover:bg-ink-2 sm:py-1">
+        <button type="submit" className="inline-flex h-8 items-center rounded-lg bg-ink px-3 text-xs font-semibold text-paper hover:bg-ink-2">
           Terminar suplantación
         </button>
       </form>
     </div>
   ) : null;
 
+  const env = [
+    { label: "Supabase", ok: !isDemo },
+    { label: "Stripe", ok: hasStripe },
+    { label: "IA", ok: hasClaude || !!process.env.OPENAI_API_KEY || !!process.env.GEMINI_API_KEY },
+    { label: "Cron", ok: !!process.env.CRON_SECRET },
+  ];
+
   return (
-    <AdminShell email={admin.email} demo={isDemo} banner={banner}>
+    <AdminShell email={admin.email} demo={isDemo} env={env} banner={banner}>
       {children}
     </AdminShell>
   );

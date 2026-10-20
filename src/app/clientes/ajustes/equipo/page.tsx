@@ -45,7 +45,7 @@ export default async function ClientTeamPage() {
               const own = m.author_side === mine;
               return (
                 <li key={m.id} className={cn("flex", own ? "justify-end" : "justify-start")}>
-                  <div className={cn("max-w-[85%] rounded-2xl px-4 py-2.5", own ? "rounded-br-md bg-signal text-signal-ink" : "rounded-bl-md bg-paper-2 text-ink")}>
+                  <div className={cn("max-w-[85%] rounded-2xl px-4 py-2.5 shadow-[var(--shadow-xs)]", own ? "rounded-br-md bg-signal text-signal-ink" : "rounded-bl-md border border-line bg-paper-2 text-ink")}>
                     <p className={cn("mb-0.5 text-xs font-semibold", own ? "opacity-85" : "text-ink-2")}>
                       {m.author_name}
                       {m.author_side === "agency" && !own ? ` · ${name}` : ""}

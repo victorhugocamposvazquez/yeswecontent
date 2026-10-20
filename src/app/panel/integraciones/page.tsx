@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Code2, ExternalLink, GitBranch, Globe, RefreshCw, Rss, SquareDashedMousePointer } from "lucide-react";
 import { ActionForm } from "@/components/panel/action-form";
 import { LinkTabs } from "@/components/panel/tabs";
-import { Badge, Card, Field, Input, PageHeader, Select } from "@/components/ui";
+import { Badge, Card, CardHeader, Field, Input, PageHeader, Select } from "@/components/ui";
 import { getCurrentSite } from "@/lib/data";
 import { isDemo, siteUrl } from "@/lib/env";
 import { cn, fmtDate } from "@/lib/utils";
@@ -55,21 +55,20 @@ function Code({ title, code, lang }: { title: string; code: string; lang?: strin
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <li className="relative min-w-0 pl-10">
-      <span className="absolute left-0 top-0 flex h-7 w-7 items-center justify-center rounded-full bg-ink text-xs font-semibold text-paper" aria-hidden>
+      <span className="absolute left-0 top-0 flex h-7 w-7 items-center justify-center rounded-full bg-signal-soft text-xs font-semibold text-signal ring-1 ring-signal/20" aria-hidden>
         {n}
       </span>
-      <h3 className="pt-0.5 font-semibold tracking-tight">{title}</h3>
-      <div className="mt-2 min-w-0 space-y-3 text-sm text-ink-2">{children}</div>
+      <h3 className="pt-1 text-[15px] font-semibold tracking-tight">{title}</h3>
+      <div className="mt-2 min-w-0 space-y-3 text-[13px] leading-relaxed text-ink-2">{children}</div>
     </li>
   );
 }
 
 function Section({ title, intro, children, className }: { title: string; intro?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
-    <Card className={cn("min-w-0 p-4 sm:p-6", className)}>
-      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-      {intro && <p className="mt-1 text-sm text-ink-2">{intro}</p>}
-      <div className="mt-5 min-w-0">{children}</div>
+    <Card className={cn("min-w-0 overflow-hidden", className)}>
+      <CardHeader title={title} intro={intro} />
+      <div className="min-w-0 p-4 sm:p-5">{children}</div>
     </Card>
   );
 }
@@ -114,13 +113,15 @@ export default async function IntegracionesPage({ searchParams }: Props) {
       <ul className="mb-6 grid grid-cols-2 gap-2.5 sm:mb-8 sm:gap-3 xl:grid-cols-4">
         {paths.map((p) => (
           <li key={p.tab} className="min-w-0">
-            <Link href={`/panel/integraciones?tab=${p.tab}`} className={cn("flex h-full min-h-11 flex-col rounded-2xl border bg-card p-3 transition hover:border-ink sm:p-4", tab === p.tab ? "border-ink ring-2 ring-lime" : "border-line")}>
+            <Link href={`/panel/integraciones?tab=${p.tab}`} className={cn("flex h-full min-h-11 flex-col rounded-2xl border bg-card p-3 shadow-[var(--shadow-xs)] transition-all duration-150 hover:border-line-2 hover:shadow-[var(--shadow-sm)] sm:p-4", tab === p.tab ? "border-signal ring-1 ring-signal" : "border-line")}>
               <span className="flex items-center justify-between gap-2">
-                <p.icon className="h-5 w-5 text-signal" aria-hidden />
+                <span className="grid h-9 w-9 place-items-center rounded-lg bg-signal-soft text-signal">
+                  <p.icon className="h-[18px] w-[18px]" aria-hidden />
+                </span>
                 <Badge tone={p.badge === "Recomendado" ? "lime" : "neutral"}>{p.badge}</Badge>
               </span>
-              <span className="mt-2.5 text-sm font-semibold tracking-tight sm:mt-3 sm:text-base">{p.title}</span>
-              <span className="mt-1 hidden text-sm text-ink-2 sm:block">{p.text}</span>
+              <span className="mt-3 text-sm font-semibold tracking-tight sm:text-[15px]">{p.title}</span>
+              <span className="mt-1 hidden text-[13px] leading-snug text-ink-2 sm:block">{p.text}</span>
             </Link>
           </li>
         ))}
@@ -130,8 +131,8 @@ export default async function IntegracionesPage({ searchParams }: Props) {
 
       {/* ───────── API y claves ───────── */}
       {tab === "api" && (
-        <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <div className="min-w-0 space-y-6">
+        <div className="grid min-w-0 gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="min-w-0 space-y-4 md:space-y-5">
             <Section title="Datos de tu sitio" intro="Los necesitarás en cualquier integración.">
               <dl className="space-y-3 text-sm">
                 <div>
@@ -146,7 +147,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
                   <dt className="text-ink-3">Feeds públicos (sin clave)</dt>
                   <dd className="mt-1 flex flex-wrap gap-2">
                     {["feed.xml", "feed.json", "sitemap.xml"].map((f) => (
-                      <a key={f} href={`${api}/${f}`} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs font-medium hover:border-ink">
+                      <a key={f} href={`${api}/${f}`} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-xs font-medium shadow-[var(--shadow-xs)] transition-colors hover:bg-paper-2">
                         <Rss className="h-3.5 w-3.5" aria-hidden /> {f}
                       </a>
                     ))}
@@ -171,7 +172,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
                 </Field>
               </RevealForm>
               {isDemo && (
-                <p className="mt-4 rounded-lg bg-paper-2 px-3 py-2 text-xs text-ink-2">
+                <p className="mt-4 rounded-lg bg-sky-soft px-3 py-2 text-xs text-ink-2">
                   En modo demo la clave que verás funciona de verdad contra la API de prueba del sitio <Mono>s_tierrafina</Mono>.
                 </p>
               )}
@@ -208,7 +209,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
             </Section>
           </div>
 
-          <div className="min-w-0 space-y-6">
+          <div className="min-w-0 space-y-4 md:space-y-5">
             <Section title="Probar la API" intro="Solo devuelve artículos publicados. Paginación con ?page y ?per_page (máx. 100), filtros ?lang y ?tag, y ?include=content para traer el HTML en la lista.">
               <div className="space-y-4">
                 <Code title="Terminal" lang="bash" code={s("curl")} />
@@ -237,7 +238,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
                 key={f.id}
                 href={`/panel/integraciones?tab=frameworks&fw=${f.id}`}
                 aria-current={fw === f.id ? "page" : undefined}
-                className={cn("inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-sm font-medium transition", fw === f.id ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-ink")}
+                className={cn("inline-flex h-9 shrink-0 items-center rounded-full border px-3.5 text-[13px] font-medium transition-colors duration-150 max-sm:h-10", fw === f.id ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-line-2 hover:bg-paper-2 hover:text-ink")}
               >
                 {f.label}
               </Link>
@@ -317,7 +318,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
                 <Code title="useArticles.tsx" lang="tsx" code={s("react")} />
               </Step>
               <Step n={3} title="Ojo con el SEO">
-                <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-ink">
+                <p className="rounded-lg border border-warn/30 bg-warn-soft px-3 py-2 text-ink">
                   En una SPA el contenido se pinta en el navegador. Google lo acaba indexando, pero más tarde y peor; la mayoría de rastreadores de IA (ChatGPT, Perplexity, Claude) no ejecutan JavaScript y no lo verán. Si puedes, usa prerenderizado (Vite SSG, react-snap) o el blog alojado.
                 </p>
               </Step>
@@ -343,7 +344,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
 
       {/* ───────── Revalidación ───────── */}
       {tab === "revalidacion" && (
-        <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid min-w-0 gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <Section
             title="Webhook de revalidación"
             intro="Cada vez que publicamos un artículo enviamos un POST firmado a tu web para que actualice su caché o lance un build."
@@ -385,7 +386,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
               <ActionForm action={testFrameworkWebhook} submitLabel={<><RefreshCw className="h-4 w-4" aria-hidden /> Enviar evento de prueba</>} pendingLabel="Enviando…" variant="outline" />
             </div>
           </Section>
-          <div className="min-w-0 space-y-6">
+          <div className="min-w-0 space-y-4 md:space-y-5">
             <Section title="Qué recibe tu web" intro="Rechaza la petición si la firma no coincide o si t tiene más de 5 minutos.">
               <Code title="article.published" lang="http" code={s("webhookPayload")} />
             </Section>
@@ -400,7 +401,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
 
       {/* ───────── GitHub ───────── */}
       {tab === "github" && (
-        <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid min-w-0 gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <Section title="Publicar en un repositorio de GitHub" intro="Para webs estáticas y Jamstack: Astro, Hugo, Next.js con MDX, Nuxt Content, Eleventy, Jekyll o Gatsby.">
             <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
               {github?.owner ? <Badge tone="ok">Conectado · {github.owner}</Badge> : <Badge tone="neutral">Sin conectar</Badge>}
@@ -445,7 +446,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
 
       {/* ───────── Blog alojado ───────── */}
       {tab === "blog" && (
-        <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid min-w-0 gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <Section title="Blog alojado" intro="Un blog rápido y con SEO completo (canonical, Open Graph, JSON-LD, sitemap y RSS), con los colores de tu marca. Tu equipo no toca nada de la web.">
             <div className="mb-4 flex flex-wrap items-center gap-2">
               {hosted?.enabled ? <Badge tone="ok">Activo</Badge> : <Badge tone="neutral">Desactivado</Badge>}
@@ -473,13 +474,13 @@ export default async function IntegracionesPage({ searchParams }: Props) {
               </div>
             </ActionForm>
           </Section>
-          <div className="min-w-0 space-y-6">
+          <div className="min-w-0 space-y-4 md:space-y-5">
             <Section title="Opción A · Subdominio (recomendada)">
               <ol className="space-y-6">
                 <Step n={1} title="Crea un registro CNAME en tu DNS">
                   <div className="overflow-x-auto rounded-lg border border-line">
-                    <table className="w-full min-w-[320px] text-left text-sm">
-                      <thead className="bg-paper-2 text-xs text-ink-3">
+                    <table className="w-full min-w-[320px] text-left text-[13px]">
+                      <thead className="bg-paper-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
                         <tr>
                           <th className="px-3 py-2 font-medium">Tipo</th>
                           <th className="px-3 py-2 font-medium">Nombre</th>
@@ -517,7 +518,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
 
       {/* ───────── Widget ───────── */}
       {tab === "widget" && (
-        <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid min-w-0 gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <Section title="Widget para incrustar" intro="Para webs donde nadie puede tocar el código del servidor: Wix, Squarespace, Framer, Carrd, Jimdo o una página HTML. Pesa menos de 5 KB y no necesita clave.">
             <Code title="Pega esto en tu página" lang="html" code={s("embed")} />
             <ul className="mt-5 list-disc space-y-2 pl-5 text-sm text-ink-2">
@@ -528,7 +529,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
           </Section>
           <Section title="Antes de usarlo, ten en cuenta el SEO">
             <div className="space-y-3 text-sm text-ink-2">
-              <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-ink">
+              <p className="rounded-lg border border-warn/30 bg-warn-soft px-3 py-2 text-ink">
                 El widget pinta el contenido con JavaScript en el navegador. Google puede indexarlo, pero tarda más y le da menos peso, y los rastreadores de IA (ChatGPT, Perplexity, Claude) normalmente no lo ven.
               </p>
               <p>

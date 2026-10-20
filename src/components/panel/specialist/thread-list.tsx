@@ -25,13 +25,13 @@ export function ThreadList({
         type="button"
         onClick={onNew}
         disabled={busy}
-        className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-line bg-card px-3 text-sm font-medium hover:bg-paper-2 disabled:opacity-50"
+        className="flex h-9 w-full items-center gap-2 rounded-[10px] border border-line-2 bg-card px-3 text-[13px] font-medium shadow-[var(--shadow-xs)] transition-colors hover:bg-paper-2 disabled:opacity-50 max-lg:h-11"
       >
         <SquarePen className="h-4 w-4 text-signal" aria-hidden /> Nueva conversación
       </button>
-      <p className="mb-1 mt-4 px-1 text-[11px] font-medium uppercase tracking-wide text-ink-3">Conversaciones</p>
+      <p className="mb-1 mt-4 px-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">Conversaciones</p>
       {threads.length === 0 ? (
-        <p className="px-1 text-sm text-ink-3">Aún no has preguntado nada. Empieza por una de las sugerencias.</p>
+        <p className="px-2 text-[13px] text-ink-3">Aún no has preguntado nada. Empieza por una de las sugerencias.</p>
       ) : (
         <ul className="-mx-1 min-h-0 flex-1 space-y-0.5 overflow-y-auto px-1">
           {threads.map((t) => {
@@ -44,12 +44,12 @@ export function ThreadList({
                   disabled={busy && !active}
                   aria-current={active ? "true" : undefined}
                   className={cn(
-                    "flex min-h-11 w-full flex-col justify-center rounded-lg py-2 pl-3 pr-11 text-left disabled:opacity-50",
-                    active ? "bg-paper-2" : "hover:bg-paper-2",
+                    "flex min-h-11 w-full flex-col justify-center rounded-lg py-1.5 pl-2.5 pr-11 text-left transition-colors duration-150 disabled:opacity-50",
+                    active ? "bg-signal-soft" : "hover:bg-paper-2",
                   )}
                 >
-                  <span className={cn("block truncate text-sm", active ? "font-medium text-ink" : "text-ink-2")}>{t.title}</span>
-                  <span className="block text-xs text-ink-3">{fmtDate(t.created_at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                  <span className={cn("block truncate text-[13px]", active ? "font-medium text-signal" : "text-ink-2")}>{t.title}</span>
+                  <span className="block text-[11px] text-ink-3">{fmtDate(t.created_at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
                 </button>
                 <button
                   type="button"

@@ -5,7 +5,8 @@ import { ArrowLeft, Check, Clock } from "lucide-react";
 import { getTool, toolCategories, tools } from "@/lib/marketing/tools";
 import { ToolRunner } from "@/components/marketing/tools/tool-runner";
 import { KeywordDensityTool, RobotsGeneratorTool, SchemaGeneratorTool, SerpPreviewTool } from "@/components/marketing/tools/client-tools";
-import { Container, CtaLink, Eyebrow, Section } from "@/components/marketing/primitives";
+import { Badge, Card } from "@/components/ui";
+import { Container, CtaLink, Eyebrow, HoverCard, Lead, Section, Title } from "@/components/marketing/primitives";
 
 export const dynamicParams = false;
 
@@ -36,72 +37,77 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-line">
-        <Container className="relative py-12 md:py-16">
-          <Link href="/herramientas" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold hover:text-signal sm:min-h-0">
+      <section className="glow relative overflow-hidden border-b border-line">
+        <Container className="relative py-10 sm:py-14 md:py-16">
+          <Link href="/herramientas" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
             <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
           </Link>
           <Eyebrow className="mt-8">{cat?.label} · herramienta gratuita</Eyebrow>
-          <h1 className="mt-4 max-w-4xl font-display text-4xl leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">{t.name}</h1>
-          <p className="mt-5 max-w-2xl text-lg text-ink-2">{t.tagline}</p>
+          <Title as="h1" size="lg" className="mt-4 max-w-4xl">
+            {t.name}
+          </Title>
+          <Lead className="mt-5 max-w-2xl">{t.tagline}</Lead>
         </Container>
       </section>
 
-      <Section className="py-12 md:py-16">
+      <Section className="py-10 sm:py-12 md:py-16 lg:py-16">
         <Container>
           {t.kind === "server" && <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} />}
           {t.kind === "client" && clientTools[t.slug]?.()}
           {t.kind === "signup" && (
-            <div className="grid grid-cols-1 gap-8 rounded-2xl border border-line bg-sky/40 p-8 md:grid-cols-[1.3fr_1fr] md:items-center md:p-12">
+            <Card className="grid grid-cols-1 gap-8 bg-sky-soft p-7 md:grid-cols-[1.3fr_1fr] md:items-center md:p-12">
               <div>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em]">
+                <Badge className="bg-card">
                   <Clock className="h-3.5 w-3.5" aria-hidden /> Incluida en la prueba gratuita
-                </span>
-                <h2 className="mt-5 font-display text-4xl leading-tight md:text-5xl">Esta comprobación consulta a los modelos en tiempo real.</h2>
-                <p className="mt-4 text-ink-2">{t.why}</p>
+                </Badge>
+                <Title className="mt-5">Esta comprobación consulta a los modelos en tiempo real.</Title>
+                <p className="mt-4 text-[15px] leading-relaxed text-ink-2">{t.why}</p>
               </div>
               <div className="flex flex-col gap-3">
                 <CtaLink href="/registro" size="lg">
                   Probar 3 días gratis
                 </CtaLink>
-                <Link href="/herramientas/auditoria-ia" className="text-center text-sm font-semibold underline underline-offset-4">
+                <Link href="/herramientas/auditoria-ia" className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-ink underline decoration-signal decoration-2 underline-offset-4">
                   Mientras tanto, haz la auditoría exprés
                 </Link>
               </div>
-            </div>
+            </Card>
           )}
         </Container>
       </Section>
 
-      <Section className="border-t border-line bg-paper-2 py-16 md:py-20">
-        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+      <Section tone="paper-2">
+        <Container className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <Eyebrow>Qué revisa</Eyebrow>
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-5 space-y-2.5">
               {t.checks.map((c) => (
-                <li key={c} className="flex gap-3 text-lg">
-                  <Check className="mt-1 h-5 w-5 shrink-0 text-signal" aria-hidden /> {c}
+                <li key={c} className="flex gap-2.5 text-[15px] text-ink-2 sm:text-base">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-signal-soft text-signal">
+                    <Check className="h-3 w-3" aria-hidden />
+                  </span>
+                  {c}
                 </li>
               ))}
             </ul>
           </div>
           <div>
             <Eyebrow>Por qué importa</Eyebrow>
-            <p className="mt-5 font-display text-3xl leading-snug">{t.why}</p>
+            <p className="text-pretty mt-5 text-xl font-medium leading-snug tracking-tight sm:text-2xl">{t.why}</p>
           </div>
         </Container>
       </Section>
 
       {siblings.length > 0 && (
-        <Section className="py-16 md:py-20">
+        <Section>
           <Container>
             <Eyebrow tone="ink">Otras herramientas de {cat?.label.toLowerCase()}</Eyebrow>
-            <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-3">
+            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
               {siblings.map((s) => (
-                <Link key={s.slug} href={`/herramientas/${s.slug}`} className="rounded-2xl border border-line bg-card p-5 transition hover:shadow-md">
-                  <p className="font-display text-2xl">{s.name}</p>
+                <HoverCard key={s.slug} href={`/herramientas/${s.slug}`} className="p-5">
+                  <p className="font-semibold tracking-tight">{s.name}</p>
                   <p className="mt-1 text-sm text-ink-2">{s.tagline}</p>
-                </Link>
+                </HoverCard>
               ))}
             </div>
           </Container>

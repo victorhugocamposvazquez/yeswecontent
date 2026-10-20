@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Share2 } from "lucide-react";
 import { ActionForm } from "@/components/panel/action-form";
 import { CarouselPreview } from "@/components/panel/carousel-preview";
 import { CopyOpenButton } from "@/components/panel/copy-open-button";
@@ -66,7 +66,7 @@ function PublishedInfo({ p }: { p: SocialPost }) {
     );
   if (p.status === "failed")
     return (
-      <div className="mt-3 rounded-lg bg-bad/10 px-3 py-2 text-sm text-bad">
+      <div className="mt-3 rounded-lg bg-bad-soft px-3 py-2 text-[13px] text-bad">
         <p>{p.last_error ?? "No hemos podido publicarla."}</p>
         <ActionForm action={updateSocialPost} submitLabel="Reintentar" variant="ghost" inline className="mt-1">
           {hidden(p, "retry")}
@@ -95,31 +95,31 @@ export default async function SocialPage({ searchParams }: { searchParams: Promi
       <LinkTabs basePath="/panel/social" current={tab} tabs={TABS.map((t) => ({ ...t, count: posts.filter((p) => p.channel === t.id && p.status !== "dismissed").length }))} />
 
       {!ready && reason && (
-        <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-line bg-paper-2 p-4 sm:flex-row sm:items-center">
-          <p className="flex-1 text-sm text-ink-2">{reason}</p>
-          <Link href="/panel/ajustes/social" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-ink px-5 py-2.5 text-sm font-semibold text-paper hover:bg-ink-2 sm:min-h-0">
+        <div className="mb-5 flex flex-col gap-3 rounded-xl border border-warn/30 bg-warn-soft p-4 sm:flex-row sm:items-center">
+          <p className="flex-1 text-[13px] text-ink">{reason}</p>
+          <Link href="/panel/ajustes/social" className="inline-flex h-10 items-center justify-center rounded-[10px] bg-ink px-4 text-[13px] font-semibold text-paper shadow-[var(--shadow-xs)] transition-colors hover:bg-ink-2 max-sm:h-11">
             Ir a Redes sociales
           </Link>
         </div>
       )}
       {tab === "quora" && (
-        <p className="mb-5 rounded-2xl border border-line bg-paper-2 p-4 text-sm text-ink-2">
+        <p className="mb-5 rounded-xl border border-line bg-card p-4 text-[13px] leading-relaxed text-ink-2 shadow-[var(--shadow-xs)]">
           Quora no tiene una API pública para publicar, así que estas respuestas no salen solas: aprueba la que te guste, pulsa <strong className="font-medium">«Copiar y abrir en Quora»</strong> y pégala en la pregunta. Después márcala como publicada.
         </p>
       )}
 
       {!rows.length && (
-        <EmptyState title="Nada pendiente por aquí">{isReply ? "Buscamos conversaciones nuevas cada día. Vuelve mañana." : "Cada artículo publicado genera un carrusel. Aparecerán aquí."}</EmptyState>
+        <EmptyState title="Nada pendiente por aquí" icon={<Share2 className="h-5 w-5" />}>{isReply ? "Buscamos conversaciones nuevas cada día. Vuelve mañana." : "Cada artículo publicado genera un carrusel. Aparecerán aquí."}</EmptyState>
       )}
 
-      <div className={isReply ? "space-y-4" : "grid gap-6 md:grid-cols-2"}>
+      <div className={isReply ? "space-y-4" : "grid gap-4 md:grid-cols-2 md:gap-5"}>
         {rows.map((p) => {
           const art = articles.find((a) => a.id === p.article_id);
           const editable = p.status === "suggested" || p.status === "approved" || p.status === "failed";
           return isReply ? (
-            <Card key={p.id} className="p-4 sm:p-5">
+            <Card key={p.id} className="p-4 transition-shadow hover:shadow-[var(--shadow-sm)] sm:p-5">
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <Badge tone={STATUS[p.status].tone}>{STATUS[p.status].label}</Badge>
+                <Badge tone={STATUS[p.status].tone} dot>{STATUS[p.status].label}</Badge>
                 {p.thread_url && (
                   <a href={p.thread_url} target="_blank" rel="noreferrer" className="-my-2 inline-flex min-h-10 items-center gap-1 text-xs text-ink-3 hover:text-ink sm:min-h-0">
                     Ver conversación <ExternalLink className="h-3 w-3" aria-hidden />
@@ -173,9 +173,9 @@ export default async function SocialPage({ searchParams }: { searchParams: Promi
               <PublishedInfo p={p} />
             </Card>
           ) : (
-            <Card key={p.id} className="p-4 sm:p-5">
+            <Card key={p.id} className="p-4 transition-shadow hover:shadow-[var(--shadow-sm)] sm:p-5">
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <Badge tone={STATUS[p.status].tone}>{STATUS[p.status].label}</Badge>
+                <Badge tone={STATUS[p.status].tone} dot>{STATUS[p.status].label}</Badge>
                 {p.scheduled_for && p.status === "scheduled" && <span className="text-xs text-ink-3">{fmtDate(p.scheduled_for, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</span>}
               </div>
               <CarouselPreview slides={p.slides ?? [p.content]} brand={site.name} channel={p.channel} />

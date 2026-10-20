@@ -1,8 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { Textarea } from "@/components/ui";
-import { cn } from "@/lib/utils";
+import { cn, wordCount } from "@/lib/utils";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const inline = (s: string) =>
@@ -51,48 +50,59 @@ function render(md: string) {
   return out.join("");
 }
 
+/** Editor Markdown con pestañas Editar / Vista previa en una barra sobre el área de texto. */
 export function MarkdownField({ name, defaultValue = "", rows = 14, label, required }: { name: string; defaultValue?: string; rows?: number; label: string; required?: boolean }) {
   const [value, setValue] = useState(defaultValue);
   const [tab, setTab] = useState<"write" | "preview">("write");
   const id = useId();
   return (
     <div>
-      <div className="mb-1.5 flex items-center justify-between">
-        <label htmlFor={id} className="text-sm font-medium text-ink-2">
-          {label}
-        </label>
-        <div role="tablist" aria-label="Modo del editor" className="flex rounded-full bg-paper-2 p-0.5 text-xs">
-          {(["write", "preview"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tab === t}
-              onClick={() => setTab(t)}
-              className={cn("min-h-9 rounded-full px-3 py-1 font-medium sm:min-h-0", tab === t ? "bg-card text-ink shadow-sm" : "text-ink-3")}
-            >
-              {t === "write" ? "Escribir" : "Vista previa"}
-            </button>
-          ))}
+      <label htmlFor={id} className="mb-1.5 block text-[13px] font-medium text-ink-2">
+        {label}
+      </label>
+      <div className="overflow-hidden rounded-[10px] border border-line-2 bg-card shadow-[var(--shadow-xs)] focus-within:border-signal focus-within:shadow-[var(--ring)]">
+        <div className="flex items-center justify-between gap-2 border-b border-line bg-paper-2/60 pl-1 pr-3">
+          <div role="tablist" aria-label="Modo del editor" className="flex">
+            {(["write", "preview"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                role="tab"
+                aria-selected={tab === t}
+                aria-controls={`${id}-${t}`}
+                onClick={() => setTab(t)}
+                className={cn(
+                  "relative min-h-11 px-3 text-[13px] font-medium transition-colors sm:min-h-9",
+                  tab === t ? "text-ink after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-signal" : "text-ink-3 hover:text-ink",
+                )}
+              >
+                {t === "write" ? "Editar" : "Vista previa"}
+              </button>
+            ))}
+          </div>
+          <span className="tabular text-xs text-ink-3">{wordCount(value)} palabras</span>
         </div>
-      </div>
-      <Textarea
-        id={id}
-        name={name}
-        rows={rows}
-        value={value}
-        required={required}
-        onChange={(e) => setValue(e.target.value)}
-        className={cn("font-mono text-[13px] leading-relaxed", tab === "preview" && "hidden")}
-      />
-      {tab === "preview" && (
-        <div
-          className="min-h-40 rounded-xl border border-line bg-card px-4 py-3 text-sm leading-relaxed"
-          // Contenido escapado en render(); solo se generan etiquetas propias.
-          dangerouslySetInnerHTML={{ __html: value.trim() ? render(value) : '<p class="text-ink-3">Nada que previsualizar todavía.</p>' }}
+        <textarea
+          id={id}
+          name={name}
+          rows={rows}
+          value={value}
+          required={required}
+          onChange={(e) => setValue(e.target.value)}
+          className={cn("block w-full resize-y bg-transparent px-3.5 py-3 font-mono text-[13px] leading-relaxed text-ink outline-none placeholder:text-ink-3", tab === "preview" && "hidden")}
+          placeholder="## Título&#10;&#10;Escribe en Markdown…"
         />
-      )}
-      <p className="mt-1 text-xs text-ink-3">Markdown: ## título, **negrita**, - listas, [enlace](https://…).</p>
+        {tab === "preview" && (
+          <div
+            id={`${id}-preview`}
+            role="tabpanel"
+            className="min-h-40 px-4 py-3 text-sm leading-relaxed"
+            // Contenido escapado en render(); solo se generan etiquetas propias.
+            dangerouslySetInnerHTML={{ __html: value.trim() ? render(value) : '<p class="text-ink-3">Nada que previsualizar todavía.</p>' }}
+          />
+        )}
+      </div>
+      <p className="mt-1.5 text-xs text-ink-3">Markdown: ## título, **negrita**, - listas, [enlace](https://…).</p>
     </div>
   );
 }

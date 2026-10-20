@@ -35,7 +35,7 @@ export default async function ClientArticlePage({ params }: { params: Promise<{ 
             href={a.published_url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-card px-4 text-sm font-semibold hover:border-signal"
+            className="inline-flex min-h-11 items-center gap-2 rounded-[10px] border border-line-2 bg-card px-4 text-[13px] font-semibold shadow-[var(--shadow-xs)] transition-colors hover:bg-paper-2"
           >
             Verlo en tu web <ExternalLink className="h-4 w-4" aria-hidden />
           </a>

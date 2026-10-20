@@ -1,5 +1,24 @@
-import { Badge, Input, PageHeader, Select } from "@/components/ui";
-import { DataTable, EmptyRow, FilterBar, FilterField, HealthBadge, SubStatusBadge, Td, Th, THead, Tr } from "@/components/admin/table";
+import { ExternalLink } from "lucide-react";
+import { Badge, PageHeader } from "@/components/ui";
+import {
+  buildChips,
+  DataTable,
+  EmptyRow,
+  FilterBar,
+  FilterSelect,
+  HealthBadge,
+  IconButton,
+  RowActions,
+  SearchField,
+  SelectAllTh,
+  SelectTd,
+  Sub,
+  SubStatusBadge,
+  Td,
+  Th,
+  THead,
+  Tr,
+} from "@/components/admin/table";
 import { listAdminPlans, listAdminSites } from "@/lib/admin/data";
 import { fmtDate, num } from "@/lib/utils";
 
@@ -19,9 +38,11 @@ const providerLabel: Record<string, string> = {
   reddit: "Reddit",
   quora: "Quora",
 };
+const healthLabel: Record<string, string> = { ok: "Sana", warn: "Revisar", bad: "Fallo" };
 
 export default async function SitesPage({ searchParams }: { searchParams: SP }) {
-  const { q = "", plan = "", health = "" } = await searchParams;
+  const sp = await searchParams;
+  const { q = "", plan = "", health = "" } = sp;
   const [sites, plans] = await Promise.all([listAdminSites(), listAdminPlans()]);
   const needle = q.trim().toLowerCase();
   const rows = sites.filter(
@@ -32,80 +53,92 @@ export default async function SitesPage({ searchParams }: { searchParams: SP }) 
   );
   const planName = (id: string | null) => plans.find((p) => p.id === id)?.name ?? "—";
   const counts = { ok: sites.filter((s) => s.health === "ok").length, warn: sites.filter((s) => s.health === "warn").length, bad: sites.filter((s) => s.health === "bad").length };
+  const chips = buildChips("/admin/sitios", sp, {
+    q: { label: "Buscar" },
+    plan: { label: "Plan", value: (v) => planName(v) },
+    health: { label: "Salud", value: (v) => healthLabel[v] ?? v },
+  });
 
   return (
     <>
       <PageHeader
         title="Sitios"
         intro={
-          <>
-            {num(sites.length)} webs en la plataforma · <span className="text-ok">{counts.ok} sanas</span> ·{" "}
-            <span className="text-warn">{counts.warn} a revisar</span> · <span className="text-bad">{counts.bad} con fallos</span>
-          </>
+          <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+            {num(sites.length)} webs en la plataforma
+            <Badge tone="ok" dot>
+              {counts.ok} sanas
+            </Badge>
+            <Badge tone="warn" dot>
+              {counts.warn} a revisar
+            </Badge>
+            <Badge tone="bad" dot>
+              {counts.bad} con fallos
+            </Badge>
+          </span>
         }
       />
-      <FilterBar action="/admin/sitios" resetHref="/admin/sitios">
-        <FilterField label="Buscar" className="col-span-2 sm:min-w-56 sm:flex-1">
-          <Input type="search" name="q" defaultValue={q} placeholder="nombre, dominio o cliente" />
-        </FilterField>
-        <FilterField label="Plan">
-          <Select name="plan" defaultValue={plan}>
-            <option value="">Todos</option>
-            {plans.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </Select>
-        </FilterField>
-        <FilterField label="Salud">
-          <Select name="health" defaultValue={health}>
-            <option value="">Todas</option>
-            <option value="ok">Sana</option>
-            <option value="warn">Revisar</option>
-            <option value="bad">Fallo</option>
-          </Select>
-        </FilterField>
+      <FilterBar action="/admin/sitios" resetHref="/admin/sitios" chips={chips}>
+        <SearchField defaultValue={q} placeholder="Nombre, dominio o cliente" />
+        <FilterSelect label="Plan" name="plan" defaultValue={plan}>
+          <option value="">Plan: todos</option>
+          {plans.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </FilterSelect>
+        <FilterSelect label="Salud" name="health" defaultValue={health}>
+          <option value="">Salud: todas</option>
+          <option value="ok">Sana</option>
+          <option value="warn">Revisar</option>
+          <option value="bad">Fallo</option>
+        </FilterSelect>
       </FilterBar>
 
       <DataTable
         caption="Todos los sitios"
-        footer={
-          <>
-            {num(rows.length)} de {num(sites.length)} sitios. «Revisar»: sin publicar en 14 días con plan activo o con menos de dos integraciones. «Fallo»: integración caída o artículos fallidos.
-          </>
-        }
+        count={rows.length}
+        total={sites.length}
+        unit="sitios"
+        minWidth="min-w-[960px]"
+        footer="«Revisar»: sin publicar en 14 días con plan activo o con menos de dos integraciones. «Fallo»: integración caída o artículos fallidos."
       >
         <THead>
+          <SelectAllTh />
           <Th>Sitio</Th>
           <Th>Cliente</Th>
           <Th>Plan</Th>
-          <Th className="text-right">Publicados</Th>
+          <Th numeric>Publicados</Th>
           <Th>Última publicación</Th>
           <Th>Integraciones</Th>
           <Th>Salud</Th>
+          <Th className="w-12">
+            <span className="sr-only">Acciones</span>
+          </Th>
         </THead>
         <tbody>
           {rows.map((s) => (
-            <Tr key={s.id}>
+            <Tr key={s.id} tone={s.health === "bad" ? "bad" : undefined}>
+              <SelectTd label={s.name} />
               <Td>
                 <div className="font-medium">{s.name}</div>
-                <a href={s.url} target="_blank" rel="noreferrer" className="text-xs text-ink-3 hover:underline">
-                  {s.url.replace(/^https?:\/\//, "")}
-                </a>
+                <Sub>{s.url.replace(/^https?:\/\//, "")}</Sub>
               </Td>
               <Td>
                 {s.workspace}
-                <div className="text-xs text-ink-3">{s.owner_email}</div>
+                <Sub>{s.owner_email}</Sub>
               </Td>
               <Td>
-                <div className="flex flex-col items-start gap-1">
+                <div className="flex flex-wrap items-center gap-1.5">
                   {planName(s.plan_id)}
                   <SubStatusBadge status={s.status} />
                 </div>
               </Td>
-              <Td className="text-right tabular-nums">{num(s.articles)}</Td>
-              <Td className="whitespace-nowrap text-ink-2">{s.last_published_at ? fmtDate(s.last_published_at, { day: "numeric", month: "short", year: "numeric" }) : "Nunca"}</Td>
+              <Td numeric>{num(s.articles)}</Td>
+              <Td muted className="whitespace-nowrap">
+                {s.last_published_at ? fmtDate(s.last_published_at, { day: "numeric", month: "short", year: "numeric" }) : "Nunca"}
+              </Td>
               <Td>
                 <div className="flex flex-wrap gap-1">
                   {s.integrations.map((i) => (
@@ -119,9 +152,16 @@ export default async function SitesPage({ searchParams }: { searchParams: SP }) 
               <Td>
                 <HealthBadge health={s.health} />
               </Td>
+              <Td>
+                <RowActions>
+                  <IconButton label={`Abrir ${s.name} en una pestaña nueva`} href={s.url} external>
+                    <ExternalLink className="size-4" aria-hidden />
+                  </IconButton>
+                </RowActions>
+              </Td>
             </Tr>
           ))}
-          {!rows.length && <EmptyRow cols={7} />}
+          {!rows.length && <EmptyRow cols={9} />}
         </tbody>
       </DataTable>
     </>

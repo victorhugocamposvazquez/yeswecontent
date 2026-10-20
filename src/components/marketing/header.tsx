@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
-import { Logo } from "@/components/ui";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
+import { ButtonLink, Card, Logo } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import type { ProductIcon } from "@/lib/marketing/products";
-import { ProductGlyph } from "./primitives";
+import { IconBox, ProductGlyph } from "./primitives";
 
 export interface ProductNavItem {
   slug: string;
@@ -23,11 +23,14 @@ const links = [
   { href: "/agencias", label: "Agencias" },
 ];
 
+const navItem = "inline-flex h-9 items-center gap-1 rounded-lg px-3 text-sm font-medium text-ink-2 transition-colors duration-150 hover:bg-paper-2 hover:text-ink";
+
 export function MarketingHeader({ products }: { products: ProductNavItem[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false); // menú móvil
   const [dropdown, setDropdown] = useState(false);
   const dropRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<number | null>(null);
 
   useEffect(() => {
     setOpen(false);
@@ -60,78 +63,81 @@ export function MarketingHeader({ products }: { products: ProductNavItem[] }) {
   }, [open]);
 
   const active = (href: string) => pathname === href || pathname.startsWith(href + "/");
-
   const close = () => setOpen(false);
+  const enter = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setDropdown(true);
+  };
+  const leave = () => {
+    closeTimer.current = window.setTimeout(() => setDropdown(false), 120);
+  };
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/85">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/" aria-label="yeswecontent, inicio" className="shrink-0">
+      <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-md supports-[backdrop-filter]:bg-paper/75">
+        <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <Link href="/" aria-label="yeswecontent, inicio" className="shrink-0 rounded-md">
             <Logo />
           </Link>
 
-          <nav aria-label="Principal" className="hidden items-center gap-1 lg:flex">
-            <div ref={dropRef} className="relative" onMouseLeave={() => setDropdown(false)}>
+          <nav aria-label="Principal" className="hidden items-center gap-0.5 lg:flex">
+            <div ref={dropRef} className="relative" onMouseEnter={enter} onMouseLeave={leave}>
               <button
                 type="button"
                 aria-expanded={dropdown}
                 aria-haspopup="true"
                 onClick={() => setDropdown((v) => !v)}
-                onMouseEnter={() => setDropdown(true)}
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-lg px-3.5 py-2 text-sm font-medium hover:bg-paper-2",
-                  (dropdown || active("/producto")) && "bg-paper-2",
-                )}
+                className={cn(navItem, (dropdown || active("/producto")) && "bg-paper-2 text-ink")}
               >
-                Producto <ChevronDown className={cn("h-4 w-4 transition-transform", dropdown && "rotate-180")} aria-hidden />
+                Producto <ChevronDown className={cn("h-4 w-4 text-ink-3 transition-transform duration-150", dropdown && "rotate-180")} aria-hidden />
               </button>
               {dropdown && (
-                <div className="absolute left-1/2 top-full w-[min(44rem,90vw)] -translate-x-1/2 pt-3">
-                  <div className="grid grid-cols-2 gap-1 rounded-2xl border border-line bg-card p-3 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)]">
-                    {products.map((p) => (
-                      <Link
-                        key={p.slug}
-                        href={`/producto/${p.slug}`}
-                        className="group flex items-start gap-3 rounded-xl p-3 hover:bg-paper"
-                      >
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line bg-paper group-hover:bg-lime">
-                          <ProductGlyph icon={p.icon} className="h-4 w-4" />
-                        </span>
-                        <span>
-                          <span className="block text-sm font-semibold">{p.name}</span>
-                          <span className="block text-xs text-ink-3">{p.short}</span>
-                        </span>
+                <div className="absolute left-1/2 top-full w-[min(46rem,calc(100vw-2rem))] -translate-x-1/2 pt-2">
+                  <Card elevated className="overflow-hidden p-2">
+                    <div className="grid grid-cols-2 gap-0.5">
+                      {products.map((p) => (
+                        <Link
+                          key={p.slug}
+                          href={`/producto/${p.slug}`}
+                          className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors duration-150 hover:bg-paper-2"
+                        >
+                          <IconBox>
+                            <ProductGlyph icon={p.icon} />
+                          </IconBox>
+                          <span className="min-w-0">
+                            <span className="block text-sm font-semibold tracking-tight">{p.name}</span>
+                            <span className="block truncate text-[13px] text-ink-3">{p.short}</span>
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="mt-2 flex items-center justify-between rounded-xl bg-paper-2 px-4 py-2.5 text-[13px]">
+                      <span className="text-ink-2">¿No sabes por dónde empezar? Prueba el agente completo.</span>
+                      <Link href="/producto/agente-seo" className="inline-flex items-center gap-1 font-semibold text-signal">
+                        Ver agente SEO <ArrowRight className="h-3.5 w-3.5" aria-hidden />
                       </Link>
-                    ))}
-                  </div>
+                    </div>
+                  </Card>
                 </div>
               )}
             </div>
             {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={cn("rounded-lg px-3.5 py-2 text-sm font-medium hover:bg-paper-2", active(l.href) && "bg-paper-2")}
-              >
+              <Link key={l.href} href={l.href} className={cn(navItem, active(l.href) && "bg-paper-2 text-ink")}>
                 {l.label}
               </Link>
             ))}
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link href="/entrar" className="hidden rounded-lg px-3.5 py-2 text-sm font-medium hover:bg-paper-2 sm:inline-flex">
+            <Link href="/entrar" className={cn(navItem, "max-sm:hidden")}>
               Entrar
             </Link>
-            <Link
-              href="/registro"
-              className="hidden rounded-lg border border-line bg-signal px-4 py-2 text-sm font-semibold text-signal-ink shadow-sm transition hover:shadow-md sm:inline-flex"
-            >
+            <ButtonLink href="/registro" size="sm" className="max-sm:hidden">
               Prueba gratis
-            </Link>
+            </ButtonLink>
             <button
               type="button"
-              className="-mr-1 grid h-11 w-11 place-items-center rounded-lg border border-line bg-card lg:hidden"
+              className="-mr-1 grid h-11 w-11 shrink-0 place-items-center rounded-lg text-ink transition-colors duration-150 hover:bg-paper-2 lg:hidden"
               aria-label={open ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={open}
               aria-controls="menu-movil"
@@ -141,42 +147,40 @@ export function MarketingHeader({ products }: { products: ProductNavItem[] }) {
             </button>
           </div>
         </div>
-
       </header>
 
       {/* Fuera del <header>: su backdrop-filter crearía un bloque contenedor para el position:fixed. */}
       {open && (
         <div id="menu-movil" className="fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto overscroll-contain border-t border-line bg-paper lg:hidden">
-          <nav aria-label="Móvil" className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-signal">Producto</p>
-            <div className="mt-3 grid grid-cols-1 gap-1 sm:grid-cols-2">
+          <nav aria-label="Móvil" className="mx-auto max-w-[1200px] px-4 pt-5 sm:px-6">
+            <p className="eyebrow">Producto</p>
+            <div className="mt-3 grid grid-cols-1 gap-0.5 sm:grid-cols-2">
               {products.map((p) => (
-                <Link key={p.slug} href={`/producto/${p.slug}`} onClick={close} className="-mx-2.5 flex min-h-12 items-center gap-3 rounded-xl p-2.5 hover:bg-paper-2 active:bg-paper-2">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line bg-card">
-                    <ProductGlyph icon={p.icon} className="h-4 w-4" />
+                <Link key={p.slug} href={`/producto/${p.slug}`} onClick={close} className="-mx-2 flex min-h-12 items-center gap-3 rounded-xl px-2 py-1.5 active:bg-paper-2">
+                  <IconBox>
+                    <ProductGlyph icon={p.icon} />
+                  </IconBox>
+                  <span className="min-w-0">
+                    <span className="block text-[15px] font-semibold tracking-tight">{p.name}</span>
+                    <span className="block truncate text-[13px] text-ink-3">{p.short}</span>
                   </span>
-                  <span className="text-sm font-semibold">{p.name}</span>
                 </Link>
               ))}
             </div>
-            <div className="mt-6 divide-y divide-line border-y border-line">
+            <div className="mt-5 divide-y divide-line border-y border-line">
               {links.map((l) => (
-                <Link key={l.href} href={l.href} onClick={close} aria-current={active(l.href) ? "page" : undefined} className="flex items-center justify-between py-4 font-display text-[1.75rem] leading-tight sm:text-3xl">
-                  {l.label} <span aria-hidden>→</span>
+                <Link key={l.href} href={l.href} onClick={close} aria-current={active(l.href) ? "page" : undefined} className="flex min-h-14 items-center justify-between text-lg font-semibold tracking-tight">
+                  {l.label} <ArrowRight className="h-4 w-4 text-ink-3" aria-hidden />
                 </Link>
               ))}
             </div>
-            <div className="sticky bottom-0 -mx-4 mt-6 grid grid-cols-[1fr_1.6fr] gap-3 border-t border-line bg-paper px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:-mx-6 sm:px-6">
-              <Link
-                href="/registro"
-                onClick={close}
-                className="order-2 rounded-lg border border-line bg-signal px-3 py-3.5 text-center font-semibold text-signal-ink shadow-sm"
-              >
-                Prueba gratis 3 días
-              </Link>
-              <Link href="/entrar" onClick={close} className="order-1 rounded-lg border border-line bg-card px-3 py-3.5 text-center font-semibold">
+            <div className="sticky bottom-0 -mx-4 mt-5 grid grid-cols-[1fr_1.6fr] gap-3 border-t border-line bg-paper px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:-mx-6 sm:px-6">
+              <ButtonLink href="/entrar" variant="outline" size="lg" onClick={close}>
                 Entrar
-              </Link>
+              </ButtonLink>
+              <ButtonLink href="/registro" size="lg" onClick={close}>
+                Prueba gratis 3 días
+              </ButtonLink>
             </div>
           </nav>
         </div>

@@ -17,11 +17,11 @@ export default async function ClientMembersPage() {
         <ul className="divide-y divide-line">
           {members.map((m) => (
             <li key={m.id} className="flex items-center gap-3 py-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-signal/12 text-sm font-bold text-signal" aria-hidden>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-signal-soft text-xs font-semibold text-signal" aria-hidden>
                 {(m.full_name ?? m.email)[0]?.toUpperCase()}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15px] font-medium">{m.full_name ?? m.email}</span>
+                <span className="block truncate text-[13px] font-medium">{m.full_name ?? m.email}</span>
                 <span className="block truncate text-xs text-ink-3">
                   {m.email}
                   {m.status === "invited" ? ` · invitada el ${fmtDate(m.invited_at)}` : ""}

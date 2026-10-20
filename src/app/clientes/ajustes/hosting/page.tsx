@@ -52,7 +52,7 @@ export default async function ClientHostingPage() {
         <div className="mt-6 border-t border-line pt-5">
           <h3 className="text-[15px] font-semibold">Crea este registro en tu proveedor de DNS</h3>
           <p className="mb-3 text-sm text-ink-3">En el panel donde compraste el dominio (GoDaddy, IONOS, Cloudflare…), añade un registro nuevo con estos valores:</p>
-          <dl className="divide-y divide-line rounded-xl border border-line text-sm">
+          <dl className="divide-y divide-line rounded-xl border border-line bg-paper-2/40 text-[13px]">
             <DnsRow label="Tipo" value="CNAME" />
             <DnsRow label="Nombre / Host" value={sub} copy />
             <DnsRow label="Valor / Destino" value={CNAME_TARGET} copy />
@@ -74,7 +74,7 @@ export default async function ClientHostingPage() {
         {cms.length > 0 && (
           <ul className="mb-5 space-y-2">
             {cms.map((i) => (
-              <li key={i.id} className="flex min-h-11 items-center justify-between gap-3 rounded-xl bg-paper-2 px-3.5 py-2">
+              <li key={i.id} className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-line bg-paper-2/60 px-3.5 py-2">
                 <span className="text-[15px] font-medium">{CMS_LABEL[i.provider]}</span>
                 <Badge tone={i.status === "connected" ? "ok" : "warn"}>{i.status === "connected" ? "Conectado" : "Revisar"}</Badge>
               </li>

@@ -278,7 +278,7 @@ export function SpecialistChat({
     <a
       href={booking.href}
       {...(booking.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="flex min-h-11 items-center gap-2 rounded-lg border border-line bg-card px-3 text-sm font-medium hover:bg-paper-2"
+      className="flex min-h-11 items-center gap-2 rounded-[10px] border border-line bg-card px-3 text-[13px] font-medium shadow-[var(--shadow-xs)] transition-colors hover:bg-paper-2"
     >
       <Headset className="h-4 w-4 text-signal" aria-hidden /> Hablar con una persona
     </a>
@@ -288,21 +288,21 @@ export function SpecialistChat({
   const waitingFirstToken = streaming && lastAsst?.role === "assistant" && !lastAsst.content && !lastAsst.proposals.length;
 
   return (
-    <div className="lg:grid lg:h-[calc(100dvh-11rem)] lg:min-h-[34rem] lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-6">
+    <div className="lg:grid lg:h-[calc(100dvh-9.5rem)] lg:min-h-[34rem] lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-5">
       {/* Lista de conversaciones (escritorio) */}
       <aside className="hidden min-h-0 flex-col gap-4 lg:flex">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Especialista SEO</h1>
-          <p className="mt-1 text-sm text-ink-2">Tu consultor de SEO y visibilidad en IA, con los datos de {siteName}.</p>
+          <h1 className="text-[1.65rem] font-semibold tracking-tight">Especialista SEO</h1>
+          <p className="mt-1 text-[13px] text-ink-2">Tu consultor de SEO y visibilidad en IA, con los datos de {siteName}.</p>
         </div>
-        <div className="min-h-0 flex-1">
+        <div className="min-h-0 flex-1 rounded-2xl border border-line bg-card p-2 shadow-[var(--shadow-xs)]">
           <ThreadList threads={threads} activeId={activeId} busy={streaming} onSelect={selectThread} onNew={newThread} onDelete={removeThread} />
         </div>
         {bookingLink}
       </aside>
 
       {/* Conversación */}
-      <section className="flex min-h-0 flex-col lg:overflow-hidden lg:rounded-2xl lg:border lg:border-line lg:bg-card" aria-label="Conversación con el especialista">
+      <section className="flex min-h-0 flex-col lg:overflow-hidden lg:rounded-2xl lg:border lg:border-line lg:bg-card lg:shadow-[var(--shadow-xs)]" aria-label="Conversación con el especialista">
         {/* Barra superior móvil */}
         <div className="-mt-2 mb-3 flex items-center gap-1 lg:hidden">
           <button type="button" onClick={() => setSheetOpen(true)} className="-ml-2 grid h-11 w-11 shrink-0 place-items-center rounded-full hover:bg-paper-2" aria-label="Ver conversaciones">
@@ -325,8 +325,8 @@ export function SpecialistChat({
             </div>
           ) : !active || messages.length === 0 ? (
             <div className="mx-auto flex max-w-2xl flex-col items-center py-6 text-center lg:py-12">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-lime" aria-hidden>
-                <Sparkles className="h-6 w-6 text-ink" />
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-signal-soft text-signal ring-1 ring-signal/15" aria-hidden>
+                <Sparkles className="h-6 w-6" />
               </span>
               <h2 className="mt-4 text-xl font-semibold tracking-tight">¿En qué te ayudo hoy?</h2>
               <p className="mt-1 max-w-md text-sm text-ink-2">
@@ -340,7 +340,7 @@ export function SpecialistChat({
                       type="button"
                       onClick={() => void send(s)}
                       disabled={streaming}
-                      className="flex min-h-11 w-full items-center rounded-xl border border-line bg-card px-4 py-3 text-left text-sm text-ink-2 transition hover:border-ink hover:text-ink disabled:opacity-50"
+                      className="flex min-h-11 w-full items-center rounded-xl border border-line bg-card px-4 py-3 text-left text-[13px] text-ink-2 shadow-[var(--shadow-xs)] transition-all duration-150 hover:border-line-2 hover:bg-paper-2 hover:text-ink disabled:opacity-50"
                     >
                       {s}
                     </button>
@@ -354,16 +354,16 @@ export function SpecialistChat({
               {messages.map((m) =>
                 m.role === "user" ? (
                   <li key={m.id} className="flex justify-end">
-                    <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-[15px] text-paper">{m.content}</p>
+                    <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-[14px] leading-relaxed text-paper">{m.content}</p>
                   </li>
                 ) : (
                   <li key={m.id} className="flex gap-3">
-                    <span className="mt-0.5 hidden h-8 w-8 shrink-0 place-items-center rounded-full bg-lime sm:grid" aria-hidden>
-                      <Sparkles className="h-4 w-4 text-ink" />
+                    <span className="mt-0.5 hidden h-8 w-8 shrink-0 place-items-center rounded-full bg-signal-soft text-signal sm:grid" aria-hidden>
+                      <Sparkles className="h-4 w-4" />
                     </span>
                     <div className="min-w-0 flex-1 space-y-3">
                       {m.content ? (
-                        <MarkdownView md={m.content} className="max-w-none text-[15px] [&_h2]:mt-5 [&_h2]:text-base [&_h3]:text-[15px]" />
+                        <MarkdownView md={m.content} className="max-w-none text-[14px] [&_h2]:mt-5 [&_h2]:text-base [&_h3]:text-[15px]" />
                       ) : waitingFirstToken && m === lastAsst ? (
                         <p className="flex items-center gap-2 py-1 text-sm text-ink-3">
                           <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden /> Revisando tus datos…
@@ -371,7 +371,7 @@ export function SpecialistChat({
                       ) : null}
                       {m.proposals.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs font-medium uppercase tracking-wide text-ink-3">Propuestas · tú decides</p>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">Propuestas · tú decides</p>
                           {m.proposals.map((p) => (
                             <ProposalCard key={p.id} proposal={p} disabled={streaming && m === lastAsst} onApply={(x) => onApply(m.id, x)} onDismiss={(x) => onDismiss(m.id, x)} />
                           ))}
@@ -385,7 +385,7 @@ export function SpecialistChat({
           )}
 
           {error && (
-            <div role="alert" className="mx-auto mt-4 flex max-w-3xl flex-wrap items-center gap-2 rounded-xl border border-bad/30 bg-bad/5 px-4 py-3 text-sm text-bad">
+            <div role="alert" className="mx-auto mt-4 flex max-w-3xl flex-wrap items-center gap-2 rounded-xl border border-bad/20 bg-bad-soft px-4 py-3 text-[13px] text-bad">
               <span className="flex-1">{error}</span>
               {active?.messages?.some((m) => m.role === "user") && (
                 <button type="button" onClick={retry} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 font-medium text-ink hover:bg-paper-2">
@@ -400,7 +400,7 @@ export function SpecialistChat({
         {/* Entrada: fija abajo en móvil, al pie de la tarjeta en escritorio */}
         <form
           onSubmit={onSubmit}
-          className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:static lg:z-auto lg:border-line lg:bg-card lg:px-6 lg:pb-5 lg:pt-4 lg:backdrop-blur-none print:hidden"
+          className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-card/90 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-md lg:static lg:z-auto lg:border-line lg:bg-paper-2/60 lg:px-6 lg:pb-5 lg:pt-4 lg:backdrop-blur-none print:hidden"
         >
           <div className="mx-auto flex max-w-3xl items-end gap-2">
             <label htmlFor="specialist-input" className="sr-only">
@@ -419,7 +419,7 @@ export function SpecialistChat({
                 autosize(e.target);
               }}
               onKeyDown={onKeyDown}
-              className="max-h-42 min-h-11 flex-1 resize-none rounded-2xl border border-line bg-card px-4 py-2.5 text-base leading-6 outline-none placeholder:text-ink-3 focus:border-ink focus:ring-2 focus:ring-lime"
+              className="max-h-42 min-h-11 flex-1 resize-none rounded-2xl border border-line-2 bg-card px-4 py-2.5 text-base leading-6 shadow-[var(--shadow-xs)] outline-none transition placeholder:text-ink-3 hover:border-ink-3 focus:border-signal focus:shadow-[var(--ring)]"
             />
             {streaming ? (
               <button type="button" onClick={stop} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-paper" aria-label="Detener respuesta">
@@ -429,7 +429,7 @@ export function SpecialistChat({
               <button
                 type="submit"
                 disabled={!input.trim()}
-                className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-signal text-signal-ink shadow-sm transition hover:brightness-95 disabled:opacity-40"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-signal text-signal-ink shadow-[var(--shadow-sm)] transition hover:bg-signal-2 active:translate-y-px disabled:opacity-40"
                 aria-label="Enviar pregunta"
               >
                 <ArrowUp className="h-5 w-5" aria-hidden />
@@ -444,7 +444,7 @@ export function SpecialistChat({
       {sheetOpen && (
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Conversaciones">
           <button type="button" className="absolute inset-0 bg-ink/40" aria-label="Cerrar" onClick={() => setSheetOpen(false)} />
-          <div className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-2xl bg-card px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-2 shadow-xl">
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-2xl bg-card px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-2 shadow-[var(--shadow-lg)]">
             <div className="mx-auto mb-1 h-1 w-10 rounded-full bg-line" aria-hidden />
             <div className="mb-2 flex items-center justify-between">
               <p className="font-semibold">Especialista SEO</p>

@@ -22,28 +22,28 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   let badge: React.ReactNode;
   if (!sub || sub.status === "canceled") {
     badge = (
-      <Link href="/panel/ajustes/facturacion" className="inline-flex min-h-10 items-center">
-        <Badge tone="bad">Sin plan activo · Elegir plan</Badge>
+      <Link href="/panel/ajustes/facturacion" className="inline-flex items-center">
+        <Badge tone="bad" dot>Sin plan · Elegir plan</Badge>
       </Link>
     );
   } else if (sub.status === "trialing") {
     const days = sub.trial_ends_at ? Math.max(0, Math.ceil((new Date(sub.trial_ends_at).getTime() - Date.now()) / 86_400_000)) : 3;
     badge = (
-      <Link href="/panel/ajustes/facturacion" className="flex min-h-10 items-center gap-2">
-        <Badge tone="lime">Prueba · {days === 1 ? "queda 1 día" : `quedan ${days} días`}</Badge>
+      <Link href="/panel/ajustes/facturacion" className="flex items-center gap-2">
+        <Badge tone="lime" dot>Prueba · {days === 1 ? "queda 1 día" : `quedan ${days} días`}</Badge>
         <span className="hidden text-xs font-medium text-signal underline sm:inline">Activar plan</span>
       </Link>
     );
   } else if (sub.status === "past_due") {
     badge = (
-      <Link href="/panel/ajustes/facturacion" className="inline-flex min-h-10 items-center">
-        <Badge tone="warn">Pago pendiente · {plan?.name ?? sub.plan_id}</Badge>
+      <Link href="/panel/ajustes/facturacion" className="inline-flex items-center">
+        <Badge tone="warn" dot>Pago pendiente · {plan?.name ?? sub.plan_id}</Badge>
       </Link>
     );
   } else {
     badge = (
-      <Link href="/panel/ajustes/facturacion" className="inline-flex min-h-10 items-center">
-        <Badge tone="neutral">
+      <Link href="/panel/ajustes/facturacion" className="inline-flex items-center">
+        <Badge tone="neutral" className="max-sm:hidden">
           Plan {plan?.name ?? sub.plan_id} · {sub.interval === "year" ? "anual" : "mensual"}
         </Badge>
       </Link>
@@ -60,7 +60,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       siteSwitcher={<SiteSwitcher sites={sites.map((s) => ({ id: s.id, name: s.name, url: s.url }))} currentId={site.id} action={setSite} />}
     >
       {global.maintenance_banner && (
-        <p role="status" className="mb-6 rounded-xl border border-warn/40 bg-warn/10 px-4 py-3 text-sm text-ink">
+        <p role="status" className="mb-5 rounded-xl border border-warn/30 bg-warn-soft px-4 py-3 text-sm text-ink">
           {global.maintenance_banner}
         </p>
       )}

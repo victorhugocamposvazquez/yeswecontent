@@ -1,30 +1,70 @@
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
-import { ArrowRight, Bot, CalendarDays, Link2, Network, PenLine, ScanSearch, Send, Share2, ShoppingBag, Sparkles, type LucideIcon } from "lucide-react";
+import Image from "next/image";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
+import { ArrowRight, Bot, CalendarDays, Link2, Minus, Network, PenLine, Plus, ScanSearch, Send, Share2, ShoppingBag, Sparkles, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ButtonLink } from "@/components/ui";
 import type { ProductIcon } from "@/lib/marketing/products";
 
+/* ───────── Layout ───────── */
+
+/** Contenedor de 1200 px de la web pública. */
 export function Container({ className, ...p }: ComponentProps<"div">) {
-  return <div className={cn("mx-auto w-full max-w-6xl px-4 sm:px-6", className)} {...p} />;
+  return <div className={cn("mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8", className)} {...p} />;
 }
 
-export function Eyebrow({ children, className, tone = "signal" }: { children: ReactNode; className?: string; tone?: "signal" | "ink" | "paper" }) {
+/** Banda de sección: ritmo vertical de 56–72 px en móvil y 96–128 px en escritorio. */
+export function Section({ className, children, id, tone = "paper" }: { className?: string; children: ReactNode; id?: string; tone?: "paper" | "paper-2" | "ink" }) {
   return (
-    <p
+    <section
+      id={id}
       className={cn(
-        "font-mono text-[11px] uppercase tracking-[0.22em]",
-        tone === "signal" && "text-signal",
-        tone === "ink" && "text-ink-2",
-        tone === "paper" && "text-lime",
+        "py-14 sm:py-16 md:py-24 lg:py-28",
+        tone === "paper-2" && "border-y border-line bg-paper-2",
+        tone === "ink" && "bg-ink text-paper",
         className,
       )}
     >
+      {children}
+    </section>
+  );
+}
+
+/* ───────── Tipografía ───────── */
+
+/** Etiqueta sobre un titular. En fondos oscuros, tono "paper" (lima). */
+export function Eyebrow({ children, className, tone = "signal" }: { children: ReactNode; className?: string; tone?: "signal" | "ink" | "paper" }) {
+  const style: CSSProperties | undefined = tone === "paper" ? { color: "var(--lime)" } : tone === "ink" ? { color: "var(--ink-2)" } : undefined;
+  return (
+    <p className={cn("eyebrow", className)} style={style}>
       {children}
     </p>
   );
 }
 
-/** CTA grueso con sombra desplazada, propio de la web pública. */
+export function Title({ as: Tag = "h2", className, children, size = "md" }: { as?: "h1" | "h2" | "h3"; className?: string; children: ReactNode; size?: "sm" | "md" | "lg" }) {
+  return (
+    <Tag
+      className={cn(
+        "font-display",
+        size === "lg" && "text-[clamp(2.125rem,5.5vw,4.25rem)]",
+        size === "md" && "text-[clamp(1.875rem,4vw,2.875rem)]",
+        size === "sm" && "text-[clamp(1.5rem,2.6vw,2.125rem)]",
+        className,
+      )}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+export function Lead({ className, ...p }: ComponentProps<"p">) {
+  return <p className={cn("text-pretty text-base leading-relaxed text-ink-2 sm:text-lg", className)} {...p} />;
+}
+
+/* ───────── Acciones ───────── */
+
+/** CTA de la web pública: envoltorio sobre ButtonLink con flecha opcional. */
 export function CtaLink({
   className,
   tone = "signal",
@@ -33,57 +73,103 @@ export function CtaLink({
   arrow = true,
   ...p
 }: ComponentProps<typeof Link> & { tone?: "signal" | "paper" | "ink" | "lime"; size?: "md" | "lg"; arrow?: boolean }) {
+  const variant = tone === "signal" ? "primary" : tone === "ink" ? "ink" : "outline";
   return (
-    <Link
-      className={cn(
-        "group inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition",
-        size === "md" ? "px-5 py-2.5 text-sm" : "px-6 py-3 text-base",
-        tone === "signal" && "bg-signal text-signal-ink shadow-sm hover:brightness-95",
-        tone === "paper" && "border border-line bg-card text-ink hover:border-ink-3",
-        tone === "ink" && "bg-ink text-paper hover:bg-ink-2",
-        tone === "lime" && "bg-lime text-ink hover:brightness-95",
-        className,
-      )}
+    <ButtonLink
+      variant={variant}
+      size={size}
+      className={cn("group", tone === "lime" && "border-0 bg-lime text-ink shadow-[var(--shadow-xs)] hover:bg-lime hover:brightness-95", className)}
       {...p}
     >
       {children}
-      {arrow && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />}
+      {arrow && <ArrowRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden />}
+    </ButtonLink>
+  );
+}
+
+export function TextLink({ className, children, ...p }: ComponentProps<typeof Link>) {
+  return (
+    <Link className={cn("group inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-ink transition-colors duration-150 hover:text-signal sm:min-h-0", className)} {...p}>
+      {children}
+      <ArrowRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden />
     </Link>
   );
 }
 
-export function Section({ className, children, id }: { className?: string; children: ReactNode; id?: string }) {
+/* ───────── Superficies ───────── */
+
+/** Icono en cuadrado de 40 px con fondo signal-soft. */
+export function IconBox({ children, className, tone = "signal" }: { children: ReactNode; className?: string; tone?: "signal" | "lime" | "sky" | "ink" | "paper" }) {
   return (
-    <section id={id} className={cn("py-20 md:py-28", className)}>
+    <span
+      className={cn(
+        "grid h-10 w-10 shrink-0 place-items-center rounded-[10px] [&>svg]:h-[18px] [&>svg]:w-[18px]",
+        tone === "signal" && "bg-signal-soft text-signal",
+        tone === "lime" && "bg-lime-soft text-ink",
+        tone === "sky" && "bg-sky-soft text-ink",
+        tone === "ink" && "bg-ink text-paper",
+        tone === "paper" && "bg-paper-2 text-ink-2",
+        className,
+      )}
+    >
       {children}
-    </section>
+    </span>
   );
 }
 
-export function Title({ as: Tag = "h2", className, children }: { as?: "h1" | "h2" | "h3"; className?: string; children: ReactNode }) {
-  return <Tag className={cn("font-display text-3xl leading-[1.1] tracking-tight sm:text-4xl md:text-5xl", className)}>{children}</Tag>;
+/** Tarjeta interactiva: borde fino, sombra xs y elevación al pasar el ratón. */
+export function HoverCard({ className, ...p }: ComponentProps<typeof Link>) {
+  return (
+    <Link
+      className={cn(
+        "group block rounded-2xl border border-line bg-card shadow-[var(--shadow-xs)] transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-line-2 hover:shadow-[var(--shadow-md)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+        className,
+      )}
+      {...p}
+    />
+  );
 }
+
+/** Ventana de producto (.window) con barra superior y título opcional. */
+export function Window({ title, className, children, bar = true, right }: { title?: ReactNode; className?: string; children: ReactNode; bar?: boolean; right?: ReactNode }) {
+  return (
+    <div className={cn("window text-ink", className)}>
+      {bar && (
+        <div className="window-bar">
+          <i aria-hidden />
+          <i aria-hidden />
+          <i aria-hidden />
+          {title && <span className="ml-2 truncate font-mono text-[11px] text-ink-3">{title}</span>}
+          {right && <span className="ml-auto">{right}</span>}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+/* ───────── FAQ ───────── */
 
 export function Faq({ items, className }: { items: { q: string; a: ReactNode }[]; className?: string }) {
   return (
-    <div className={cn("divide-y divide-line border-y border-line", className)}>
+    <div className={cn("divide-y divide-line rounded-2xl border border-line bg-card shadow-[var(--shadow-xs)]", className)}>
       {items.map((it) => (
-        <details key={it.q} className="group">
-          <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+        <details key={it.q} className="group px-5 sm:px-6">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 py-4 text-[15px] font-semibold tracking-tight sm:text-base [&::-webkit-details-marker]:hidden">
             <span>{it.q}</span>
-            <span
-              aria-hidden
-              className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-line font-mono text-sm transition-transform group-open:rotate-45 group-open:bg-lime"
-            >
-              +
+            <span aria-hidden className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-paper-2 text-ink-2 transition-colors duration-150 group-open:bg-signal-soft group-open:text-signal">
+              <Plus className="h-4 w-4 group-open:hidden" />
+              <Minus className="hidden h-4 w-4 group-open:block" />
             </span>
           </summary>
-          <div className="-mt-2 max-w-3xl pb-5 text-ink-2 leading-relaxed">{it.a}</div>
+          <div className="max-w-3xl pb-5 text-[15px] leading-relaxed text-ink-2">{it.a}</div>
         </details>
       ))}
     </div>
   );
 }
+
+/* ───────── CTA final ───────── */
 
 export function CtaBand({
   title,
@@ -99,18 +185,26 @@ export function CtaBand({
   secondary?: { label: string; href: string };
 }) {
   return (
-    <Section className="pt-0 md:pt-0">
+    <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
       <Container>
-        <div className="relative overflow-hidden rounded-2xl bg-ink px-6 py-14 text-center text-paper sm:px-12 md:py-20">
+        <div className="relative overflow-hidden rounded-3xl bg-ink px-6 py-14 text-center text-paper shadow-[var(--shadow-lg)] sm:px-12 md:py-20">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage:
+                "radial-gradient(50% 60% at 50% 100%, rgba(255,79,31,0.28), transparent 70%), radial-gradient(30% 40% at 90% 0%, rgba(212,245,90,0.16), transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.04), transparent)",
+            }}
+          />
           <div className="relative mx-auto max-w-3xl">
-            <h2 className="font-display text-3xl leading-[1.1] sm:text-4xl md:text-5xl">{title}</h2>
-            {text && <p className="mx-auto mt-5 max-w-xl text-lg text-paper/75">{text}</p>}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <h2 className="font-display text-[clamp(1.875rem,4.4vw,3.25rem)]">{title}</h2>
+            {text && <p className="text-pretty mx-auto mt-5 max-w-xl text-base text-paper/70 sm:text-lg">{text}</p>}
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <CtaLink href={href} size="lg">
                 {cta}
               </CtaLink>
               {secondary && (
-                <Link href={secondary.href} className="font-semibold text-paper/80 underline underline-offset-4 hover:text-paper">
+                <Link href={secondary.href} className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-paper/80 transition-colors duration-150 hover:text-paper">
                   {secondary.label}
                 </Link>
               )}
@@ -121,6 +215,8 @@ export function CtaBand({
     </Section>
   );
 }
+
+/* ───────── Iconos de producto ───────── */
 
 const productIcons: Record<ProductIcon, LucideIcon> = {
   bot: Bot,
@@ -140,6 +236,27 @@ export function ProductGlyph({ icon, className }: { icon: ProductIcon; className
   return <I className={className} aria-hidden />;
 }
 
+/* ───────── Logotipos oficiales de motores (a color) ───────── */
+
+const engineLogos: Record<string, string> = {
+  Google: "/logos/color/google.svg",
+  ChatGPT: "/logos/color/chatgpt.svg",
+  Gemini: "/logos/color/gemini.svg",
+  Perplexity: "/logos/color/perplexity.svg",
+  Claude: "/logos/color/claude.svg",
+  Reddit: "/logos/color/reddit.svg",
+  Quora: "/logos/color/quora.svg",
+};
+
+/** Logotipo oficial a color de un motor o plataforma. Marcas de sus respectivos titulares (nota en el pie). */
+export function EngineLogo({ name, size = 20, className, alt }: { name: string; size?: number; className?: string; alt?: string }) {
+  const src = engineLogos[name];
+  if (!src) return null;
+  return <Image src={src} alt={alt ?? `Logotipo de ${name}`} width={size} height={size} className={cn("shrink-0 select-none", className)} draggable={false} />;
+}
+
+/* ───────── Ficha de ejemplo (compatibilidad con products.sample) ───────── */
+
 export function Ticket({
   heading,
   rows,
@@ -152,35 +269,29 @@ export function Ticket({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-2xl border border-line bg-card p-5 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)]", className)}>
-      <div className="flex items-center justify-between border-b border-dashed border-line pb-3">
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">yeswecontent</p>
-        <span className="flex gap-1" aria-hidden>
-          <span className="h-2.5 w-2.5 rounded-full bg-signal" />
-          <span className="h-2.5 w-2.5 rounded-full bg-lime" />
-          <span className="h-2.5 w-2.5 rounded-full bg-sky" />
-        </span>
+    <Window title="yeswecontent" className={className}>
+      <div className="p-5 sm:p-6">
+        <p className="text-lg font-semibold tracking-tight">{heading}</p>
+        <dl className="mt-4 divide-y divide-line">
+          {rows.map((r) => (
+            <div key={r.k} className="flex items-center justify-between gap-4 py-2.5 text-sm">
+              <dt className="text-ink-2">{r.k}</dt>
+              <dd
+                className={cn(
+                  "tabular rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                  r.tone === "ok" && "bg-ok-soft text-ok",
+                  r.tone === "warn" && "bg-warn-soft text-warn",
+                  r.tone === "signal" && "bg-signal-soft text-signal",
+                  !r.tone && "bg-paper-2 text-ink",
+                )}
+              >
+                {r.v}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        {note && <p className="mt-4 text-xs text-ink-3">{note}</p>}
       </div>
-      <p className="mt-4 font-display text-2xl leading-tight">{heading}</p>
-      <dl className="mt-4 divide-y divide-line">
-        {rows.map((r) => (
-          <div key={r.k} className="flex items-center justify-between gap-4 py-2.5 text-sm">
-            <dt className="text-ink-2">{r.k}</dt>
-            <dd
-              className={cn(
-                "rounded-full px-2.5 py-0.5 font-mono text-xs font-semibold",
-                r.tone === "ok" && "bg-ok/12 text-ok",
-                r.tone === "warn" && "bg-warn/15 text-warn",
-                r.tone === "signal" && "bg-lime text-ink",
-                !r.tone && "bg-paper-2 text-ink",
-              )}
-            >
-              {r.v}
-            </dd>
-          </div>
-        ))}
-      </dl>
-      {note && <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{note}</p>}
-    </div>
+    </Window>
   );
 }

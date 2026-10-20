@@ -4,6 +4,11 @@ export const alt = "yeswecontent · Tráfico orgánico desde Google y la IA, en 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const INK = "#121212";
+const INK2 = "#4b4b48";
+const SIGNAL = "#ff4f1f";
+const LINE = "#e7e6e2";
+
 export default function OpengraphImage() {
   return new ImageResponse(
     (
@@ -15,32 +20,42 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           background: "#ffffff",
+          backgroundImage:
+            "radial-gradient(60% 50% at 50% 0%, rgba(255,79,31,0.12), transparent 70%), radial-gradient(40% 40% at 90% 30%, rgba(212,245,90,0.35), transparent 70%), radial-gradient(40% 40% at 5% 40%, rgba(159,211,255,0.3), transparent 70%)",
           padding: 64,
           fontFamily: "Arial, sans-serif",
-          color: "#15130f",
-          backgroundImage: "radial-gradient(rgba(21,19,15,0.08) 1.5px, transparent 1.5px)",
-          backgroundSize: "22px 22px",
+          color: INK,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <svg width="84" height="68" viewBox="0 0 40 32">
-            <path d="M4 2h32a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H16l-8 6v-6H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" fill="#ff4f1f" stroke="#15130f" strokeWidth="2" />
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <svg width="64" height="52" viewBox="0 0 40 32">
+            <path d="M4 2h32a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H16l-8 6v-6H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" fill={SIGNAL} stroke={INK} strokeWidth="2" />
           </svg>
-          <div style={{ display: "flex", fontSize: 44, fontFamily: "Arial, sans-serif", fontWeight: 700, letterSpacing: -1 }}>
+          <div style={{ display: "flex", fontSize: 40, fontWeight: 700, letterSpacing: -1 }}>
             yeswe<span style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontWeight: 400 }}>content</span>
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", fontSize: 76, lineHeight: 1.05, letterSpacing: -2, fontWeight: 700, maxWidth: 1000 }}>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 22, fontWeight: 700, color: SIGNAL }}>
+            <span style={{ width: 10, height: 10, borderRadius: 999, background: SIGNAL }} />
+            SEO + GEO · en piloto automático
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", fontSize: 72, lineHeight: 1.04, letterSpacing: -2.5, fontWeight: 700, maxWidth: 1040 }}>
             <span>Automatiza que te encuentren cuando buscan en&nbsp;</span>
-            <span style={{ color: "#ff4f1f" }}>Google y la IA.</span>
+            <span style={{ color: SIGNAL }}>Google y la IA.</span>
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "Arial, sans-serif", fontSize: 24 }}>
-          <span style={{ letterSpacing: 4, textTransform: "uppercase", color: "#4a453c" }}>SEO + GEO en piloto automático</span>
-          <span style={{ background: "#ff4f1f", color: "#fff", borderRadius: 12, padding: "12px 28px", fontWeight: 700, boxShadow: "none" }}>
-            Prueba 3 días gratis
-          </span>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 22 }}>
+          <div style={{ display: "flex", gap: 10 }}>
+            {["Google", "ChatGPT", "Gemini", "Perplexity", "Claude"].map((m) => (
+              <span key={m} style={{ display: "flex", border: `1px solid ${LINE}`, background: "#fff", borderRadius: 999, padding: "8px 18px", color: INK2, fontSize: 20, fontWeight: 600 }}>
+                {m}
+              </span>
+            ))}
+          </div>
+          <span style={{ display: "flex", background: SIGNAL, color: "#fff", borderRadius: 12, padding: "14px 28px", fontWeight: 700 }}>Prueba 3 días gratis</span>
         </div>
       </div>
     ),

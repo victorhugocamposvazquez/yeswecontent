@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { RotateCcw, X } from "lucide-react";
-import { Badge, Card, PageHeader } from "@/components/ui";
+import { AlertTriangle, RotateCcw, X } from "lucide-react";
+import { Badge, Card, CardHeader, PageHeader } from "@/components/ui";
 import { ActionForm, SubmitButton } from "@/components/admin/ActionForm";
-import { DataTable, EmptyRow, Td, Th, THead, Tr } from "@/components/admin/table";
+import { DataTable, EmptyRow, RowActions, Segmented, Sub, Td, Th, THead, Tr } from "@/components/admin/table";
 import { getSettings, listQueue } from "@/lib/admin/data";
 import type { QueueStage } from "@/lib/admin/types";
-import { cn, fmtDate } from "@/lib/utils";
+import { fmtDate } from "@/lib/utils";
 import { cancelJob, retryJob } from "../actions";
 
 export const metadata = { title: "Cola de contenido" };
@@ -19,6 +19,17 @@ const stages: { id: QueueStage; label: string; tone: "neutral" | "sky" | "signal
   { id: "failed", label: "Fallido", tone: "bad" },
 ];
 
+/** Tiempo transcurrido en formato corto («4 min», «2 h», «3 d»). */
+function elapsed(iso: string, now: number) {
+  const s = Math.max(0, Math.round((now - new Date(iso).getTime()) / 1000));
+  if (s < 60) return `${s} s`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} min`;
+  const h = Math.round(m / 60);
+  if (h < 48) return `${h} h`;
+  return `${Math.round(h / 24)} d`;
+}
+
 type SP = Promise<{ stage?: string }>;
 
 export default async function QueuePage({ searchParams }: { searchParams: SP }) {
@@ -26,91 +37,114 @@ export default async function QueuePage({ searchParams }: { searchParams: SP }) 
   const [jobs, settings] = await Promise.all([listQueue(), getSettings()]);
   const rows = jobs.filter((j) => !stage || j.stage === stage).sort((a, b) => (a.stage === "failed" ? -1 : 0) - (b.stage === "failed" ? -1 : 0));
   const meta = (s: QueueStage) => stages.find((x) => x.id === s)!;
+  const now = Date.now();
+  const failed = jobs.filter((j) => j.stage === "failed").length;
 
   return (
     <>
-      <PageHeader title="Cola de contenido" intro="Lo que la máquina está generando y publicando ahora mismo, de todos los clientes." />
+      <PageHeader
+        title="Cola de contenido"
+        intro="Lo que la máquina está generando y publicando ahora mismo, de todos los clientes."
+        actions={
+          <Badge tone={settings.generation_enabled ? "ok" : "bad"} dot className="h-8 px-3">
+            {settings.generation_enabled ? "Generación activa" : "Generación pausada"}
+          </Badge>
+        }
+      />
 
       {!settings.generation_enabled && (
-        <div role="alert" className="mb-4 rounded-2xl border border-bad/30 bg-bad/10 px-4 py-3 text-sm text-bad">
-          La generación de artículos está <strong>pausada</strong> globalmente.{" "}
-          <Link href="/admin/ajustes" className="underline">
-            Cambiar en Ajustes
-          </Link>
+        <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-bad/30 bg-bad-soft px-4 py-3 text-[13px] text-bad">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>
+            La generación de artículos está <strong>pausada</strong> globalmente.{" "}
+            <Link href="/admin/ajustes" className="font-medium underline underline-offset-2">
+              Cambiar en Ajustes
+            </Link>
+          </span>
         </div>
       )}
 
-      <nav aria-label="Filtrar por etapa" className="mb-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
-        {stages.map((s) => {
-          const count = jobs.filter((j) => j.stage === s.id).length;
-          const active = stage === s.id;
-          return (
-            <Link
-              key={s.id}
-              href={active ? "/admin/cola" : `/admin/cola?stage=${s.id}`}
-              aria-current={active ? "true" : undefined}
-              className={cn("rounded-xl border bg-card p-3 transition hover:border-ink", active ? "border-ink ring-2 ring-lime" : "border-line")}
-            >
-              <span className="block text-xs text-ink-3">{s.label}</span>
-              <span className={cn("text-2xl font-semibold tabular-nums", s.id === "failed" && count > 0 && "text-bad")}>{count}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      <div className="mb-3">
+        <Segmented
+          label="Filtrar por etapa"
+          items={[
+            { href: "/admin/cola", label: "Todas", count: jobs.length, active: !stage },
+            ...stages.map((s) => ({
+              href: `/admin/cola?stage=${s.id}`,
+              label: s.label,
+              count: jobs.filter((j) => j.stage === s.id).length,
+              active: stage === s.id,
+              tone: s.id === "failed" ? ("bad" as const) : undefined,
+            })),
+          ]}
+        />
+      </div>
 
-      <DataTable caption="Trabajos de la cola">
+      <DataTable caption="Trabajos de la cola" count={rows.length} total={jobs.length} unit="trabajos" footer={failed ? `${failed} fallidos primero` : undefined} minWidth="min-w-[760px]">
         <THead>
           <Th>Artículo</Th>
           <Th>Sitio</Th>
           <Th>Etapa</Th>
           <Th>Inicio</Th>
-          <Th className="text-right">Acciones</Th>
+          <Th numeric>Transcurrido</Th>
+          <Th className="w-24">
+            <span className="sr-only">Acciones</span>
+          </Th>
         </THead>
         <tbody>
           {rows.map((j) => {
             const m = meta(j.stage);
             return (
-              <Tr key={j.id} className={j.stage === "failed" ? "bg-bad/[0.03]" : undefined}>
+              <Tr key={j.id} tone={j.stage === "failed" ? "bad" : undefined}>
                 <Td>
                   <div className="font-medium">{j.title}</div>
-                  {j.error && <div className="mt-0.5 text-xs text-bad">{j.error}</div>}
+                  {j.error && <Sub className="whitespace-normal text-bad">{j.error}</Sub>}
                 </Td>
-                <Td>{j.site}</Td>
+                <Td muted>{j.site}</Td>
                 <Td>
-                  <Badge tone={m.tone}>{m.label}</Badge>
+                  <Badge tone={m.tone} dot>
+                    {m.label}
+                  </Badge>
                 </Td>
-                <Td className="whitespace-nowrap text-ink-2">{fmtDate(j.started_at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</Td>
+                <Td muted className="whitespace-nowrap">
+                  {fmtDate(j.started_at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                </Td>
+                <Td numeric muted>
+                  {elapsed(j.started_at, now)}
+                </Td>
                 <Td>
-                  <div className="flex flex-wrap justify-end gap-2">
+                  <RowActions>
                     {j.stage === "failed" && (
                       <ActionForm action={retryJob} inline>
                         <input type="hidden" name="id" value={j.id} />
-                        <SubmitButton size="sm" variant="outline">
-                          <RotateCcw className="size-3" aria-hidden /> Reintentar
+                        <SubmitButton size="icon" aria-label={`Reintentar ${j.title}`}>
+                          <RotateCcw className="size-4" aria-hidden />
                         </SubmitButton>
                       </ActionForm>
                     )}
                     {j.stage !== "publishing" && (
                       <ActionForm action={cancelJob} inline confirm={`¿Cancelar «${j.title}»? El tema se marcará como descartado.`}>
                         <input type="hidden" name="id" value={j.id} />
-                        <SubmitButton size="sm" variant="ghost" aria-label={`Cancelar ${j.title}`}>
-                          <X className="size-3" aria-hidden /> Cancelar
+                        <SubmitButton size="icon" variant="danger" aria-label={`Cancelar ${j.title}`}>
+                          <X className="size-4" aria-hidden />
                         </SubmitButton>
                       </ActionForm>
                     )}
-                  </div>
+                  </RowActions>
                 </Td>
               </Tr>
             );
           })}
-          {!rows.length && <EmptyRow cols={5}>No hay trabajos en esta etapa.</EmptyRow>}
+          {!rows.length && <EmptyRow cols={6}>No hay trabajos en esta etapa.</EmptyRow>}
         </tbody>
       </DataTable>
 
-      <Card className="mt-6 p-5 text-sm text-ink-2">
-        <h2 className="mb-1 font-semibold text-ink">Cómo funciona</h2>
-        Un cron de Vercel recoge los temas programados, redacta el artículo, genera imágenes, pasa el control de calidad y lo publica en el CMS del cliente. Si
-        algo falla (credenciales caducadas, CMS caído, límite del modelo), el trabajo queda aquí para reintentarlo.
+      <Card className="mt-4">
+        <CardHeader title="Cómo funciona" className="px-4 py-3" />
+        <p className="px-4 py-3 text-[13px] leading-relaxed text-ink-2">
+          Un cron de Vercel recoge los temas programados, redacta el artículo, genera imágenes, pasa el control de calidad y lo publica en el CMS del cliente. Si algo
+          falla (credenciales caducadas, CMS caído, límite del modelo), el trabajo queda aquí para reintentarlo.
+        </p>
       </Card>
     </>
   );

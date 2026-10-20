@@ -39,14 +39,14 @@ export default async function ClientInvoicePage({ params }: { params: Promise<{ 
         )}
       </div>
 
-      <article className="rounded-2xl border border-line bg-card p-5 sm:p-10 print:border-0 print:p-0">
+      <article className="rounded-2xl border border-line bg-card p-5 shadow-[var(--shadow-xs)] sm:p-10 print:border-0 print:p-0 print:shadow-none">
         <header className="flex flex-col gap-5 border-b border-line pb-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1">
             <AgencyMark name={name} logoUrl={agency.white_label.logo_url} />
             {agency.white_label.support_email && <p className="text-sm text-ink-3">{agency.white_label.support_email}</p>}
           </div>
           <div className="sm:text-right">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-signal">Factura</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-signal">Factura</p>
             <p className="font-mono text-lg font-semibold">{inv.number}</p>
             <Badge tone={st.tone} className="mt-1 print:hidden">
               {st.label}
@@ -71,7 +71,7 @@ export default async function ClientInvoicePage({ params }: { params: Promise<{ 
         </dl>
 
         <table className="mt-6 w-full text-[15px]">
-          <thead className="text-left text-xs uppercase tracking-wide text-ink-3">
+          <thead className="text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
             <tr>
               <th className="pb-2 font-medium">Concepto</th>
               <th className="pb-2 text-right font-medium">Importe</th>

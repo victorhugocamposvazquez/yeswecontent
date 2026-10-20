@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { pButton, type Variant } from "./button-class";
 
 const field =
-  "block w-full min-h-11 rounded-xl border border-line bg-card px-3.5 py-2.5 text-base text-ink outline-none placeholder:text-ink-3 focus:border-signal focus:ring-2 focus:ring-signal/25 disabled:bg-paper-2 disabled:text-ink-3";
+  "block w-full min-h-11 rounded-[10px] border border-line-2 bg-card px-3.5 py-2.5 text-base text-ink shadow-[var(--shadow-xs)] outline-none transition placeholder:text-ink-3 hover:border-ink-3 focus:border-signal focus:shadow-[var(--ring)] disabled:bg-paper-2 disabled:text-ink-3 sm:min-h-10 sm:text-sm";
 
 export function PInput({ className, ...p }: ComponentProps<"input">) {
   return <input className={cn(field, className)} {...p} />;
@@ -28,7 +28,7 @@ export function PSelect({ className, ...p }: ComponentProps<"select">) {
 export function PField({ label, hint, htmlFor, children }: { label: string; hint?: ReactNode; htmlFor: string; children: ReactNode }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-ink-2">
+      <label htmlFor={htmlFor} className="mb-1.5 block text-[13px] font-medium text-ink-2">
         {label}
       </label>
       {children}
@@ -80,7 +80,7 @@ export function PForm({
       className={cn("space-y-5", className)}
     >
       {children}
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="flex flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:flex-wrap sm:items-center">
         <PSubmit variant={variant} pendingLabel={pendingLabel} className={cn("w-full sm:w-auto", submitClassName)}>
           {submitLabel}
         </PSubmit>

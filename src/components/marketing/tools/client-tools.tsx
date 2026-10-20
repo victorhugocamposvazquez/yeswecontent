@@ -4,15 +4,14 @@ import { useMemo, useState } from "react";
 import { Monitor, Plus, Smartphone, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AI_CRAWLERS as AI_CRAWLER_LIST } from "@/lib/marketing/crawlers";
+import { Button, Card, Label } from "@/components/ui";
 import { OutputBlock } from "./tool-runner";
 
-const field = "w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm outline-none placeholder:text-ink-3 focus:ring-4 focus:ring-lime";
-const panel = "rounded-2xl border border-line bg-card p-5 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-6";
-const Lbl = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
-  <label htmlFor={htmlFor} className="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
-    {children}
-  </label>
-);
+/* Mismo aspecto que Input/Textarea/Select de ui, sin cambiar los elementos nativos. */
+const field =
+  "w-full rounded-[10px] border border-line-2 bg-card px-3.5 py-2.5 text-sm text-ink shadow-[var(--shadow-xs)] outline-none transition placeholder:text-ink-3 hover:border-ink-3 focus:border-signal focus:shadow-[var(--ring)] disabled:bg-paper-2 disabled:text-ink-3";
+const panel = "surface p-5 shadow-[var(--shadow-md)] sm:p-6";
+const Lbl = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => <Label htmlFor={htmlFor}>{children}</Label>;
 
 /* ═════════════ Vista previa SERP ═════════════ */
 
@@ -73,21 +72,21 @@ export function SerpPreviewTool() {
         </div>
       </div>
       <div>
-        <div className="mb-4 inline-flex rounded-lg border border-line bg-card p-1">
+        <div className="mb-4 inline-flex rounded-xl border border-line bg-paper-2 p-1">
           {(["desktop", "mobile"] as const).map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => setDevice(k)}
               aria-pressed={device === k}
-              className={cn("inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-semibold", device === k ? "bg-ink text-paper" : "text-ink-2")}
+              className={cn("inline-flex h-9 items-center gap-1.5 rounded-lg px-4 text-sm font-semibold transition-colors duration-150", device === k ? "bg-card text-ink shadow-[var(--shadow-xs)]" : "text-ink-2 hover:text-ink")}
             >
               {k === "desktop" ? <Monitor className="h-4 w-4" aria-hidden /> : <Smartphone className="h-4 w-4" aria-hidden />}
               {k === "desktop" ? "Escritorio" : "Móvil"}
             </button>
           ))}
         </div>
-        <div className={cn("rounded-2xl border border-line bg-white p-5 font-[Arial,sans-serif]", device === "mobile" && "max-w-[380px]")}>
+        <div className={cn("rounded-2xl border border-line bg-white p-5 font-[Arial,sans-serif] shadow-[var(--shadow-xs)]", device === "mobile" && "max-w-[380px]")}>
           <div className="flex items-center gap-3">
             <span className="grid h-7 w-7 place-items-center rounded-full bg-[#f1f3f4] text-xs font-bold text-[#5f6368]">{crumbs.charAt(0).toUpperCase() || "?"}</span>
             <span className="min-w-0">
@@ -200,7 +199,7 @@ export function SchemaGeneratorTool() {
               role="tab"
               aria-selected={type === t}
               onClick={() => setType(t)}
-              className={cn("rounded-lg border border-line px-3.5 py-1.5 text-sm font-semibold", type === t ? "bg-ink text-paper" : "bg-paper hover:bg-paper-2")}
+              className={cn("inline-flex h-9 items-center rounded-lg border px-3.5 text-sm font-semibold transition-colors duration-150", type === t ? "border-ink bg-ink text-paper" : "border-line-2 bg-card hover:bg-paper-2")}
             >
               {t === "FAQPage" ? "FAQ" : t}
             </button>
@@ -210,11 +209,11 @@ export function SchemaGeneratorTool() {
           {type === "FAQPage" && (
             <>
               {faq.map((f, i) => (
-                <div key={i} className="rounded-xl border border-dashed border-line p-3">
+                <div key={i} className="rounded-xl border border-line bg-paper-2 p-3">
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-xs text-ink-3">Pregunta {i + 1}</span>
                     {faq.length > 1 && (
-                      <button type="button" aria-label="Eliminar pregunta" onClick={() => setFaq(faq.filter((_, j) => j !== i))} className="-m-2 grid h-10 w-10 place-items-center text-ink-3 hover:text-bad">
+                      <button type="button" aria-label="Eliminar pregunta" onClick={() => setFaq(faq.filter((_, j) => j !== i))} className="-m-2 grid h-10 w-10 place-items-center rounded-lg text-ink-3 transition-colors duration-150 hover:text-bad">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     )}
@@ -223,9 +222,9 @@ export function SchemaGeneratorTool() {
                   <textarea aria-label={`Respuesta ${i + 1}`} value={f.a} onChange={(e) => setFaq(faq.map((x, j) => (j === i ? { ...x, a: e.target.value } : x)))} placeholder="Respuesta" rows={2} className={cn(field, "mt-2")} />
                 </div>
               ))}
-              <button type="button" onClick={() => setFaq([...faq, { q: "", a: "" }])} className="inline-flex items-center gap-1.5 rounded-lg border border-line px-4 py-2 text-sm font-semibold hover:bg-paper-2">
+              <Button type="button" variant="outline" onClick={() => setFaq([...faq, { q: "", a: "" }])}>
                 <Plus className="h-4 w-4" aria-hidden /> Añadir pregunta
-              </button>
+              </Button>
             </>
           )}
           {type === "Article" && (
@@ -348,14 +347,14 @@ export function KeywordDensityTool() {
             ["Lectura", `${stats.minutes} min`],
             ["Densidad", kw ? `${stats.kwDensity.toFixed(1)}%` : "—"],
           ].map(([k, v]) => (
-            <div key={k} className="rounded-xl border border-line bg-card p-3">
-              <p className="text-xs text-ink-3">{k}</p>
-              <p className="text-xl font-semibold tabular-nums">{v}</p>
-            </div>
+            <Card key={k} className="p-3">
+              <p className="text-xs font-medium text-ink-3">{k}</p>
+              <p className="tabular mt-1 text-xl font-semibold tracking-tight">{v}</p>
+            </Card>
           ))}
         </div>
         {kw && stats.total > 0 && (
-          <p className={cn("rounded-xl border p-3 text-sm", stats.kwDensity > 3 ? "border-warn bg-warn/10" : stats.kwCount === 0 ? "border-bad bg-bad/10" : "border-ok bg-ok/10")}>
+          <p className={cn("rounded-xl border p-3 text-sm", stats.kwDensity > 3 ? "border-warn/30 bg-warn-soft text-warn" : stats.kwCount === 0 ? "border-bad/30 bg-bad-soft text-bad" : "border-ok/30 bg-ok-soft text-ok")}>
             «{kw}» aparece {stats.kwCount} {stats.kwCount === 1 ? "vez" : "veces"}.{" "}
             {stats.kwDensity > 3 ? "Quizá la repites demasiado: usa sinónimos." : stats.kwCount === 0 ? "No aparece ni una vez." : "Frecuencia natural."}
           </p>
@@ -370,8 +369,8 @@ export function KeywordDensityTool() {
 function FreqTable({ title, rows, total }: { title: string; rows: [string, number][]; total: number }) {
   const max = rows[0]?.[1] ?? 1;
   return (
-    <div className="rounded-2xl border border-line bg-card p-4">
-      <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">{title}</p>
+    <Card className="p-4">
+      <p className="mb-3 text-[13px] font-medium text-ink-3">{title}</p>
       {rows.length === 0 ? (
         <p className="text-sm text-ink-3">Pega un texto para ver resultados.</p>
       ) : (
@@ -379,17 +378,17 @@ function FreqTable({ title, rows, total }: { title: string; rows: [string, numbe
           {rows.map(([w, c]) => (
             <li key={w} className="grid grid-cols-[1fr_5rem_3.5rem] items-center gap-2 text-sm">
               <span className="truncate">{w}</span>
-              <span className="h-2 rounded-full bg-paper-2">
+              <span className="h-1.5 overflow-hidden rounded-full bg-paper-3">
                 <span className="block h-full rounded-full bg-signal" style={{ width: `${(c / max) * 100}%` }} />
               </span>
-              <span className="text-right font-mono text-xs tabular-nums">
+              <span className="tabular text-right text-xs text-ink-2">
                 {c} · {((c / Math.max(total, 1)) * 100).toFixed(1)}%
               </span>
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -423,7 +422,7 @@ export function RobotsGeneratorTool() {
         <div>
           <p className="font-semibold">Rastreadores de IA</p>
           <p className="text-sm text-ink-3">Activa los que quieres dejar entrar.</p>
-          <ul className="mt-3 divide-y divide-line rounded-xl border border-line">
+          <ul className="mt-3 divide-y divide-line rounded-xl border border-line bg-card">
             {AI_CRAWLER_LIST.map((c) => {
               const on = !blocked[c.agent];
               return (
@@ -440,9 +439,9 @@ export function RobotsGeneratorTool() {
                     aria-checked={on}
                     aria-label={`Permitir ${c.agent}`}
                     onClick={() => setBlocked({ ...blocked, [c.agent]: on })}
-                    className={cn("relative h-7 w-12 shrink-0 rounded-full border border-line transition", on ? "bg-lime" : "bg-paper-2")}
+                    className={cn("relative h-7 w-12 shrink-0 rounded-full transition-colors duration-150", on ? "bg-signal" : "bg-line-2")}
                   >
-                    <span className={cn("absolute top-0.5 h-5 w-5 rounded-full border border-line bg-card transition-all", on ? "left-[22px]" : "left-0.5")} />
+                    <span className={cn("absolute top-0.5 h-6 w-6 rounded-full bg-card shadow-[var(--shadow-sm)] transition-[left] duration-150", on ? "left-[22px]" : "left-0.5")} />
                   </button>
                 </li>
               );

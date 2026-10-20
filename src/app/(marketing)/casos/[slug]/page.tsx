@@ -6,7 +6,8 @@ import { num } from "@/lib/utils";
 import type { CaseStudy } from "@/lib/types";
 import { getPublishedCase, growth, listPublishedCases } from "@/lib/marketing/cases";
 import { Markdown } from "@/components/marketing/markdown";
-import { Container, CtaBand, Eyebrow, Section } from "@/components/marketing/primitives";
+import { Badge, Card } from "@/components/ui";
+import { Container, CtaBand, Eyebrow, Section, Title } from "@/components/marketing/primitives";
 
 export const revalidate = 3600;
 
@@ -52,16 +53,16 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
 
   return (
     <>
-      <section className="border-b border-line">
-        <Container className="py-14 md:py-20">
-          <Link href="/casos" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold hover:text-signal sm:min-h-0">
+      <section className="glow relative overflow-hidden border-b border-line">
+        <Container className="relative py-12 sm:py-16 md:py-20">
+          <Link href="/casos" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
             <ArrowLeft className="h-4 w-4" aria-hidden /> Todos los casos
           </Link>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Eyebrow>{c.sector}</Eyebrow>
-            <span className="rounded-full border border-line bg-card px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em]">Caso de ejemplo</span>
+            <Badge className="bg-card">Caso de ejemplo</Badge>
           </div>
-          <h1 className="mt-5 max-w-4xl font-display text-4xl leading-[1.05] tracking-tight sm:text-6xl">
+          <Title as="h1" size="lg" className="mt-5 max-w-4xl">
             {c.metric_before != null && c.metric_after != null ? (
               <>
                 Cómo {c.company} pasó de {num(c.metric_before)} a <span className="marker">{num(c.metric_after)}</span> {c.metric_label}
@@ -69,26 +70,26 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
             ) : (
               c.company
             )}
-          </h1>
+          </Title>
         </Container>
       </section>
       <Section>
         <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_20rem]">
           <article className="max-w-2xl">
             <Markdown source={c.body_md?.trim() ? c.body_md : fallbackBody(c)} />
-            <p className="mt-10 rounded-xl border border-dashed border-line p-4 text-sm text-ink-3">
+            <p className="mt-10 rounded-xl border border-line bg-paper-2 p-4 text-sm text-ink-3">
               Caso ilustrativo: empresa y cifras ficticias, basadas en escenarios habituales. Los resultados reales dependen de cada web, su sector y su punto de partida.
             </p>
           </article>
           <aside className="h-fit space-y-4 lg:sticky lg:top-24">
             {g && (
-              <div className="rounded-2xl border border-line bg-lime p-6">
-                <p className="font-mono text-[11px] uppercase tracking-[0.16em]">Crecimiento</p>
-                <p className="mt-1 font-display text-7xl leading-none">{g}</p>
-                <p className="mt-2 text-sm">{c.metric_label}</p>
-              </div>
+              <Card className="bg-lime-soft p-6">
+                <p className="text-[13px] font-medium text-ink-2">Crecimiento</p>
+                <p className="tabular mt-1 text-[3.5rem] font-semibold leading-none tracking-tight">{g}</p>
+                <p className="mt-2 text-sm text-ink-2">{c.metric_label}</p>
+              </Card>
             )}
-            <div className="rounded-2xl border border-line bg-card p-6">
+            <Card className="p-6">
               <dl className="space-y-3 text-sm">
                 <div>
                   <dt className="text-ink-3">Empresa</dt>
@@ -107,7 +108,7 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
                   </div>
                 )}
               </dl>
-            </div>
+            </Card>
           </aside>
         </Container>
       </Section>

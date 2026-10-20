@@ -70,8 +70,8 @@ export default async function HostedArticle({ params }: Props) {
       </nav>
 
       <header className="mb-8">
-        <h1 className="b-head text-3xl font-semibold leading-tight sm:text-[2.6rem]">{a.title}</h1>
-        {a.meta_description && <p className="mt-4 text-lg leading-relaxed" style={{ color: "var(--b-muted)" }}>{a.meta_description}</p>}
+        <h1 className="b-head text-[2rem] font-semibold leading-[1.1] sm:text-[2.75rem]">{a.title}</h1>
+        {a.meta_description && <p className="mt-5 text-lg leading-relaxed" style={{ color: "var(--b-muted)" }}>{a.meta_description}</p>}
         <p className="mt-4 text-sm" style={{ color: "var(--b-muted)" }}>
           <time dateTime={a.published_at ?? undefined}>{fmtLongDate(a.published_at, a.language)}</time>
           {" · "}
@@ -89,7 +89,7 @@ export default async function HostedArticle({ params }: Props) {
       {!!a.tags?.length && (
         <p className="mt-10 flex flex-wrap gap-2">
           {a.tags.map((t) => (
-            <Link key={t} href={`${ctx.base || "/"}?tag=${encodeURIComponent(t)}`} className="inline-flex min-h-9 items-center rounded-full border px-3 text-xs" style={{ borderColor: "var(--b-line)" }}>
+            <Link key={t} href={`${ctx.base || "/"}?tag=${encodeURIComponent(t)}`} className="b-tag">
               {t}
             </Link>
           ))}

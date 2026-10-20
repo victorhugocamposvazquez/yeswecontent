@@ -22,7 +22,7 @@ export default async function ClientArticlesPage({ searchParams }: { searchParam
     return (
       <div className="space-y-6">
         <Header title="Artículos publicados" intro={`${published.length} artículos ya están en tu web.`} />
-        <p className="flex items-start gap-2 rounded-xl bg-paper-2 p-3.5 text-sm text-ink-2">
+        <p className="flex items-start gap-2 rounded-xl border border-line bg-card p-3.5 text-[13px] text-ink-2 shadow-[var(--shadow-xs)]">
           <Lock className="mt-0.5 h-4 w-4 shrink-0 text-ink-3" aria-hidden />
           {agencyName(agency)} se encarga del plan y de la redacción. Si quieres ver los borradores antes de publicarse, pídeselo desde «Habla con tu equipo».
         </p>
@@ -51,8 +51,8 @@ export default async function ClientArticlesPage({ searchParams }: { searchParam
               href={f === "todos" ? "/clientes/articulos" : `/clientes/articulos?estado=${f}`}
               aria-current={on ? "page" : undefined}
               className={cn(
-                "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm transition",
-                on ? "border-signal bg-signal text-signal-ink" : "border-line bg-card text-ink-2 hover:border-ink",
+                "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-medium transition-colors sm:h-9",
+                on ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-line-2 hover:bg-paper-2",
               )}
             >
               {f === "todos" ? "Todos" : articleStatusLabel(f)} <span className="opacity-70">{count}</span>
@@ -66,7 +66,7 @@ export default async function ClientArticlesPage({ searchParams }: { searchParam
           <ul className="divide-y divide-line">
             {rows.map((a) => (
               <li key={a.id}>
-                <Link href={`/clientes/articulos/${a.id}`} className="flex min-h-16 items-center gap-3 px-4 py-3 hover:bg-paper/70 sm:px-5">
+                <Link href={`/clientes/articulos/${a.id}`} className="flex min-h-16 items-center gap-3 px-4 py-3 transition-colors hover:bg-paper-2 sm:px-5">
                   <span className="min-w-0 flex-1">
                     <span className="block text-[15px] font-medium leading-snug">{a.title}</span>
                     <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-3">
@@ -93,7 +93,7 @@ export default async function ClientArticlesPage({ searchParams }: { searchParam
             <ul className="divide-y divide-line">
               {plan.map((i) => (
                 <li key={i.id} className="flex items-start gap-3 px-4 py-3 sm:px-5">
-                  <span className="w-14 shrink-0 pt-0.5 text-xs font-medium uppercase text-ink-3">{fmtDate(i.scheduled_for!)}</span>
+                  <span className="w-12 shrink-0 rounded-md bg-paper-2 py-0.5 text-center text-[11px] font-semibold uppercase text-ink-2">{fmtDate(i.scheduled_for!)}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[15px] leading-snug">{i.title}</span>
                     <span className="text-xs text-ink-3">
@@ -118,8 +118,8 @@ export default async function ClientArticlesPage({ searchParams }: { searchParam
 function Header({ title, intro }: { title: string; intro: string }) {
   return (
     <header>
-      <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight sm:text-3xl">{title}</h1>
-      <p className="mt-1.5 text-[15px] text-ink-2">{intro}</p>
+      <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight md:text-[1.9rem]">{title}</h1>
+      <p className="mt-1 text-sm text-ink-2">{intro}</p>
     </header>
   );
 }
@@ -135,7 +135,7 @@ function PublishedList({ items }: { items: Awaited<ReturnType<typeof getPortalRe
               href={a.published_url ?? undefined}
               target="_blank"
               rel="noreferrer"
-              className="flex min-h-16 items-center gap-3 px-4 py-3 hover:bg-paper/70 sm:px-5"
+              className="flex min-h-16 items-center gap-3 px-4 py-3 transition-colors hover:bg-paper-2 sm:px-5"
               aria-label={`${a.title} (se abre en tu web)`}
             >
               <span className="min-w-0 flex-1">

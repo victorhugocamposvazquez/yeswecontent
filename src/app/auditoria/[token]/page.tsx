@@ -17,48 +17,48 @@ export default async function PublicAuditPage({ params }: { params: Promise<{ to
   const host = audit.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   return (
-    <div className="min-h-screen bg-paper">
-      <header className="border-b border-line bg-card">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
+    <div className="glow min-h-screen bg-paper-2">
+      <header className="border-b border-line bg-card/90 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
           <Link href="/" aria-label="yeswecontent">
             <Logo />
           </Link>
-          <span className="rounded-full bg-paper-2 px-3 py-1 text-xs text-ink-2">Informe de solo lectura</span>
+          <span className="rounded-full border border-line bg-paper-2 px-2.5 py-0.5 text-xs font-medium text-ink-2">Informe de solo lectura</span>
         </div>
       </header>
-      <main className="mx-auto max-w-4xl px-4 py-10">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-signal">Auditoría técnica y GEO</p>
-        <h1 className="mt-2 font-display text-4xl leading-tight md:text-5xl">
+      <main className="mx-auto max-w-4xl px-4 py-10 md:py-14">
+        <p className="eyebrow">Auditoría técnica y GEO</p>
+        <h1 className="mt-3 font-display text-[2.25rem] md:text-5xl">
           Cómo ven <span className="marker">{host}</span> Google y la IA
         </h1>
-        <p className="mt-2 text-ink-2">Analizada el {fmtDate(audit.created_at, { day: "numeric", month: "long", year: "numeric" })}</p>
+        <p className="mt-3 text-[15px] text-ink-2">Analizada el {fmtDate(audit.created_at, { day: "numeric", month: "long", year: "numeric" })}</p>
 
-        <div className="grain mt-8 flex flex-col items-center gap-6 rounded-2xl border border-line bg-card p-6 sm:flex-row">
-          <ScoreRing score={audit.score ?? 0} size={140} />
-          <div className="grid flex-1 grid-cols-3 gap-3 text-center">
-            <div className="rounded-xl bg-ok/10 p-3">
-              <p className="text-3xl font-semibold text-ok">{s.pass}</p>
+        <div className="surface mt-8 flex flex-col items-center gap-6 p-6 sm:flex-row md:p-8">
+          <ScoreRing score={audit.score ?? 0} size={140} label="/ 100" />
+          <div className="grid w-full flex-1 grid-cols-3 gap-3 text-center">
+            <div className="rounded-xl bg-ok-soft p-3">
+              <p className="tabular text-3xl font-semibold tracking-tight text-ok">{s.pass}</p>
               <p className="text-xs text-ink-2">correctas</p>
             </div>
-            <div className="rounded-xl bg-warn/10 p-3">
-              <p className="text-3xl font-semibold text-warn">{s.warn}</p>
+            <div className="rounded-xl bg-warn-soft p-3">
+              <p className="tabular text-3xl font-semibold tracking-tight text-warn">{s.warn}</p>
               <p className="text-xs text-ink-2">mejorables</p>
             </div>
-            <div className="rounded-xl bg-bad/10 p-3">
-              <p className="text-3xl font-semibold text-bad">{s.fail}</p>
+            <div className="rounded-xl bg-bad-soft p-3">
+              <p className="tabular text-3xl font-semibold tracking-tight text-bad">{s.fail}</p>
               <p className="text-xs text-ink-2">fallos</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-6">
           <AuditChecks audit={audit} />
         </div>
 
-        <section className="mt-10 rounded-2xl bg-ink p-8 text-paper">
+        <section className="mt-10 rounded-2xl bg-ink p-8 text-paper shadow-[var(--shadow-lg)] md:p-10">
           <h2 className="font-display text-3xl">¿Quieres que lo arreglemos por ti?</h2>
-          <p className="mt-2 max-w-xl text-paper/80">yeswecontent corrige lo técnico, escribe contenido que responde lo que busca tu cliente y lo publica solo. Pruébalo 3 días gratis.</p>
-          <ButtonLink href="/registro" className="mt-5">
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-paper/80">yeswecontent corrige lo técnico, escribe contenido que responde lo que busca tu cliente y lo publica solo. Pruébalo 3 días gratis.</p>
+          <ButtonLink href="/registro" className="mt-6">
             Empezar gratis
           </ButtonLink>
         </section>

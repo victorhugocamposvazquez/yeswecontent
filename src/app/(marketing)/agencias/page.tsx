@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Building2, Eye, Layers, Palette, Receipt, Users } from "lucide-react";
 import { volumeDiscounts } from "@/lib/demo";
+import { Card } from "@/components/ui";
 import { AgencyForm } from "@/components/marketing/agency-form";
-import { Container, CtaLink, Eyebrow, Faq, Section, Title } from "@/components/marketing/primitives";
+import { AgencyPortalMockup } from "@/components/marketing/mockups";
+import { Container, CtaLink, Eyebrow, Faq, IconBox, Lead, Section, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
   title: "Agencias y marca blanca",
@@ -30,17 +32,24 @@ export default function AgenciasPage() {
   const maxPct = Math.max(...volumeDiscounts.map((d) => d.pct));
   return (
     <>
-      <section className="relative overflow-hidden border-b border-line bg-ink text-paper">
-        <Container className="relative grid grid-cols-1 items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_1fr]">
+      <section className="relative overflow-hidden bg-ink text-paper">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundImage: "radial-gradient(45% 60% at 85% 20%, rgba(255,79,31,0.22), transparent 70%), radial-gradient(35% 45% at 10% 100%, rgba(212,245,90,0.14), transparent 70%)" }}
+        />
+        <Container className="relative grid grid-cols-1 items-center gap-12 py-14 sm:py-20 md:py-24 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
           <div>
-            <Eyebrow tone="paper">Para agencias</Eyebrow>
-            <h1 className="mt-5 font-display text-4xl leading-[1.05] tracking-tight sm:text-6xl">
+            <Eyebrow tone="paper" className="rise">
+              Para agencias
+            </Eyebrow>
+            <Title as="h1" size="lg" className="rise rise-2 mt-5">
               Más clientes de SEO <span className="text-lime">sin contratar</span> a nadie más.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg text-paper/75">
+            </Title>
+            <p className="text-pretty rise rise-2 mt-6 max-w-xl text-base leading-relaxed text-paper/70 sm:text-lg">
               Ofrece contenido, enlaces y visibilidad en IA con tu propia marca. Nosotros ponemos la maquinaria; tú, la relación con el cliente y el criterio.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="rise rise-3 mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <CtaLink href="#contacto" tone="lime" size="lg">
                 Reservar una llamada de 15 min
               </CtaLink>
@@ -49,29 +58,8 @@ export default function AgenciasPage() {
               </CtaLink>
             </div>
           </div>
-          {/* Mock del portal */}
-          <div className="rounded-2xl border border-paper/20 bg-paper p-4 text-ink shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)]">
-            <div className="flex items-center justify-between rounded-xl bg-ink px-4 py-3 text-paper">
-              <span className="font-display text-xl">Tu Agencia</span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-paper/60">portal.tuagencia.com</span>
-            </div>
-            <ul className="mt-3 divide-y divide-line">
-              {[
-                ["Clínica Azahar", "8 artículos · +3 menciones IA", "ok"],
-                ["Rutas Norte", "12 artículos · 3 idiomas", "ok"],
-                ["Pedalea", "Pendiente de aprobar plan", "warn"],
-                ["LegalClaro", "6 artículos · auditoría 84", "ok"],
-              ].map(([n, d, s]) => (
-                <li key={n} className="flex items-center justify-between gap-3 px-1 py-3">
-                  <span>
-                    <span className="block font-semibold">{n}</span>
-                    <span className="block text-xs text-ink-3">{d}</span>
-                  </span>
-                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s === "ok" ? "bg-ok" : "bg-warn"}`} aria-hidden />
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 px-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">Ejemplo ilustrativo</p>
+          <div className="rise rise-3">
+            <AgencyPortalMockup />
           </div>
         </Container>
       </section>
@@ -84,44 +72,52 @@ export default function AgenciasPage() {
               Tu servicio, <span className="marker">nuestra sala de máquinas</span>.
             </Title>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 md:gap-5 lg:grid-cols-3">
             {pillars.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-2xl border border-line bg-card p-7">
-                <span className="grid h-11 w-11 place-items-center rounded-xl border border-line bg-lime">
-                  <Icon className="h-5 w-5" aria-hidden />
-                </span>
-                <h3 className="mt-5 text-xl font-semibold">{title}</h3>
-                <p className="mt-2 text-ink-2">{text}</p>
-              </div>
+              <Card key={title} className="p-6 sm:p-7">
+                <IconBox>
+                  <Icon />
+                </IconBox>
+                <h3 className="mt-4 text-lg font-semibold tracking-tight sm:text-xl">{title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{text}</p>
+              </Card>
             ))}
           </div>
         </Container>
       </Section>
 
-      <Section className="border-y border-line bg-paper-2">
-        <Container className="grid grid-cols-1 gap-10 md:grid-cols-3">
-          {[
-            ["1", "Llamada de 15 minutos", "Vemos cuántos clientes tienes, qué vendes y si encajamos. Sin presentaciones eternas."],
-            ["2", "Configuramos tu marca", "Logo, colores, subdominio y remitente de emails. Lo dejamos listo contigo."],
-            ["3", "Das de alta clientes", `Cada web nueva suma al descuento por volumen, hasta un ${maxPct}%.`],
-          ].map(([n, t, d]) => (
-            <div key={n}>
-              <span className="font-display text-7xl leading-none text-signal">{n}</span>
-              <h3 className="mt-3 text-xl font-semibold">{t}</h3>
-              <p className="mt-2 text-ink-2">{d}</p>
-            </div>
-          ))}
+      <Section tone="paper-2">
+        <Container>
+          <div className="max-w-2xl">
+            <Eyebrow>Cómo empezar</Eyebrow>
+            <Title className="mt-4">Tres pasos y estás vendiendo.</Title>
+          </div>
+          <ol className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+            {[
+              ["1", "Llamada de 15 minutos", "Vemos cuántos clientes tienes, qué vendes y si encajamos. Sin presentaciones eternas."],
+              ["2", "Configuramos tu marca", "Logo, colores, subdominio y remitente de emails. Lo dejamos listo contigo."],
+              ["3", "Das de alta clientes", `Cada web nueva suma al descuento por volumen, hasta un ${maxPct}%.`],
+            ].map(([n, t, d]) => (
+              <li key={n}>
+                <Card className="h-full p-6">
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-ink text-sm font-semibold text-paper">{n}</span>
+                  <h3 className="mt-4 text-lg font-semibold tracking-tight">{t}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{d}</p>
+                </Card>
+              </li>
+            ))}
+          </ol>
         </Container>
       </Section>
 
       <Section id="contacto" className="scroll-mt-16">
-        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+        <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <div>
             <Eyebrow>Hablemos</Eyebrow>
             <Title className="mt-4">
               Reserva <span className="marker">15 minutos</span> y lo vemos.
             </Title>
-            <p className="mt-5 max-w-md text-lg text-ink-2">Déjanos tus datos y te proponemos un par de huecos. Si no encajamos, te lo diremos en la misma llamada.</p>
+            <Lead className="mt-5 max-w-md">Déjanos tus datos y te proponemos un par de huecos. Si no encajamos, te lo diremos en la misma llamada.</Lead>
             <Faq items={faqs} className="mt-10" />
           </div>
           <AgencyForm />

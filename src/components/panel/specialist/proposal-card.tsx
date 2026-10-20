@@ -45,12 +45,12 @@ export function ProposalCard({
   return (
     <div
       className={cn(
-        "rounded-xl border bg-card p-3.5 sm:p-4",
-        proposal.status === "applied" ? "border-ok/40" : proposal.status === "dismissed" ? "border-line opacity-60" : "border-line",
+        "rounded-xl border bg-card p-3.5 shadow-[var(--shadow-xs)] transition-colors sm:p-4",
+        proposal.status === "applied" ? "border-ok/40 bg-ok-soft/30" : proposal.status === "dismissed" ? "border-line opacity-60" : "border-line",
       )}
     >
       <div className="flex items-start gap-3">
-        <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-lg", proposal.status === "applied" ? "bg-ok/12 text-ok" : "bg-paper-2 text-ink-2")} aria-hidden>
+        <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-lg", proposal.status === "applied" ? "bg-ok-soft text-ok" : "bg-signal-soft text-signal")} aria-hidden>
           {proposal.status === "applied" ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
         </span>
         <div className="min-w-0 flex-1">
@@ -98,7 +98,7 @@ export function ProposalCard({
       )}
 
       {!done && confirming && (
-        <div className="mt-3 rounded-lg bg-paper-2 p-3" role="group" aria-label="Confirmar propuesta">
+        <div className="mt-3 rounded-lg border border-line bg-paper-2 p-3" role="group" aria-label="Confirmar propuesta">
           <p className="text-sm font-medium">{confirmText(proposal)}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <Button

@@ -37,7 +37,7 @@ export function RevealForm({
         <Notice state={state} />
       </div>
       {state?.secret && (
-        <div key={state.at} className="rounded-xl border border-ink/15 bg-lime/30 p-4">
+        <div key={state.at} className="rounded-xl border border-lime bg-lime-soft p-4">
           <p className="flex items-center gap-2 text-sm font-semibold text-ink">
             <KeyRound className="h-4 w-4" aria-hidden /> {secretTitle}
           </p>

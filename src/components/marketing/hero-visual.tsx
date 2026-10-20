@@ -18,7 +18,7 @@ export function HeroVisual() {
       `}</style>
 
       {/* Hoja de periódico */}
-      <div className="relative rounded-md border border-line bg-card p-5 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-7">
+      <div className="relative rounded-2xl border border-line bg-card p-5 shadow-[var(--shadow-lg)] sm:p-7">
         <div className="flex items-end justify-between gap-3 border-b border-line pb-2">
           <p className="whitespace-nowrap font-display text-2xl leading-none sm:text-3xl">El Cuaderno</p>
           <p className="text-right font-mono text-[9px] uppercase tracking-[0.18em] text-ink-3">Blog de Tierrafina · Nº 42</p>
@@ -65,12 +65,12 @@ export function HeroVisual() {
           <span className="inline-flex items-center gap-1.5 text-ink-2">
             <span className="h-2 w-2 rounded-full bg-ok" /> Publicado · martes 09:00
           </span>
-          <span className="rounded-full bg-lime px-2.5 py-0.5 font-mono font-semibold">Calidad 94/100</span>
+          <span className="rounded-full bg-ok-soft px-2.5 py-0.5 text-xs font-semibold text-ok">Calidad 94/100</span>
         </div>
       </div>
 
       {/* Respuesta de la IA */}
-      <div className="ywc-rise absolute right-0 -bottom-2 w-[88%] rounded-2xl border border-line bg-ink p-4 text-paper shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:-right-8 sm:-bottom-6 sm:w-[78%]">
+      <div className="ywc-rise absolute right-0 -bottom-2 w-[88%] rounded-2xl border border-line bg-ink p-4 text-paper shadow-[var(--shadow-lg)] sm:-right-8 sm:-bottom-6 sm:w-[78%]">
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-paper/60">
           <span className="h-2 w-2 rounded-full bg-lime" /> Asistente de IA
         </div>

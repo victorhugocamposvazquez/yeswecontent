@@ -38,8 +38,8 @@ export default async function ClientReportsPage({ searchParams }: { searchParams
     <div className="space-y-5">
       <div className="space-y-4 print:hidden">
         <header>
-          <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight sm:text-3xl">Informes</h1>
-          <p className="mt-1.5 text-[15px] text-ink-2">Tu resumen mensual. Descárgalo en PDF para compartirlo con quien quieras.</p>
+          <h1 className="text-[1.65rem] font-semibold leading-tight tracking-tight md:text-[1.9rem]">Informes</h1>
+          <p className="mt-1 text-sm text-ink-2">Tu resumen mensual. Descárgalo en PDF para compartirlo con quien quieras.</p>
         </header>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <form action="/clientes/informes" className="flex flex-1 gap-2 sm:max-w-sm">
@@ -62,11 +62,11 @@ export default async function ClientReportsPage({ searchParams }: { searchParams
         </div>
       </div>
 
-      <article className="space-y-6 rounded-2xl border border-line bg-card p-4 sm:p-8 lg:p-10 print:border-0 print:p-0">
+      <article className="space-y-6 rounded-2xl border border-line bg-card p-4 shadow-[var(--shadow-xs)] sm:p-8 lg:p-10 print:border-0 print:p-0 print:shadow-none">
         <header className="flex flex-col-reverse gap-4 border-b border-line pb-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-signal">Informe mensual</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight first-letter:uppercase">{month.label}</h2>
+            <p className="eyebrow">Informe mensual</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight first-letter:uppercase">{month.label}</h2>
             <p className="text-ink-2">
               {site.name} · {host(site.url)}
             </p>
@@ -83,9 +83,9 @@ export default async function ClientReportsPage({ searchParams }: { searchParams
             ["Visitas desde IA", num(ai)],
             ["Artículos publicados", String(published.length)],
           ].map(([l, v]) => (
-            <div key={l} className="rounded-xl bg-paper-2 p-3.5 sm:p-4">
-              <p className="text-xs leading-tight text-ink-3">{l}</p>
-              <p className="mt-1 text-xl font-semibold tabular-nums sm:text-2xl">{v}</p>
+            <div key={l} className="rounded-xl border border-line bg-paper-2/60 p-3.5 sm:p-4">
+              <p className="text-xs font-medium leading-tight text-ink-3">{l}</p>
+              <p className="tabular mt-1 text-xl font-semibold tracking-tight sm:text-2xl">{v}</p>
             </div>
           ))}
         </section>

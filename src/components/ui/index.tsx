@@ -136,7 +136,7 @@ export function Logo({ className, inverted = false, compact = false }: { classNa
       </svg>
       {!compact && (
         <span className={cn("whitespace-nowrap text-[22px] leading-none sm:text-2xl", inverted ? "text-paper" : "text-ink")}>
-          yeswe<span className="font-logo text-[25px] sm:text-[27px]">content!</span>
+          yeswe<span className="font-logo">content!</span>
         </span>
       )}
     </span>

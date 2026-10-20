@@ -44,7 +44,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             <Stat label="CTR medio" value={`${((sum(last, "clicks") / Math.max(sum(last, "impressions"), 1)) * 100).toFixed(1)}%`} />
             <Stat label="Posición media" value={(a.topQueries.reduce((x, q) => x + q.position, 0) / Math.max(a.topQueries.length, 1)).toFixed(1)} />
           </div>
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <Card className="p-6">
               <h2 className="font-semibold">Clics</h2>
               <p className="mb-3 text-xs text-ink-3">{range}</p>
@@ -56,7 +56,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
               <AreaChart data={t.map((p) => p.impressions)} color="var(--ink)" />
             </Card>
           </div>
-          <Card className="mt-6 overflow-x-auto">
+          <Card className="scroll-x mt-6">
             <h2 className="px-5 pt-5 font-semibold">Consultas principales</h2>
             <table className="mt-3 w-full min-w-[520px] text-sm">
               <thead className="border-y border-line text-left text-xs uppercase tracking-wide text-ink-3">
@@ -89,7 +89,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             <Stat label="Fuente principal" value={a.aiReferrers[0]?.source ?? "—"} />
             <Stat label="% del tráfico orgánico" value={`${((sum(last, "ai_visits") / Math.max(sum(last, "clicks"), 1)) * 100).toFixed(1)}%`} className="col-span-2 lg:col-span-1" />
           </div>
-          <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
             <Card className="p-6 lg:col-span-2">
               <h2 className="font-semibold">Visitas diarias desde asistentes de IA</h2>
               <p className="mb-3 text-xs text-ink-3">{range}</p>

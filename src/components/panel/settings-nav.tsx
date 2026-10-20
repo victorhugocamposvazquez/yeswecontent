@@ -2,22 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { SETTINGS_SECTIONS } from "./settings-config";
 
 export function SettingsNav() {
   const path = usePathname();
   const current = path.split("/")[3] ?? "cuenta";
+  const barRef = useRef<HTMLDivElement>(null);
+  // Mantiene visible el chip activo en la barra horizontal de móvil.
+  useEffect(() => {
+    const bar = barRef.current;
+    const el = bar?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!bar || !el) return;
+    bar.scrollLeft = el.offsetLeft - (bar.clientWidth - el.offsetWidth) / 2;
+  }, [current]);
   return (
     <nav aria-label="Ajustes">
       {/* Móvil: selector horizontal */}
-      <div className="-mx-4 flex gap-1 overflow-x-auto px-4 pb-2 lg:hidden">
+      <div ref={barRef} className="no-scrollbar relative -mx-4 flex snap-x scroll-px-4 gap-1.5 overflow-x-auto px-4 lg:hidden">
         {SETTINGS_SECTIONS.flatMap((g) => g.items).map((s) => (
           <Link
             key={s.id}
             href={`/panel/ajustes/${s.id}`}
             aria-current={current === s.id ? "page" : undefined}
-            className={cn("whitespace-nowrap rounded-full border px-3 py-1 text-sm", current === s.id ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2")}
+            className={cn("inline-flex min-h-10 shrink-0 snap-start items-center whitespace-nowrap rounded-full border px-4 text-sm", current === s.id ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2")}
           >
             {s.label}
           </Link>

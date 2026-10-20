@@ -55,7 +55,7 @@ export function SerpPreviewTool() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <div className={cn(panel, "space-y-5")}>
         <div>
           <Lbl htmlFor="serp-title">Título</Lbl>
@@ -190,7 +190,7 @@ export function SchemaGeneratorTool() {
   );
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <div className={panel}>
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Tipo de schema">
           {(["FAQPage", "Article", "Product", "LocalBusiness"] as const).map((t) => (
@@ -214,7 +214,7 @@ export function SchemaGeneratorTool() {
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-xs text-ink-3">Pregunta {i + 1}</span>
                     {faq.length > 1 && (
-                      <button type="button" aria-label="Eliminar pregunta" onClick={() => setFaq(faq.filter((_, j) => j !== i))} className="text-ink-3 hover:text-bad">
+                      <button type="button" aria-label="Eliminar pregunta" onClick={() => setFaq(faq.filter((_, j) => j !== i))} className="-m-2 grid h-10 w-10 place-items-center text-ink-3 hover:text-bad">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     )}
@@ -231,7 +231,7 @@ export function SchemaGeneratorTool() {
           {type === "Article" && (
             <>
               {input(article, setArticle, "headline", "Titular")}
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {input(article, setArticle, "author", "Autor")}
                 {input(article, setArticle, "date", "Fecha de publicación", { type: "date" })}
               </div>
@@ -244,7 +244,7 @@ export function SchemaGeneratorTool() {
             <>
               {input(product, setProduct, "name", "Nombre del producto")}
               {input(product, setProduct, "description", "Descripción")}
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {input(product, setProduct, "brand", "Marca")}
                 {input(product, setProduct, "sku", "SKU")}
                 {input(product, setProduct, "price", "Precio", { inputMode: "decimal", placeholder: "39.90" })}
@@ -273,7 +273,7 @@ export function SchemaGeneratorTool() {
                   ))}
                 </select>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {input(biz, setBiz, "phone", "Teléfono", { type: "tel" })}
                 {input(biz, setBiz, "url", "Web", { placeholder: "https://" })}
                 {input(biz, setBiz, "street", "Dirección")}
@@ -330,7 +330,7 @@ export function KeywordDensityTool() {
   }, [text, kw]);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.2fr_1fr]">
       <div className={cn(panel, "space-y-4")}>
         <div>
           <Lbl htmlFor="kd-text">Tu texto</Lbl>
@@ -418,7 +418,7 @@ export function RobotsGeneratorTool() {
   }, [allowAll, blocked, paths, sitemap]);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <div className={cn(panel, "space-y-6")}>
         <div>
           <p className="font-semibold">Rastreadores de IA</p>

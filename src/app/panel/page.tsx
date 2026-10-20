@@ -73,7 +73,7 @@ export default async function OverviewPage() {
         <Stat label="Cuota de voz en IA" value={`${share}%`} delta={`${vis.prompts.length} preguntas seguidas`} />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
@@ -115,7 +115,7 @@ export default async function OverviewPage() {
         </Card>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold">Próximos artículos</h2>

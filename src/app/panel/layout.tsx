@@ -22,27 +22,27 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   let badge: React.ReactNode;
   if (!sub || sub.status === "canceled") {
     badge = (
-      <Link href="/panel/ajustes/facturacion">
+      <Link href="/panel/ajustes/facturacion" className="inline-flex min-h-10 items-center">
         <Badge tone="bad">Sin plan activo · Elegir plan</Badge>
       </Link>
     );
   } else if (sub.status === "trialing") {
     const days = sub.trial_ends_at ? Math.max(0, Math.ceil((new Date(sub.trial_ends_at).getTime() - Date.now()) / 86_400_000)) : 3;
     badge = (
-      <Link href="/panel/ajustes/facturacion" className="flex items-center gap-2">
+      <Link href="/panel/ajustes/facturacion" className="flex min-h-10 items-center gap-2">
         <Badge tone="lime">Prueba · {days === 1 ? "queda 1 día" : `quedan ${days} días`}</Badge>
         <span className="hidden text-xs font-medium text-signal underline sm:inline">Activar plan</span>
       </Link>
     );
   } else if (sub.status === "past_due") {
     badge = (
-      <Link href="/panel/ajustes/facturacion">
+      <Link href="/panel/ajustes/facturacion" className="inline-flex min-h-10 items-center">
         <Badge tone="warn">Pago pendiente · {plan?.name ?? sub.plan_id}</Badge>
       </Link>
     );
   } else {
     badge = (
-      <Link href="/panel/ajustes/facturacion">
+      <Link href="/panel/ajustes/facturacion" className="inline-flex min-h-10 items-center">
         <Badge tone="neutral">
           Plan {plan?.name ?? sub.plan_id} · {sub.interval === "year" ? "anual" : "mensual"}
         </Badge>

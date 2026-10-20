@@ -82,11 +82,11 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-line">
         <Container className="relative flex flex-col items-center py-16 text-center md:py-24">
           <Eyebrow>SEO + GEO · en piloto automático</Eyebrow>
-          <h1 className="mt-6 font-display text-4xl leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="mt-6 font-display text-[2.125rem] leading-[1.08] tracking-tight min-[400px]:text-4xl sm:text-6xl lg:text-7xl">
             <span className="sr-only">Automatiza que te encuentren cuando buscan en Google, ChatGPT, Gemini, Perplexity o Claude.</span>
             <span aria-hidden className="block">Automatiza que te encuentren</span>
             <span aria-hidden className="block">
-              cuando buscan en <RotatingWord />
+              cuando buscan en <RotatingWord className="max-sm:grid max-sm:justify-items-center" />
             </span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-ink-2 md:text-xl">
@@ -170,7 +170,7 @@ export default async function HomePage() {
             </div>
             <p className="max-w-sm text-ink-2">Configuras una vez. A partir de ahí, el sistema trabaja cada semana y tú decides cuánto quieres supervisar.</p>
           </div>
-          <ol className="mt-14 grid gap-6 md:grid-cols-3">
+          <ol className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
             {steps.map((s) => (
               <li key={s.n} className="relative rounded-2xl border border-line bg-card p-7">
                 <span className="font-mono text-sm font-semibold text-signal">{s.n}</span>
@@ -179,7 +179,7 @@ export default async function HomePage() {
               </li>
             ))}
           </ol>
-          <div className="mt-14 grid items-center gap-12 rounded-2xl border border-line bg-paper-2 p-6 sm:p-10 lg:grid-cols-[1fr_1.1fr]">
+          <div className="mt-14 grid grid-cols-1 items-center gap-12 rounded-2xl border border-line bg-paper-2 p-6 sm:p-10 lg:grid-cols-[1fr_1.1fr]">
             <div>
               <Eyebrow tone="ink">Lo que pasa cada semana</Eyebrow>
               <p className="mt-4 font-display text-3xl leading-[1.1] md:text-4xl">
@@ -208,7 +208,7 @@ export default async function HomePage() {
             {featureRows.map((f, i) => {
               const p = getProduct(f.slug)!;
               return (
-                <div key={f.slug} className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
+                <div key={f.slug} className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
                   <div className={i % 2 ? "md:order-2" : ""}>
                     <div className="flex items-center gap-3">
                       <span className="grid h-11 w-11 place-items-center rounded-xl border border-line bg-card">
@@ -247,7 +247,7 @@ export default async function HomePage() {
       {/* ───────── SOCIAL ───────── */}
       <Section>
         <Container>
-          <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
             <div>
               <Eyebrow>Visibilidad social</Eyebrow>
               <Title className="mt-4">
@@ -260,7 +260,7 @@ export default async function HomePage() {
                 Cómo funciona
               </CtaLink>
             </div>
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="rounded-2xl border border-line bg-card p-5 sm:col-span-2">
                 <div className="flex items-center justify-between">
                   <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">Agente de Reddit · r/Ceramics</p>
@@ -296,7 +296,7 @@ export default async function HomePage() {
       {/* ───────── VISIBILIDAD IA ───────── */}
       <section className="border-y border-line bg-ink py-20 text-paper md:py-28">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-end">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-end">
             <div>
               <Eyebrow tone="paper">Visibilidad en IA</Eyebrow>
               <h2 className="mt-4 font-display text-3xl leading-[1.1] sm:text-4xl md:text-5xl">
@@ -307,12 +307,12 @@ export default async function HomePage() {
               Eliges las preguntas que haría tu cliente. Cada día se las hacemos a cuatro asistentes y apuntamos si sales, en qué posición, con qué fuentes y junto a qué competidores.
             </p>
           </div>
-          <div className="mt-12 overflow-x-auto rounded-2xl border border-paper/20">
-            <table className="w-full min-w-[640px] text-left text-sm">
+          <div className="scroll-x mt-12 rounded-2xl border border-paper/20 [--scroll-bg:var(--ink)] [--scroll-shadow:rgba(255,255,255,0.22)]">
+            <table className="w-full min-w-[560px] text-left text-sm sm:min-w-[640px]">
               <caption className="sr-only">Ejemplo de seguimiento de menciones en asistentes de IA</caption>
               <thead>
                 <tr className="border-b border-paper/20 font-mono text-[11px] uppercase tracking-[0.16em] text-paper/60">
-                  <th className="px-5 py-4 font-normal">Pregunta seguida</th>
+                  <th className="sticky left-0 z-[1] bg-ink px-5 py-4 font-normal sm:static">Pregunta seguida</th>
                   {models.map((m) => (
                     <th key={m} className="px-4 py-4 text-center font-normal">
                       {m}
@@ -323,7 +323,7 @@ export default async function HomePage() {
               <tbody>
                 {prompts.map((p) => (
                   <tr key={p.q} className="border-b border-paper/10 last:border-0">
-                    <td className="px-5 py-4 font-display text-xl">«{p.q}»</td>
+                    <td className="sticky left-0 z-[1] w-44 bg-ink px-5 py-4 font-display text-lg leading-snug sm:static sm:w-auto sm:text-xl">«{p.q}»</td>
                     {p.r.map((r, i) => (
                       <td key={i} className="px-4 py-4 text-center">
                         {r === null ? (
@@ -354,7 +354,7 @@ export default async function HomePage() {
       {/* ───────── IDIOMAS ───────── */}
       <Section>
         <Container>
-          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <Eyebrow>Idiomas</Eyebrow>
               <Title className="mt-4">
@@ -392,7 +392,7 @@ export default async function HomePage() {
             </Title>
             <p className="mt-5 text-lg text-ink-2">Ejemplo ficticio para una clínica de fisioterapia. Fíjate en la respuesta directa arriba, las preguntas frecuentes y los enlaces internos.</p>
           </div>
-          <div className="mt-12 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+          <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-[1.6fr_1fr]">
             <article className="rounded-2xl border border-line bg-card p-6 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-10">
               <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">Blog · Clínica Azahar · 6 min</p>
               <h3 className="mt-3 font-display text-3xl leading-[1.1] md:text-4xl">¿Frío o calor para el dolor de espalda? Depende de cuándo empezó</h3>
@@ -459,7 +459,7 @@ export default async function HomePage() {
       {/* ───────── RED DE ENLACES ───────── */}
       <Section>
         <Container>
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
             <div className="order-2 lg:order-1">
               <NetworkDiagram />
             </div>
@@ -471,7 +471,7 @@ export default async function HomePage() {
               <p className="mt-5 max-w-lg text-lg text-ink-2">
                 Cada cliente aporta enlaces desde sus artículos y recibe enlaces de webs de su temática. Cuantas más webs se suman, más opciones relevantes hay para todos. Sin granjas, sin reciprocidad obvia y con tu visto bueno.
               </p>
-              <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+              <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {[
                   ["Afinidad", "solo webs de temática relacionada"],
                   ["Contexto", "enlaces dentro de artículos útiles"],
@@ -491,7 +491,7 @@ export default async function HomePage() {
       {/* ───────── DOS RESULTADOS ───────── */}
       <Section className="pt-0 md:pt-0">
         <Container>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-line bg-sky/50 p-8 md:p-10">
               <Eyebrow tone="ink">Resultado 1</Eyebrow>
               <h3 className="mt-4 font-display text-3xl leading-[1.1] md:text-4xl">Aparece en las respuestas de la IA</h3>
@@ -544,7 +544,7 @@ export default async function HomePage() {
                 Ver todos los casos
               </CtaLink>
             </div>
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
               {cases.slice(0, 3).map((c) => (
                 <Link key={c.slug} href={`/casos/${c.slug}`} className="group flex flex-col rounded-2xl border border-line bg-card p-6 transition hover:shadow-md">
                   <div className="flex items-center justify-between">
@@ -569,7 +569,7 @@ export default async function HomePage() {
       {/* ───────── PRECIOS (teaser) ───────── */}
       <Section>
         <Container>
-          <div className="grid gap-10 rounded-2xl border border-line bg-card p-8 md:grid-cols-[1.2fr_1fr] md:items-center md:p-14">
+          <div className="grid grid-cols-1 gap-10 rounded-2xl border border-line bg-card p-8 md:grid-cols-[1.2fr_1fr] md:items-center md:p-14">
             <div>
               <Eyebrow>Precios</Eyebrow>
               <Title className="mt-4">
@@ -608,7 +608,7 @@ export default async function HomePage() {
       <Section className="pt-0 md:pt-0">
         <Container>
           <div className="relative overflow-hidden rounded-2xl border border-line bg-lime p-8 md:p-14">
-            <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
               <div>
                 <Eyebrow tone="ink">Gratis, en un minuto</Eyebrow>
                 <h2 className="mt-4 font-display text-3xl leading-[1.1] sm:text-4xl md:text-5xl">¿Está tu web lista para que la IA te recomiende?</h2>
@@ -652,7 +652,7 @@ export default async function HomePage() {
               </Title>
             </div>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
             {guides.map((g, i) => (
               <Link key={g.title} href="/blog" className="group relative flex flex-col rounded-2xl border border-line bg-card p-6 transition hover:shadow-md">
                 <div className={`mb-6 grid aspect-[3/2] place-items-center rounded-xl border border-line ${["bg-signal", "bg-sky/60", "bg-paper-2"][i]}`}>
@@ -672,7 +672,7 @@ export default async function HomePage() {
 
       {/* ───────── FAQ ───────── */}
       <Section className="pt-0 md:pt-0">
-        <Container className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <Eyebrow>Preguntas frecuentes</Eyebrow>
             <Title className="mt-4">

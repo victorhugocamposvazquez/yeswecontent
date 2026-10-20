@@ -69,7 +69,7 @@ export function MarkdownField({ name, defaultValue = "", rows = 14, label, requi
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={cn("rounded-full px-3 py-1 font-medium", tab === t ? "bg-card text-ink shadow-sm" : "text-ink-3")}
+              className={cn("min-h-9 rounded-full px-3 py-1 font-medium sm:min-h-0", tab === t ? "bg-card text-ink shadow-sm" : "text-ink-3")}
             >
               {t === "write" ? "Escribir" : "Vista previa"}
             </button>

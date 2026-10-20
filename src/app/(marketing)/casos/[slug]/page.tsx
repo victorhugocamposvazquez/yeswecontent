@@ -54,7 +54,7 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
     <>
       <section className="border-b border-line">
         <Container className="py-14 md:py-20">
-          <Link href="/casos" className="inline-flex items-center gap-1.5 text-sm font-semibold hover:text-signal">
+          <Link href="/casos" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold hover:text-signal sm:min-h-0">
             <ArrowLeft className="h-4 w-4" aria-hidden /> Todos los casos
           </Link>
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -73,7 +73,7 @@ export default async function CasoPage({ params }: { params: Promise<{ slug: str
         </Container>
       </section>
       <Section>
-        <Container className="grid gap-12 lg:grid-cols-[1fr_20rem]">
+        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_20rem]">
           <article className="max-w-2xl">
             <Markdown source={c.body_md?.trim() ? c.body_md : fallbackBody(c)} />
             <p className="mt-10 rounded-xl border border-dashed border-line p-4 text-sm text-ink-3">

@@ -26,7 +26,7 @@ export default async function AdminHome() {
         <Stat label="Artículos publicados este mes" value={num(o.publishedThisMonth)} />
       </section>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="p-5 lg:col-span-2">
           <div className="flex items-baseline justify-between gap-2">
             <h2 className="font-semibold">MRR últimos 12 meses</h2>
@@ -52,13 +52,13 @@ export default async function AdminHome() {
         </Card>
       </div>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
         <section aria-labelledby="altas">
           <div className="mb-2 flex items-baseline justify-between">
             <h2 id="altas" className="font-semibold">
               Últimas altas
             </h2>
-            <Link href="/admin/usuarios" className="text-sm text-ink-2 underline-offset-4 hover:underline">
+            <Link href="/admin/usuarios" className="-my-2 inline-flex min-h-10 items-center text-sm text-ink-2 underline-offset-4 hover:underline sm:my-0 sm:min-h-0">
               Ver todos
             </Link>
           </div>
@@ -95,7 +95,7 @@ export default async function AdminHome() {
             <h2 id="fallos" className="font-semibold">
               Trabajos fallidos
             </h2>
-            <Link href="/admin/cola" className="text-sm text-ink-2 underline-offset-4 hover:underline">
+            <Link href="/admin/cola" className="-my-2 inline-flex min-h-10 items-center text-sm text-ink-2 underline-offset-4 hover:underline sm:my-0 sm:min-h-0">
               Ir a la cola
             </Link>
           </div>

@@ -208,7 +208,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
         </div>
       </div>
 
-      <Card className="p-6 md:p-8">
+      <Card className="p-5 sm:p-6 md:p-8">
         {step === "web" && (
           <StepHead title="Empecemos por tu web" intro="Dinos dónde vive tu negocio en internet. A partir de ahí, nosotros nos encargamos.">
             <div className="space-y-5">
@@ -220,7 +220,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
               </Field>
               <fieldset>
                 <legend className="mb-2 text-sm font-medium text-ink-2">¿Para quién es?</legend>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {(
                     [
                       ["business", "Para mi negocio", "Una o varias webs propias.", Building2],
@@ -268,7 +268,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
             <Field label="Subdominio">
               <Input value={s.agency.domain} onChange={(e) => setAgency({ domain: e.target.value })} placeholder="panel.tuagencia.com" />
             </Field>
-            <div className="mt-5 overflow-x-auto rounded-xl border border-line">
+            <div className="scroll-x mt-5 rounded-xl border border-line">
               <table className="w-full min-w-[420px] text-sm">
                 <thead className="bg-paper text-left text-xs uppercase tracking-wide text-ink-3">
                   <tr>
@@ -370,7 +370,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                       type="button"
                       aria-pressed={on}
                       onClick={() => set("extra_languages", on ? s.extra_languages.filter((x) => x !== v) : [...s.extra_languages, v])}
-                      className={cn("rounded-full border px-3.5 py-1.5 text-sm", on ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}
+                      className={cn("min-h-10 rounded-full border px-3.5 py-1.5 text-sm sm:min-h-0", on ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}
                     >
                       {on && <Check className="mr-1 inline h-3.5 w-3.5" aria-hidden />}
                       {l}
@@ -389,14 +389,14 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
               <legend className="mb-2 text-sm font-medium text-ink-2">Tono</legend>
               <div className="flex flex-wrap gap-2">
                 {TONES.map((t) => (
-                  <button key={t} type="button" aria-pressed={s.tone === t} onClick={() => set("tone", t)} className={cn("rounded-full border px-3.5 py-1.5 text-sm", s.tone === t ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}>
+                  <button key={t} type="button" aria-pressed={s.tone === t} onClick={() => set("tone", t)} className={cn("min-h-10 rounded-full border px-3.5 py-1.5 text-sm sm:min-h-0", s.tone === t ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}>
                     {t}
                   </button>
                 ))}
               </div>
               <Input className="mt-2" value={s.tone} onChange={(e) => set("tone", e.target.value)} aria-label="Tono personalizado" />
             </fieldset>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Escribimos en">
                 <Select value={s.person} onChange={(e) => set("person", e.target.value)}>
                   <option value="nosotros">Primera del plural (nosotros)</option>
@@ -420,7 +420,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
 
         {step === "seo" && (
           <StepHead title="Ajustes de publicación" intro="Valores recomendados para empezar. Todo se puede cambiar después.">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Palabras mínimas por artículo">
                 <Select value={String(s.min_words)} onChange={(e) => set("min_words", Number(e.target.value))}>
                   {[800, 1000, 1400, 1800, 2500].map((n) => (
@@ -440,7 +440,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                 </Select>
               </Field>
             </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <CheckCard checked={s.faq} onChange={(v) => set("faq", v)} title="Preguntas frecuentes" desc="Un bloque FAQ al final de cada artículo." />
               <CheckCard checked={s.schema} onChange={(v) => set("schema", v)} title="Datos estructurados" desc="JSON-LD para Google y la IA." />
             </div>
@@ -464,7 +464,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                 })}
               </div>
             </fieldset>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="Hora (UTC)">
                 <Input type="time" value={s.time} onChange={(e) => set("time", e.target.value)} />
               </Field>
@@ -506,12 +506,12 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                   ["month", "Mensual"],
                 ] as const
               ).map(([v, l]) => (
-                <button key={v} type="button" role="radio" aria-checked={s.interval === v} onClick={() => set("interval", v)} className={cn("rounded-full px-4 py-1.5 text-sm", s.interval === v ? "bg-ink text-paper" : "text-ink-2")}>
+                <button key={v} type="button" role="radio" aria-checked={s.interval === v} onClick={() => set("interval", v)} className={cn("min-h-9 rounded-full px-4 py-1.5 text-sm", s.interval === v ? "bg-ink text-paper" : "text-ink-2")}>
                   {l}
                 </button>
               ))}
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {plans.map((p, k) => (
                 <label key={p.id} className={cn("relative cursor-pointer rounded-2xl border p-5 transition", s.planId === p.id ? "border-ink bg-lime/25 shadow-sm" : "border-line bg-paper hover:border-ink")}>
                   <input type="radio" name="plan" className="sr-only" checked={s.planId === p.id} onChange={() => set("planId", p.id)} />
@@ -572,17 +572,17 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
           </p>
         )}
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
-          <Button type="button" variant="ghost" onClick={() => setI(Math.max(0, idx - 1))} disabled={idx === 0 || pending}>
+        <div className="sticky bottom-0 z-10 -mx-5 -mb-5 mt-8 flex items-center justify-between gap-2 rounded-b-2xl border-t border-line bg-card/95 px-5 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur sm:static sm:mx-0 sm:mb-0 sm:flex-wrap sm:gap-3 sm:rounded-none sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:backdrop-blur-none">
+          <Button type="button" variant="ghost" className="max-sm:min-h-11 max-sm:px-3" onClick={() => setI(Math.max(0, idx - 1))} disabled={idx === 0 || pending}>
             <ArrowLeft className="h-4 w-4" aria-hidden /> Atrás
           </Button>
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:flex-none">
             {["conectar", "llamada", "dominio", "equipo", "encuesta", "competidores"].includes(step) && (
-              <Button type="button" variant="ghost" disabled={pending} onClick={() => (idx === steps.length - 1 ? startTransition(() => finish(siteId)) : setI(idx + 1))}>
+              <Button type="button" variant="ghost" className="max-sm:min-h-11 max-sm:px-3" disabled={pending} onClick={() => (idx === steps.length - 1 ? startTransition(() => finish(siteId)) : setI(idx + 1))}>
                 Saltar
               </Button>
             )}
-            <Button type="button" onClick={next} disabled={pending}>
+            <Button type="button" onClick={next} disabled={pending} className="max-sm:min-h-11 max-sm:flex-1 max-sm:px-4">
               {pending && <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden />}
               {step === "plan" ? "Empezar prueba gratis" : idx === steps.length - 1 ? "Ir a mi panel" : "Continuar"}
               {!pending && <ArrowRight className="h-4 w-4" aria-hidden />}
@@ -638,7 +638,7 @@ function TeamStep({ invites, onChange }: { invites: string[]; onChange: (v: stri
         {invites.map((e) => (
           <li key={e} className="inline-flex items-center gap-1 rounded-full bg-paper-2 py-1 pl-3 pr-1 text-sm">
             {e}
-            <button type="button" onClick={() => onChange(invites.filter((x) => x !== e))} className="rounded-full p-1 hover:bg-line" aria-label={`Quitar ${e}`}>
+            <button type="button" onClick={() => onChange(invites.filter((x) => x !== e))} className="grid h-8 w-8 place-items-center rounded-full hover:bg-line" aria-label={`Quitar ${e}`}>
               <X className="h-3.5 w-3.5" />
             </button>
           </li>
@@ -662,7 +662,7 @@ function CompetitorsStep({ list, suggestions, onChange }: { list: { name: string
             type="button"
             onClick={() => (has(c.url) ? onChange(list.filter((x) => domainOf(x.url) !== domainOf(c.url))) : add(c))}
             aria-pressed={has(c.url)}
-            className={cn("rounded-full border px-3.5 py-1.5 text-sm", has(c.url) ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}
+            className={cn("min-h-10 rounded-full border px-3.5 py-1.5 text-sm sm:min-h-0", has(c.url) ? "border-ink bg-ink text-paper" : "border-line bg-paper hover:border-ink")}
           >
             {has(c.url) ? <Check className="mr-1 inline h-3.5 w-3.5" aria-hidden /> : <Plus className="mr-1 inline h-3.5 w-3.5" aria-hidden />}
             {c.name} <span className="opacity-60">· {domainOf(c.url)}</span>
@@ -705,7 +705,7 @@ function CompetitorsStep({ list, suggestions, onChange }: { list: { name: string
               <span>
                 {c.name} <span className="text-ink-3">· {domainOf(c.url)}</span>
               </span>
-              <button type="button" onClick={() => onChange(list.filter((x) => x.url !== c.url))} className="rounded-full p-1 hover:bg-paper-2" aria-label={`Quitar ${c.name}`}>
+              <button type="button" onClick={() => onChange(list.filter((x) => x.url !== c.url))} className="-mr-2 grid h-10 w-10 place-items-center rounded-full hover:bg-paper-2" aria-label={`Quitar ${c.name}`}>
                 <X className="h-4 w-4" />
               </button>
             </li>

@@ -3,6 +3,7 @@ import { Check, Minus, ShieldCheck, Timer } from "lucide-react";
 import { listPlans } from "@/lib/data";
 import { volumeDiscounts } from "@/lib/demo";
 import type { Plan } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { Pricing } from "@/components/marketing/pricing";
 import { Container, CtaBand, CtaLink, Eyebrow, Faq, Section, Title } from "@/components/marketing/primitives";
 
@@ -123,7 +124,7 @@ export default async function PreciosPage() {
       {/* Agencias */}
       <Section className="pt-0 md:pt-0">
         <Container>
-          <div className="grid gap-10 rounded-2xl border border-line bg-ink p-8 text-paper md:grid-cols-[1.1fr_1fr] md:p-14">
+          <div className="grid grid-cols-1 gap-10 rounded-2xl border border-line bg-ink p-8 text-paper md:grid-cols-[1.1fr_1fr] md:p-14">
             <div>
               <Eyebrow tone="paper">Agencias y reventa</Eyebrow>
               <h2 className="mt-4 font-display text-3xl leading-[1.1] sm:text-4xl md:text-5xl">
@@ -133,7 +134,7 @@ export default async function PreciosPage() {
                 Reservar una llamada de 15 min
               </CtaLink>
             </div>
-            <ul className="grid gap-4 sm:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {[
                 ["Revende con tu marca", "Panel, informes y emails con tu logo, tus colores y tu dominio."],
                 ["Tú controlas qué se ve", "Decide qué módulos y datos ve cada cliente."],
@@ -160,16 +161,17 @@ export default async function PreciosPage() {
                 Todo lo que incluye, <span className="marker">al detalle</span>.
               </Title>
             </div>
-            <div className="mt-12 overflow-x-auto rounded-2xl border border-line bg-card">
-              <table className="w-full min-w-[560px] text-sm">
+            {/* Con 1–2 planes cabe en móvil: sin contenedor de scroll, así la cabecera puede quedarse fija bajo el menú. */}
+            <div className={cn("mt-12 rounded-2xl border border-line bg-card", plans.length > 2 ? "scroll-x" : "overflow-clip")}>
+              <table className="w-full text-sm" style={{ minWidth: plans.length > 2 ? `${200 + plans.length * 96}px` : undefined }}>
                 <caption className="sr-only">Comparativa de planes</caption>
-                <thead className="sticky top-0">
+                <thead className="sticky top-16 z-[2]">
                   <tr className="border-b border-line bg-card">
-                    <th scope="col" className="w-1/2 px-5 py-5 text-left font-mono text-[11px] font-normal uppercase tracking-[0.16em] text-ink-3">
+                    <th scope="col" className="sticky left-0 z-[1] w-1/2 bg-card px-4 py-4 text-left font-mono sm:px-5 sm:py-5 text-[11px] font-normal uppercase tracking-[0.16em] text-ink-3">
                       Funcionalidad
                     </th>
                     {plans.map((p) => (
-                      <th key={p.id} scope="col" className="px-4 py-5 text-center font-display text-2xl font-normal">
+                      <th key={p.id} scope="col" className="px-2 py-4 text-center font-display text-xl font-normal sm:px-4 sm:py-5 sm:text-2xl">
                         {p.name}
                       </th>
                     ))}
@@ -178,20 +180,20 @@ export default async function PreciosPage() {
                 {groups.map((g) => (
                   <tbody key={g.title}>
                     <tr className="bg-paper-2">
-                      <th colSpan={plans.length + 1} scope="colgroup" className="px-5 py-3 text-left font-mono text-[11px] uppercase tracking-[0.2em] text-signal">
-                        {g.title}
+                      <th colSpan={plans.length + 1} scope="colgroup" className="px-4 py-3 text-left font-mono text-[11px] uppercase tracking-[0.2em] text-signal sm:px-5">
+                        <span className="sticky left-4 sm:left-5">{g.title}</span>
                       </th>
                     </tr>
                     {g.rows.map((r) => (
                       <tr key={r.label} className="border-t border-line">
-                        <th scope="row" className="px-5 py-3.5 text-left font-normal">
+                        <th scope="row" className="sticky left-0 z-[1] bg-card px-4 py-3.5 text-left font-normal sm:px-5">
                           {r.label}
                           {r.hint && <span className="block text-xs text-ink-3">{r.hint}</span>}
                         </th>
                         {plans.map((p, t) => {
                           const v = r.value(p, t);
                           return (
-                            <td key={p.id} className="px-4 py-3.5 text-center">
+                            <td key={p.id} className="px-2 py-3.5 text-center sm:px-4">
                               {v === true ? (
                                 <Check className="mx-auto h-5 w-5 text-ok" aria-label="Incluido" />
                               ) : v === false ? (
@@ -213,7 +215,7 @@ export default async function PreciosPage() {
       )}
 
       <Section className="pt-0 md:pt-0">
-        <Container className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <Eyebrow>Preguntas frecuentes</Eyebrow>
             <Title className="mt-4">

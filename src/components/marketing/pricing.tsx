@@ -136,7 +136,7 @@ function VolumeCalculator({ plans, discounts, interval }: { plans: Plan[]; disco
 
   return (
     <div id="volumen" className="mt-24 scroll-mt-24 rounded-2xl border border-line bg-paper-2 p-6 sm:p-10">
-      <div className="grid gap-10 lg:grid-cols-[1fr_1.15fr]">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.15fr]">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-signal">Descuentos por volumen</p>
           <h2 className="mt-3 font-display text-3xl leading-[1.1] md:text-4xl">¿Más de una web? Cuantas más, menos pagas por cada una.</h2>
@@ -155,7 +155,7 @@ function VolumeCalculator({ plans, discounts, interval }: { plans: Plan[]; disco
         </div>
 
         <div className="rounded-2xl border border-line bg-card p-6 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-8">
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor="calc-sites" className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
                 Número de webs

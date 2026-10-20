@@ -20,7 +20,7 @@ export function AgencyForm() {
     );
 
   return (
-    <form action={action} className="grid gap-4 rounded-2xl border border-line bg-card p-6 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:grid-cols-2 sm:p-8">
+    <form action={action} className="grid grid-cols-1 gap-4 rounded-2xl border border-line bg-card p-6 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:grid-cols-2 sm:p-8">
       <input type="text" name="company_fax" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
       <label className="text-sm font-medium">
         Nombre

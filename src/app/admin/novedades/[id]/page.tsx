@@ -21,7 +21,7 @@ export default async function UpdateEditPage({ params }: { params: Promise<{ id:
 
   return (
     <>
-      <Link href="/admin/novedades" className="mb-4 inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink">
+      <Link href="/admin/novedades" className="mb-2 -mt-2 inline-flex min-h-10 items-center gap-1.5 text-sm text-ink-2 hover:text-ink sm:mt-0 sm:mb-4 sm:min-h-0">
         <ArrowLeft className="size-4" aria-hidden /> Novedades
       </Link>
       <PageHeader title={u ? "Editar novedad" : "Nueva novedad"} />
@@ -32,7 +32,7 @@ export default async function UpdateEditPage({ params }: { params: Promise<{ id:
           <Field label="Título">
             <Input name="title" defaultValue={u?.title} required maxLength={120} />
           </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Etiqueta">
               <Select name="tag" defaultValue={u?.tag ?? "Nuevo"}>
                 <option value="">Sin etiqueta</option>

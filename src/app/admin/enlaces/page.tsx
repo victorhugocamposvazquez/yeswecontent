@@ -40,10 +40,10 @@ export default async function LinksPage({ searchParams }: { searchParams: SP }) 
         intro={`Modera los intercambios entre clientes antes de que se publiquen. ${num(pending)} pendientes de revisión.`}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_20rem]">
         <div className="min-w-0">
           <FilterBar action="/admin/enlaces" resetHref="/admin/enlaces">
-            <FilterField label="Buscar" className="min-w-48 flex-1">
+            <FilterField label="Buscar" className="col-span-2 sm:min-w-48 sm:flex-1">
               <Input type="search" name="q" defaultValue={sp.q} placeholder="dominio o anchor" />
             </FilterField>
             <FilterField label="Estado">
@@ -56,7 +56,7 @@ export default async function LinksPage({ searchParams }: { searchParams: SP }) 
               </Select>
             </FilterField>
             <FilterField label="DR mínimo">
-              <Input type="number" name="dr" min={0} max={100} defaultValue={sp.dr} placeholder="0" className="w-24" />
+              <Input type="number" name="dr" min={0} max={100} defaultValue={sp.dr} placeholder="0" className="sm:w-24" />
             </FilterField>
           </FilterBar>
 

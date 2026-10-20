@@ -24,7 +24,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
 
   return (
     <>
-      <Link href="/panel/articulos" className="mb-4 inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink">
+      <Link href="/panel/articulos" className="mb-2 -mt-2 inline-flex min-h-10 items-center gap-1.5 text-sm text-ink-3 hover:text-ink sm:mt-0 sm:mb-4 sm:min-h-0">
         <ArrowLeft className="h-4 w-4" aria-hidden /> Artículos
       </Link>
       <div className="mb-6 flex flex-wrap items-center gap-3">

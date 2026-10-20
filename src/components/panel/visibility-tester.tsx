@@ -44,7 +44,7 @@ export function VisibilityTester() {
       <div aria-live="polite">
         {error && <p className="mt-3 text-sm text-bad">{error}</p>}
         {results && (
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {results.map((r) => (
               <li key={r.model} className="rounded-xl border border-line bg-paper p-3">
                 <div className="flex items-center justify-between">

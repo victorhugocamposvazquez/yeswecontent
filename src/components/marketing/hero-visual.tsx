@@ -5,7 +5,7 @@
  */
 export function HeroVisual() {
   return (
-    <div className="relative mx-auto w-full max-w-[34rem] pb-24 sm:pb-16" aria-label="Ilustración: un artículo escribiéndose y una respuesta de IA que cita a la marca" role="img">
+    <div className="relative mx-auto w-full max-w-[34rem] pb-44 sm:pb-16" aria-label="Ilustración: un artículo escribiéndose y una respuesta de IA que cita a la marca" role="img">
       <style>{`
         @keyframes ywc-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
         @keyframes ywc-blink { 50% { opacity: 0; } }
@@ -19,9 +19,9 @@ export function HeroVisual() {
 
       {/* Hoja de periódico */}
       <div className="relative rounded-md border border-line bg-card p-5 shadow-[0_12px_32px_-16px_rgba(21,19,15,0.22)] sm:p-7">
-        <div className="flex items-end justify-between border-b border-line pb-2">
-          <p className="font-display text-2xl leading-none sm:text-3xl">El Cuaderno</p>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-ink-3">Blog de Tierrafina · Nº 42</p>
+        <div className="flex items-end justify-between gap-3 border-b border-line pb-2">
+          <p className="whitespace-nowrap font-display text-2xl leading-none sm:text-3xl">El Cuaderno</p>
+          <p className="text-right font-mono text-[9px] uppercase tracking-[0.18em] text-ink-3">Blog de Tierrafina · Nº 42</p>
         </div>
         <div className="mt-1 flex justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-ink-3">
           <span>Guías</span>

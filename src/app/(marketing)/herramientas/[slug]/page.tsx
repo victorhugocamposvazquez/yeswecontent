@@ -38,7 +38,7 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
     <>
       <section className="relative overflow-hidden border-b border-line">
         <Container className="relative py-12 md:py-16">
-          <Link href="/herramientas" className="inline-flex items-center gap-1.5 text-sm font-semibold hover:text-signal">
+          <Link href="/herramientas" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold hover:text-signal sm:min-h-0">
             <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
           </Link>
           <Eyebrow className="mt-8">{cat?.label} · herramienta gratuita</Eyebrow>
@@ -52,7 +52,7 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
           {t.kind === "server" && <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} />}
           {t.kind === "client" && clientTools[t.slug]?.()}
           {t.kind === "signup" && (
-            <div className="grid gap-8 rounded-2xl border border-line bg-sky/40 p-8 md:grid-cols-[1.3fr_1fr] md:items-center md:p-12">
+            <div className="grid grid-cols-1 gap-8 rounded-2xl border border-line bg-sky/40 p-8 md:grid-cols-[1.3fr_1fr] md:items-center md:p-12">
               <div>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em]">
                   <Clock className="h-3.5 w-3.5" aria-hidden /> Incluida en la prueba gratuita
@@ -74,7 +74,7 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
       </Section>
 
       <Section className="border-t border-line bg-paper-2 py-16 md:py-20">
-        <Container className="grid gap-12 lg:grid-cols-2">
+        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <div>
             <Eyebrow>Qué revisa</Eyebrow>
             <ul className="mt-5 space-y-3">
@@ -96,7 +96,7 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
         <Section className="py-16 md:py-20">
           <Container>
             <Eyebrow tone="ink">Otras herramientas de {cat?.label.toLowerCase()}</Eyebrow>
-            <div className="mt-6 grid gap-5 md:grid-cols-3">
+            <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-3">
               {siblings.map((s) => (
                 <Link key={s.slug} href={`/herramientas/${s.slug}`} className="rounded-2xl border border-line bg-card p-5 transition hover:shadow-md">
                   <p className="font-display text-2xl">{s.name}</p>

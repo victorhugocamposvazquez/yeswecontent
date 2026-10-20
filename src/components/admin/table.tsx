@@ -9,7 +9,7 @@ import type { Subscription } from "@/lib/types";
 export function DataTable({ caption, children, className, footer }: { caption: string; children: ReactNode; className?: string; footer?: ReactNode }) {
   return (
     <Card className={cn("overflow-hidden", className)}>
-      <div className="overflow-x-auto">
+      <div className="scroll-x">
         <table className="w-full min-w-[720px] border-collapse text-sm">
           <caption className="sr-only">{caption}</caption>
           {children}
@@ -74,12 +74,12 @@ export function HealthBadge({ health }: { health: "ok" | "warn" | "bad" }) {
 /** Barra de filtros por GET (funciona sin JS y deja la URL compartible). */
 export function FilterBar({ children, action, resetHref }: { children: ReactNode; action: string; resetHref: string }) {
   return (
-    <form action={action} method="get" role="search" className="mb-4 flex flex-wrap items-end gap-2">
+    <form action={action} method="get" role="search" className="mb-4 grid grid-cols-2 items-end gap-2 sm:flex sm:flex-wrap">
       {children}
-      <button type="submit" className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-paper hover:bg-ink-2">
+      <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-paper hover:bg-ink-2 sm:min-h-0">
         <Search className="size-4" aria-hidden /> Filtrar
       </button>
-      <Link href={resetHref} className="rounded-full px-3 py-2.5 text-sm text-ink-2 underline-offset-4 hover:underline">
+      <Link href={resetHref} className="inline-flex min-h-11 items-center justify-center rounded-full px-3 py-2.5 text-sm sm:min-h-0 text-ink-2 underline-offset-4 hover:underline">
         Limpiar
       </Link>
     </form>
@@ -88,7 +88,7 @@ export function FilterBar({ children, action, resetHref }: { children: ReactNode
 
 export function FilterField({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
   return (
-    <label className={cn("flex flex-col gap-1 text-xs font-medium text-ink-3", className)}>
+    <label className={cn("flex min-w-0 flex-col gap-1 text-xs font-medium text-ink-3", className)}>
       {label}
       {children}
     </label>

@@ -56,7 +56,7 @@ export default function HerramientasPage() {
                   <h2 className="font-display text-4xl md:text-5xl">{c.label}</h2>
                   <p className="text-ink-2">{c.intro}</p>
                 </div>
-                <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {list.map((t) => {
                     const disabled = t.kind === "soon";
                     const inner = (

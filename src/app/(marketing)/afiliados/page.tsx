@@ -27,7 +27,7 @@ export default function AfiliadosPage() {
       </section>
       <Section>
         <Container>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
               { I: Link2, t: "1. Comparte tu enlace", d: "Lo tienes en tu panel nada más crear la cuenta. La cookie dura 60 días." },
               { I: Gift, t: "2. Tu audiencia gana", d: "Quien llega con tu enlace tiene 7 días de prueba en lugar de 3." },
@@ -46,7 +46,7 @@ export default function AfiliadosPage() {
         </Container>
       </Section>
       <Section className="pt-0 md:pt-0">
-        <Container className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           <Title>
             Preguntas <span className="marker">rápidas</span>
           </Title>

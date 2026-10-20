@@ -124,7 +124,7 @@ export function PageHeader({ title, intro, actions }: { title: string; intro?: R
 
 export function Stat({ label, value, delta, className }: { label: string; value: ReactNode; delta?: string; className?: string }) {
   return (
-    <Card className={cn("p-5", className)}>
+    <Card className={cn("p-4 sm:p-5", className)}>
       <p className="text-[13px] text-ink-3">{label}</p>
       <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
       {delta && <p className="mt-1 text-xs font-medium text-ok">{delta}</p>}

@@ -179,7 +179,7 @@ function ResultView({ result }: { result: ToolResult }) {
       </ul>
 
       {result.table && (
-        <div className="overflow-x-auto rounded-2xl border border-line bg-card">
+        <div className="scroll-x rounded-2xl border border-line bg-card">
           <table className="w-full min-w-[560px] text-left text-sm">
             <caption className="px-5 pt-4 text-left font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">{result.table.caption}</caption>
             <thead>

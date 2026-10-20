@@ -47,7 +47,7 @@ export function CuentaSection({ profile }: { profile: Profile }) {
     <div className="space-y-6">
       <Section title="Tu cuenta" intro="Cómo te ve tu equipo dentro de yeswecontent.">
         <ActionForm action={saveSettings.bind(null, "cuenta")}>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="Nombre">
               <Input name="full_name" defaultValue={profile.full_name ?? ""} autoComplete="name" />
             </Field>
@@ -71,7 +71,7 @@ export function NegocioSection({ site }: { site: Site }) {
   return (
     <Section title="Tu negocio" intro="Con esto decidimos de qué escribir y para quién.">
       <ActionForm action={saveSettings.bind(null, "negocio")}>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Nombre de la marca">
             <Input name="name" defaultValue={site.name} required />
           </Field>
@@ -88,7 +88,7 @@ export function NegocioSection({ site }: { site: Site }) {
         <Field label="Descripción" hint="Qué vendes, qué te diferencia y dónde trabajas.">
           <Textarea name="description" rows={3} defaultValue={site.description ?? ""} />
         </Field>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Idioma principal">
             <Select name="language" defaultValue={site.language}>
               {LANGS.map(([v, l]) => (
@@ -137,7 +137,7 @@ export function EquipoSection({ team, seats }: { team: { email: string; name: st
       </Section>
       <Section title="Invitar a alguien" intro="Le llegará un email con un enlace para unirse.">
         <ActionForm action={inviteMember} submitLabel="Enviar invitación">
-          <div className="grid gap-4 md:grid-cols-[1fr_200px]">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_200px]">
             <Field label="Email">
               <Input name="email" type="email" required placeholder="nombre@empresa.com" />
             </Field>
@@ -188,7 +188,7 @@ export function ArticuloSection({ site }: { site: Site }) {
   return (
     <Section title="Formato de artículo" intro="Estructura y elementos SEO que tendrá cada artículo.">
       <ActionForm action={saveSettings.bind(null, "articulo")}>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Longitud mínima (palabras)">
             <Input name="min_words" type="number" min={600} max={5000} step={100} defaultValue={s.min_words ?? 1200} />
           </Field>
@@ -230,7 +230,7 @@ export function VisualSection({ site }: { site: Site }) {
         <Field label="Paleta o colores de marca">
           <Input name="palette" defaultValue={v.palette ?? ""} placeholder="terracota, crema y verde oliva" />
         </Field>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-line bg-paper p-4">
             <Toggle name="cover" defaultChecked={v.cover ?? true} label="Imagen de portada" />
           </div>
@@ -264,7 +264,7 @@ export function CalendarioSection({ site }: { site: Site }) {
         </Field>
         <fieldset>
           <legend className="mb-1.5 text-sm font-medium text-ink-2">Ritmo</legend>
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {[
               ["drip", "Goteo", "Repartimos los artículos del mes en tus días de publicación."],
               ["batch", "Todo de golpe", "Publicamos todos los artículos del mes el primer día disponible."],
@@ -291,7 +291,7 @@ export function MejorasSection({ site }: { site: Site }) {
         <div className="rounded-xl border border-line bg-paper p-4">
           <Toggle name="enabled" defaultChecked={r.enabled ?? true} label="Detectar y renovar artículos" hint="Aparecerán en Plan de contenidos › Mejoras." />
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Field label="Antigüedad mínima (meses)">
             <Input name="min_age_months" type="number" min={1} max={36} defaultValue={r.min_age_months ?? 6} />
           </Field>
@@ -326,7 +326,7 @@ export function CompetidoresSection({ competitors }: { competitors: { id: string
         {!competitors.length && <li className="px-4 py-3 text-sm text-ink-3">Aún no has añadido competidores.</li>}
       </ul>
       <ActionForm action={addCompetitor} submitLabel="Añadir competidor" variant="ink">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Web">
             <Input name="url" placeholder="competidor.com" required />
           </Field>
@@ -416,7 +416,7 @@ export function PublicacionSection({ site, integrations, articles }: { site: Sit
               <div className="border-t border-line p-4">
                 <p className="mb-4 text-sm text-ink-3">{c.help}</p>
                 <ActionForm action={connectIntegration.bind(null, c.id)} submitLabel={connected.has(c.id) ? "Actualizar" : "Conectar"} variant="ink">
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {c.fields.map((f) => (
                       <Field key={f.name} label={f.label} hint={f.hint}>
                         <Input name={f.name} type={f.type ?? "text"} placeholder={f.placeholder} autoComplete="off" required={!connected.has(c.id)} />
@@ -442,7 +442,7 @@ export function PublicacionSection({ site, integrations, articles }: { site: Sit
                 <code className="rounded bg-paper-2 px-1">{"`${t}.${body}`"}</code> con tu secreto. Si respondes con <code className="rounded bg-paper-2 px-1">{"{ \"url\": … }"}</code>, la guardamos como URL publicada.
               </p>
               <ActionForm action={connectIntegration.bind(null, "webhook")} submitLabel="Guardar webhook" variant="ink">
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Field label="URL del webhook">
                     <Input name="url" type="url" placeholder="https://api.tuweb.com/ywc" required />
                   </Field>
@@ -544,7 +544,7 @@ export function MarcaBlancaSection({ whiteLabel }: { whiteLabel: Record<string, 
     <div className="space-y-6">
       <Section title="Marca blanca" intro="Para agencias: tus clientes verán tu marca en el panel, los informes y los emails.">
         <ActionForm action={saveSettings.bind(null, "marca-blanca")}>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="Nombre de tu marca">
               <Input name="brand_name" defaultValue={whiteLabel.brand_name ?? ""} placeholder="Nido Studio" />
             </Field>
@@ -570,7 +570,7 @@ export function DnsInstructions({ domain }: { domain?: string }) {
   const host = domain || "panel.tuagencia.com";
   return (
     <Section title="Configurar el dominio" intro="Añade este registro en el proveedor de tu dominio. La propagación puede tardar hasta 24 horas.">
-      <div className="overflow-x-auto rounded-xl border border-line">
+      <div className="scroll-x rounded-xl border border-line">
         <table className="w-full min-w-[480px] text-sm">
           <thead className="bg-paper text-left text-xs uppercase tracking-wide text-ink-3">
             <tr>
@@ -666,7 +666,7 @@ export function FacturacionSection({
       </Section>
 
       <Section title="Cambiar de plan" intro="El cambio se prorratea automáticamente.">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {plans.map((p) => {
             const current = p.id === sub?.plan_id;
             return (

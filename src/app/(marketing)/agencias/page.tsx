@@ -31,7 +31,7 @@ export default function AgenciasPage() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-line bg-ink text-paper">
-        <Container className="relative grid items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_1fr]">
+        <Container className="relative grid grid-cols-1 items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_1fr]">
           <div>
             <Eyebrow tone="paper">Para agencias</Eyebrow>
             <h1 className="mt-5 font-display text-4xl leading-[1.05] tracking-tight sm:text-6xl">
@@ -84,7 +84,7 @@ export default function AgenciasPage() {
               Tu servicio, <span className="marker">nuestra sala de máquinas</span>.
             </Title>
           </div>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {pillars.map(({ icon: Icon, title, text }) => (
               <div key={title} className="rounded-2xl border border-line bg-card p-7">
                 <span className="grid h-11 w-11 place-items-center rounded-xl border border-line bg-lime">
@@ -99,7 +99,7 @@ export default function AgenciasPage() {
       </Section>
 
       <Section className="border-y border-line bg-paper-2">
-        <Container className="grid gap-10 md:grid-cols-3">
+        <Container className="grid grid-cols-1 gap-10 md:grid-cols-3">
           {[
             ["1", "Llamada de 15 minutos", "Vemos cuántos clientes tienes, qué vendes y si encajamos. Sin presentaciones eternas."],
             ["2", "Configuramos tu marca", "Logo, colores, subdominio y remitente de emails. Lo dejamos listo contigo."],
@@ -115,7 +115,7 @@ export default function AgenciasPage() {
       </Section>
 
       <Section id="contacto" className="scroll-mt-16">
-        <Container className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+        <Container className="grid grid-cols-1 gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <Eyebrow>Hablemos</Eyebrow>
             <Title className="mt-4">

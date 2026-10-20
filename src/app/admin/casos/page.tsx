@@ -61,7 +61,7 @@ export default async function CasesPage() {
                       {c.published ? "Despublicar" : "Publicar"}
                     </SubmitButton>
                   </ActionForm>
-                  <Link href={`/admin/casos/${c.id}`} className="rounded-full px-3 py-1 text-xs font-semibold text-ink-2 hover:bg-paper-2">
+                  <Link href={`/admin/casos/${c.id}`} className="inline-flex min-h-9 items-center rounded-full px-3 py-1 text-xs font-semibold text-ink-2 hover:bg-paper-2 sm:min-h-0">
                     Editar
                   </Link>
                 </div>

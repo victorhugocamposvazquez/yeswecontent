@@ -42,11 +42,42 @@ export default async function LinksPage({ searchParams }: { searchParams: Promis
         <Stat label="Créditos disponibles" value={balance} delta={`${credits} incluidos en tu plan`} />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="min-w-0 lg:col-span-2">
           <LinkTabs basePath="/panel/enlaces" current={tab} tabs={[{ id: "recibidos", label: "Recibidos", count: received.length }, { id: "dados", label: "Dados", count: given.length }]} />
+          {rows.length > 0 && (
+            <ul className="space-y-3 md:hidden">
+              {rows.map((l) => (
+                <li key={l.id}>
+                  <Card className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium">
+                          {l.partner_domain}
+                          {l.source_article_url && (
+                            <a href={l.source_article_url} target="_blank" rel="noreferrer" className="-my-2 ml-0.5 inline-grid h-9 w-9 place-items-center align-middle text-ink-3 hover:text-ink" aria-label="Ver artículo con el enlace">
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                        </p>
+                        <p className="truncate text-xs text-ink-3">→ {l.target_url.replace(/^https?:\/\//, "")}</p>
+                      </div>
+                      <Badge tone={STATUS[l.status].tone} className="shrink-0">{STATUS[l.status].label}</Badge>
+                    </div>
+                    <p className="mt-2 text-sm text-ink-2">“{l.anchor}”</p>
+                    <div className="mt-2 flex gap-4 text-xs text-ink-3">
+                      <span>
+                        DR <span className="font-semibold tabular-nums text-ink">{l.domain_rating ?? "—"}</span>
+                      </span>
+                      <span>{fmtDate(l.created_at)}</span>
+                    </div>
+                  </Card>
+                </li>
+              ))}
+            </ul>
+          )}
           {rows.length ? (
-            <Card className="overflow-x-auto">
+            <Card className="scroll-x max-md:hidden">
               <table className="w-full min-w-[620px] text-sm">
                 <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-3">
                   <tr>

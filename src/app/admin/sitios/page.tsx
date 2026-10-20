@@ -45,7 +45,7 @@ export default async function SitesPage({ searchParams }: { searchParams: SP }) 
         }
       />
       <FilterBar action="/admin/sitios" resetHref="/admin/sitios">
-        <FilterField label="Buscar" className="min-w-56 flex-1">
+        <FilterField label="Buscar" className="col-span-2 sm:min-w-56 sm:flex-1">
           <Input type="search" name="q" defaultValue={q} placeholder="nombre, dominio o cliente" />
         </FilterField>
         <FilterField label="Plan">

@@ -33,7 +33,7 @@ export default async function CasosPage() {
           {cases.length === 0 ? (
             <p className="text-ink-2">Pronto publicaremos los primeros casos.</p>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {cases.map((c, i) => (
                 <Link
                   key={c.slug}

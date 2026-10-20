@@ -78,7 +78,7 @@ export function SubmitButton({
       disabled={pending}
       className={cn(
         "inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-        size === "sm" ? "px-3 py-1 text-xs" : "px-4 py-2 text-sm",
+        size === "sm" ? "min-h-9 px-3 py-1 text-xs sm:min-h-0" : "min-h-10 px-4 py-2 text-sm sm:min-h-0",
         variants[variant],
         className,
       )}

@@ -19,7 +19,7 @@ export function VolumeTiersEditor({ tiers, action }: { tiers: VolumeTier[]; acti
 
   return (
     <ActionForm action={action}>
-      <div className="overflow-x-auto">
+      <div className="scroll-x">
         <table className="w-full min-w-[420px] text-sm">
           <caption className="sr-only">Tramos de descuento por volumen</caption>
           <thead className="text-left text-xs uppercase tracking-wide text-ink-3">

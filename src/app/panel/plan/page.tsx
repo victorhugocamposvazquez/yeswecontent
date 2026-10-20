@@ -61,10 +61,10 @@ export default async function PlanPage({ searchParams }: { searchParams: SP }) {
       />
 
       {view !== "mejoras" && (
-        <form className="mb-5 flex flex-wrap items-end gap-3" action="/panel/plan">
+        <form className="mb-5 grid grid-cols-2 items-end gap-3 sm:flex sm:flex-wrap" action="/panel/plan">
           <input type="hidden" name="vista" value={view} />
           {sp.mes && <input type="hidden" name="mes" value={sp.mes} />}
-          <div className="w-44">
+          <div className="min-w-0 sm:w-44">
             <label htmlFor="f-cluster" className="mb-1 block text-xs font-medium text-ink-3">
               Clúster
             </label>
@@ -75,7 +75,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SP }) {
               ))}
             </Select>
           </div>
-          <div className="w-44">
+          <div className="min-w-0 sm:w-44">
             <label htmlFor="f-estado" className="mb-1 block text-xs font-medium text-ink-3">
               Estado
             </label>
@@ -88,11 +88,11 @@ export default async function PlanPage({ searchParams }: { searchParams: SP }) {
               ))}
             </Select>
           </div>
-          <Button type="submit" variant="outline">
+          <Button type="submit" variant="outline" className="max-sm:col-span-2 max-sm:min-h-11">
             Filtrar
           </Button>
           {(sp.cluster || sp.estado) && (
-            <Link href={`/panel/plan?vista=${view}`} className="pb-2.5 text-sm text-ink-3 underline">
+            <Link href={`/panel/plan?vista=${view}`} className="inline-flex min-h-11 items-center justify-center text-sm text-ink-3 underline max-sm:col-span-2 sm:min-h-0 sm:pb-2.5">
               Quitar filtros
             </Link>
           )}
@@ -101,12 +101,12 @@ export default async function PlanPage({ searchParams }: { searchParams: SP }) {
 
       {view === "calendario" && (
         <Card className="overflow-hidden">
-          <div className="flex items-center justify-between border-b border-line px-4 py-3">
-            <Link href={`/panel/plan?${new URLSearchParams({ ...clean(extra), vista: view, mes: prevMonth })}`} className="rounded-full p-2 hover:bg-paper-2" aria-label="Mes anterior">
+          <div className="flex items-center justify-between border-b border-line px-4 py-2 md:py-3">
+            <Link href={`/panel/plan?${new URLSearchParams({ ...clean(extra), vista: view, mes: prevMonth })}`} className="-ml-2 grid h-10 w-10 place-items-center rounded-full hover:bg-paper-2" aria-label="Mes anterior">
               <ChevronLeft className="h-4 w-4" />
             </Link>
             <h2 className="font-semibold tracking-tight text-lg capitalize">{monthLabel}</h2>
-            <Link href={`/panel/plan?${new URLSearchParams({ ...clean(extra), vista: view, mes: nextMonth })}`} className="rounded-full p-2 hover:bg-paper-2" aria-label="Mes siguiente">
+            <Link href={`/panel/plan?${new URLSearchParams({ ...clean(extra), vista: view, mes: nextMonth })}`} className="-mr-2 grid h-10 w-10 place-items-center rounded-full hover:bg-paper-2" aria-label="Mes siguiente">
               <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
@@ -114,8 +114,65 @@ export default async function PlanPage({ searchParams }: { searchParams: SP }) {
         </Card>
       )}
 
+      {view === "lista" && filtered.length > 0 && (
+        <ul className="space-y-3 md:hidden">
+          {filtered.map((i) => {
+            const artId = articles.find((a) => a.content_item_id === i.id)?.id;
+            return (
+              <li key={i.id}>
+                <Card className="p-4">
+                  <div className="flex items-center justify-between gap-3 text-xs text-ink-3">
+                    <span className="font-medium uppercase tracking-wide">{i.scheduled_for ? fmtDate(i.scheduled_for) : "—"}</span>
+                    <ContentStatusBadge status={i.status} />
+                  </div>
+                  {artId ? (
+                    <Link href={`/panel/articulos/${artId}`} className="mt-2 block font-medium leading-snug hover:underline">
+                      {i.title}
+                    </Link>
+                  ) : (
+                    <p className="mt-2 font-medium leading-snug">{i.title}</p>
+                  )}
+                  <p className="mt-0.5 text-xs text-ink-3">
+                    {i.keyword}
+                    {i.intent && ` · ${INTENT_LABEL[i.intent]}`}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-2">
+                    {i.cluster && <Badge>{i.cluster}</Badge>}
+                    <span>
+                      Volumen <span className="font-semibold tabular-nums">{i.search_volume != null ? num(i.search_volume) : "—"}</span>
+                    </span>
+                    <span>
+                      Dific. <span className="font-semibold tabular-nums">{i.difficulty ?? "—"}</span>
+                    </span>
+                  </div>
+                  {i.status === "planned" && (
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-line pt-3">
+                      <ActionForm action={writeNow} submitLabel="Escribir ya" pendingLabel="Escribiendo…" variant="outline" inline>
+                        <input type="hidden" name="id" value={i.id} />
+                      </ActionForm>
+                      <ActionForm action={setContentStatus} submitLabel="Descartar" variant="ghost" inline>
+                        <input type="hidden" name="id" value={i.id} />
+                        <input type="hidden" name="status" value="skipped" />
+                      </ActionForm>
+                    </div>
+                  )}
+                  {i.status === "skipped" && (
+                    <div className="mt-3 border-t border-line pt-3">
+                      <ActionForm action={setContentStatus} submitLabel="Recuperar" variant="ghost" inline>
+                        <input type="hidden" name="id" value={i.id} />
+                        <input type="hidden" name="status" value="planned" />
+                      </ActionForm>
+                    </div>
+                  )}
+                </Card>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
       {view === "lista" && (
-        <Card className="overflow-x-auto">
+        <Card className={cn("scroll-x", filtered.length > 0 && "max-md:hidden")}>
           {filtered.length ? (
             <table className="w-full min-w-[760px] text-sm">
               <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-3">
@@ -189,7 +246,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SP }) {
       )}
 
       {view === "mejoras" && (
-        <div className="grid gap-6 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
           <Card className="p-6 lg:col-span-3">
             <h2 className="font-semibold">Artículos publicados</h2>
             <p className="mb-4 text-sm text-ink-3">Marca los que quieras renovar: actualizamos datos, ampliamos secciones y reforzamos la respuesta directa.</p>
@@ -318,7 +375,13 @@ function Calendar({ monthStart, items, articleByItem }: { monthStart: Date; item
             <li key={i.id} className="flex items-start gap-3 px-4 py-3">
               <span className="w-12 shrink-0 rounded-lg bg-paper-2 py-1 text-center text-xs font-semibold uppercase">{fmtDate(i.scheduled_for!)}</span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{i.title}</p>
+                {articleByItem.get(i.id) ? (
+                  <Link href={`/panel/articulos/${articleByItem.get(i.id)}`} className="text-sm font-medium hover:underline">
+                    {i.title}
+                  </Link>
+                ) : (
+                  <p className="text-sm font-medium">{i.title}</p>
+                )}
                 <div className="mt-1">
                   <ContentStatusBadge status={i.status} />
                 </div>

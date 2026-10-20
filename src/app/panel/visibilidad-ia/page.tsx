@@ -6,7 +6,7 @@ import { Badge, Card, EmptyState, Input, PageHeader, Stat } from "@/components/u
 import { getCurrentSite, getSubscription, getVisibility, listPlans } from "@/lib/data";
 import { getVisibilityHistory } from "@/lib/panel/data";
 import { MODELS, MODEL_LABEL, competitorCounts, latestByPromptModel, overallShare, shareByModel } from "@/lib/panel/visibility";
-import { fmtDate } from "@/lib/utils";
+import { cn, fmtDate } from "@/lib/utils";
 import { addPrompt, checkPromptNow, togglePrompt } from "../actions";
 
 export const metadata = { title: "Visibilidad IA" };
@@ -39,7 +39,7 @@ export default async function VisibilityPage() {
         <Stat label="Última revisión" value={lastCheck ? fmtDate(lastCheck) : "—"} />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="p-6 lg:col-span-2">
           <h2 className="font-semibold">Evolución de tu cuota de voz</h2>
           <p className="mb-4 text-sm text-ink-3">% de respuestas que te mencionan, por semana</p>
@@ -90,8 +90,51 @@ export default async function VisibilityPage() {
             <Input id="new-prompt" name="prompt" placeholder="¿Dónde comprar…?" className="md:w-80" required disabled={prompts.length >= limit} />
           </ActionForm>
         </div>
+        {prompts.length > 0 && (
+          <ul className="divide-y divide-line md:hidden">
+            {prompts.map((p) => (
+              <li key={p.id} className={cn("p-4", !p.active && "opacity-50")}>
+                <p className="font-medium leading-snug">{p.prompt}</p>
+                <dl className="mt-3 grid grid-cols-2 gap-2">
+                  {MODELS.map((m) => {
+                    const c = latest.get(`${p.id}:${m}`);
+                    return (
+                      <div key={m} className="flex items-center justify-between gap-2 rounded-lg bg-paper px-3 py-2">
+                        <dt className="truncate text-xs text-ink-3">{MODEL_LABEL[m]}</dt>
+                        <dd>
+                          {!c ? (
+                            <span className="text-xs text-ink-3">pendiente</span>
+                          ) : c.mentioned ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-ok/12 px-2 py-0.5 text-xs font-semibold text-ok">
+                              <Check className="h-3.5 w-3.5" aria-hidden /> #{c.position}
+                              <span className="sr-only">Mencionado en posición {c.position}</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex text-ink-3">
+                              <Minus className="h-4 w-4" aria-hidden />
+                              <span className="sr-only">No mencionado</span>
+                            </span>
+                          )}
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+                <div className="mt-2 flex gap-1">
+                  <ActionForm action={checkPromptNow} submitLabel="Comprobar" variant="ghost" pendingLabel="Preguntando…" inline>
+                    <input type="hidden" name="id" value={p.id} />
+                  </ActionForm>
+                  <ActionForm action={togglePrompt} submitLabel={p.active ? "Pausar" : "Reactivar"} variant="ghost" inline>
+                    <input type="hidden" name="id" value={p.id} />
+                    <input type="hidden" name="active" value={String(!p.active)} />
+                  </ActionForm>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
         {prompts.length ? (
-          <div className="overflow-x-auto">
+          <div className="scroll-x max-md:hidden">
             <table className="w-full min-w-[720px] text-sm">
               <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-3">
                 <tr>
@@ -153,7 +196,7 @@ export default async function VisibilityPage() {
         )}
       </Card>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <h2 className="font-semibold">Competidores que aparecen</h2>
           <p className="mb-4 text-sm text-ink-3">Veces que los modelos los nombran en tus preguntas</p>

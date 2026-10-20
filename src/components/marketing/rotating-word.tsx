@@ -6,7 +6,7 @@ import { ROTATING_ENGINES } from "@/lib/marketing/social-proof";
 import { BrandLogo } from "./brand-logo";
 
 /** Motor que rota cada ~2 s con su logotipo. Decorativo: el texto completo va en sr-only en el titular. */
-export function RotatingWord() {
+export function RotatingWord({ className }: { className?: string }) {
   const [i, setI] = useState(0);
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -15,7 +15,7 @@ export function RotatingWord() {
   }, []);
 
   return (
-    <span aria-hidden className="relative inline-grid overflow-hidden pb-[0.1em] align-bottom">
+    <span aria-hidden className={cn("relative inline-grid overflow-hidden pb-[0.1em] align-bottom", className)}>
       {ROTATING_ENGINES.map((w, k) => {
         const state = k === i ? "now" : k === (i - 1 + ROTATING_ENGINES.length) % ROTATING_ENGINES.length ? "prev" : "next";
         return (

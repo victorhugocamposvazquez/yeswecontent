@@ -94,7 +94,7 @@ export function SignInForm({ next, initialError }: { next: string; initialError?
           <Field
             label="Contraseña"
             aside={
-              <Link href="/recuperar" className="text-xs font-medium text-ink-3 hover:text-ink">
+              <Link href="/recuperar" className="-my-2 inline-flex min-h-8 items-center text-xs font-medium text-ink-3 hover:text-ink">
                 ¿La olvidaste?
               </Link>
             }

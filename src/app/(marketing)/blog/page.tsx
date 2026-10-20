@@ -49,7 +49,7 @@ export default function BlogPage() {
       </section>
       <Section>
         <Container>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {posts.map((p, i) => (
               <article key={p.title} className={`flex flex-col rounded-2xl border border-line bg-card ${i === 0 ? "md:col-span-3 md:flex-row" : ""}`}>
                 <div className={`grid place-items-center border-b border-line ${p.color} ${i === 0 ? "aspect-[16/9] md:aspect-auto md:w-1/2 md:border-r md:border-b-0" : "aspect-[16/9]"}`}>

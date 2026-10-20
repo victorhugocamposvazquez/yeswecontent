@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   },
   description:
     "yeswecontent planifica, escribe y publica el contenido de tu web, consigue enlaces y vigila si ChatGPT, Claude o Gemini te recomiendan.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -95,7 +95,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
           {series.length ? <AreaChart data={series.map((p) => p.clicks)} /> : <p className="text-sm text-ink-3">Sin datos de Search Console.</p>}
         </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
+        <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="break-inside-avoid">
             <h2 className="mb-3 font-semibold">Visibilidad en IA · {overallShare(vis.checks)}%</h2>
             <Bars data={shareByModel(vis.checks).map((m) => ({ label: m.label, value: m.share }))} />
@@ -118,8 +118,8 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                 {published.map((a) => (
                   <tr key={a.id}>
                     <td className="py-2">{a.title}</td>
-                    <td className="py-2 text-right text-ink-3">{fmtDate(a.published_at!)}</td>
-                    <td className="py-2 text-right tabular-nums">{a.quality_score}/100</td>
+                    <td className="whitespace-nowrap py-2 pl-3 text-right text-ink-3">{fmtDate(a.published_at!)}</td>
+                    <td className="whitespace-nowrap py-2 pl-3 text-right tabular-nums">{a.quality_score}/100</td>
                   </tr>
                 ))}
               </tbody>

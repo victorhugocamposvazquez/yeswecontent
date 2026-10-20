@@ -35,7 +35,7 @@ export default async function SettingsPage() {
   return (
     <>
       <PageHeader title="Ajustes globales" intro="Afectan a toda la plataforma y a todos los clientes. Cambia con cuidado." />
-      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_22rem]">
         <Card className="p-5 sm:p-6">
           <ActionForm action={saveSettings} className="space-y-6">
             <section aria-labelledby="gen" className="rounded-xl border border-line p-4">
@@ -60,7 +60,7 @@ export default async function SettingsPage() {
               </label>
             </section>
 
-            <section aria-labelledby="ai" className="grid gap-4 sm:grid-cols-2">
+            <section aria-labelledby="ai" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <h2 id="ai" className="font-semibold sm:col-span-2">
                 Modelo de IA por defecto
               </h2>

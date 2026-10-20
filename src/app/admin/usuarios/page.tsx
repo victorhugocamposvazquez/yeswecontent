@@ -25,7 +25,7 @@ export default async function UsersPage({ searchParams }: { searchParams: SP }) 
     <>
       <PageHeader title="Usuarios" intro={`${num(users.length)} cuentas registradas. Busca por email, nombre o espacio de trabajo.`} />
       <FilterBar action="/admin/usuarios" resetHref="/admin/usuarios">
-        <FilterField label="Buscar" className="min-w-56 flex-1">
+        <FilterField label="Buscar" className="col-span-2 sm:min-w-56 sm:flex-1">
           <Input type="search" name="q" defaultValue={q} placeholder="email, nombre o empresa" />
         </FilterField>
         <FilterField label="Estado">

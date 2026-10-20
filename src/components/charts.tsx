@@ -29,7 +29,7 @@ export function Bars({ data, className }: { data: { label: string; value: number
   return (
     <div className={cn("space-y-2.5", className)}>
       {data.map((d) => (
-        <div key={d.label} className="grid grid-cols-[7rem_1fr_3rem] items-center gap-3 text-sm">
+        <div key={d.label} className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_3rem] items-center gap-3 text-sm">
           <span className="truncate text-ink-2">{d.label}</span>
           <span className="h-2.5 overflow-hidden rounded-full bg-paper-2">
             <span className="block h-full rounded-full bg-ink" style={{ width: `${(d.value / max) * 100}%` }} />

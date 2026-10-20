@@ -53,7 +53,7 @@ export default async function SocialPage({ searchParams }: { searchParams: Promi
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge tone={STATUS[p.status].tone}>{STATUS[p.status].label}</Badge>
                 {p.thread_url && (
-                  <a href={p.thread_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-ink-3 hover:text-ink">
+                  <a href={p.thread_url} target="_blank" rel="noreferrer" className="-my-2 inline-flex min-h-10 items-center gap-1 text-xs text-ink-3 hover:text-ink sm:min-h-0">
                     Ver conversación <ExternalLink className="h-3 w-3" aria-hidden />
                   </a>
                 )}

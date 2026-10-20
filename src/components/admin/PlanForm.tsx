@@ -11,7 +11,7 @@ export function PlanForm({ plan, action }: { plan?: AdminPlan; action: (p: Actio
   const uid = p?.id ?? "nuevo";
   return (
     <ActionForm action={action} className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Field label="Identificador" hint={p ? "No editable: lo usan las suscripciones." : "Minúsculas, sin espacios (p. ej. «huerta»)."}>
           <Input name="id" defaultValue={p?.id} readOnly={!!p} required pattern="[a-z0-9-]+" className={p ? "bg-paper-2 text-ink-2" : undefined} />
         </Field>
@@ -23,7 +23,7 @@ export function PlanForm({ plan, action }: { plan?: AdminPlan; action: (p: Actio
         </Field>
       </div>
 
-      <fieldset className="grid gap-4 sm:grid-cols-2">
+      <fieldset className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-3">Precio por sitio</legend>
         <Field label="Mensual (€/mes)">
           <Input name="monthly_price" inputMode="decimal" defaultValue={p ? euros(p.monthly_price_eur) : ""} required />

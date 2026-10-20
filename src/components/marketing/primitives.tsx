@@ -68,8 +68,8 @@ export function Faq({ items, className }: { items: { q: string; a: ReactNode }[]
   return (
     <div className={cn("divide-y divide-line border-y border-line", className)}>
       {items.map((it) => (
-        <details key={it.q} className="group py-5">
-          <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+        <details key={it.q} className="group">
+          <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-lg font-semibold [&::-webkit-details-marker]:hidden">
             <span>{it.q}</span>
             <span
               aria-hidden
@@ -78,7 +78,7 @@ export function Faq({ items, className }: { items: { q: string; a: ReactNode }[]
               +
             </span>
           </summary>
-          <div className="mt-3 max-w-3xl text-ink-2 leading-relaxed">{it.a}</div>
+          <div className="-mt-2 max-w-3xl pb-5 text-ink-2 leading-relaxed">{it.a}</div>
         </details>
       ))}
     </div>

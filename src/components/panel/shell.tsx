@@ -20,6 +20,8 @@ import {
   ShieldCheck,
   Sparkles,
   X,
+  MessagesSquare,
+  Users,
 } from "lucide-react";
 import { Logo } from "@/components/ui";
 import { cn } from "@/lib/utils";
@@ -40,6 +42,8 @@ const NAV: { group: string; items: { href: string; label: string; icon: typeof L
       { href: "/panel/visibilidad-ia", label: "Visibilidad IA", icon: Sparkles },
       { href: "/panel/auditoria", label: "Auditoría", icon: ShieldCheck },
       { href: "/panel/enlaces", label: "Enlaces", icon: Link2 },
+      { href: "/panel/especialista", label: "Especialista SEO", icon: MessagesSquare },
+      { href: "/agencia/clientes", label: "Clientes (agencia)", icon: Users },
     ],
   },
   {
@@ -80,7 +84,12 @@ export function PanelShell({
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
   }, [open]);
 
   const initials = user.name
@@ -96,7 +105,7 @@ export function PanelShell({
         <Link href="/panel" aria-label="Ir al resumen">
           <Logo />
         </Link>
-        <button type="button" className="rounded-full p-2 hover:bg-paper-2 lg:hidden" onClick={() => setOpen(false)} aria-label="Cerrar menú">
+        <button type="button" className="-mr-2 grid h-11 w-11 place-items-center rounded-full hover:bg-paper-2 lg:hidden" onClick={() => setOpen(false)} aria-label="Cerrar menú">
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -114,7 +123,7 @@ export function PanelShell({
                       href={it.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition",
+                        "flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm transition lg:py-1.5 lg:text-[13px]",
                         active ? "bg-paper-2 font-medium text-ink" : "text-ink-2 hover:bg-paper-2 hover:text-ink",
                       )}
                     >
@@ -132,12 +141,12 @@ export function PanelShell({
         <Link
           href="/panel/ajustes/cuenta"
           aria-current={path.startsWith("/panel/ajustes") ? "page" : undefined}
-          className={cn("flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px]", path.startsWith("/panel/ajustes") ? "bg-paper-2 font-medium text-ink" : "text-ink-2 hover:bg-paper-2")}
+          className={cn("flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm lg:py-1.5 lg:text-[13px]", path.startsWith("/panel/ajustes") ? "bg-paper-2 font-medium text-ink" : "text-ink-2 hover:bg-paper-2")}
         >
           <Settings className="h-4 w-4" aria-hidden /> Ajustes
         </Link>
         {isAdmin && (
-          <Link href="/admin" className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] text-ink-2 hover:bg-paper-2">
+          <Link href="/admin" className="flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm text-ink-2 lg:py-1.5 lg:text-[13px] hover:bg-paper-2">
             <Shield className="h-4 w-4" aria-hidden /> Administración
           </Link>
         )}
@@ -153,14 +162,14 @@ export function PanelShell({
             <ChevronDown className="h-4 w-4 text-ink-3 transition group-open:rotate-180" aria-hidden />
           </summary>
           <div className="absolute bottom-full left-0 right-0 mb-2 rounded-xl border border-line bg-card p-1 shadow-lg">
-            <Link href="/panel/ajustes/cuenta" className="block rounded-lg px-3 py-2 text-sm hover:bg-paper-2">
+            <Link href="/panel/ajustes/cuenta" className="block rounded-lg px-3 py-2.5 text-sm hover:bg-paper-2 lg:py-2">
               Mi cuenta
             </Link>
-            <Link href="/panel/ajustes/facturacion" className="block rounded-lg px-3 py-2 text-sm hover:bg-paper-2">
+            <Link href="/panel/ajustes/facturacion" className="block rounded-lg px-3 py-2.5 text-sm hover:bg-paper-2 lg:py-2">
               Facturación
             </Link>
             <form action={logoutAction}>
-              <button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-bad hover:bg-paper-2">
+              <button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-bad hover:bg-paper-2 lg:py-2">
                 <LogOut className="h-4 w-4" aria-hidden /> Cerrar sesión
               </button>
             </form>
@@ -184,21 +193,21 @@ export function PanelShell({
         {open && (
           <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Menú del panel">
             <button type="button" className="absolute inset-0 bg-ink/40" aria-label="Cerrar menú" onClick={() => setOpen(false)} />
-            <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card shadow-xl">{sidebar}</aside>
+            <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto bg-card pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-xl">{sidebar}</aside>
           </div>
         )}
 
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-paper/90 px-4 py-3 backdrop-blur md:px-8 print:hidden">
-            <button type="button" className="rounded-full p-2 hover:bg-paper-2 lg:hidden" onClick={() => setOpen(true)} aria-label="Abrir menú" aria-expanded={open}>
+          <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-paper/90 px-4 py-2 backdrop-blur md:px-8 lg:gap-3 lg:py-3 print:hidden">
+            <button type="button" className="-ml-2 grid h-11 w-11 shrink-0 place-items-center rounded-full hover:bg-paper-2 lg:hidden" onClick={() => setOpen(true)} aria-label="Abrir menú" aria-expanded={open}>
               <Menu className="h-5 w-5" />
             </button>
-            <div className="lg:hidden">
-              <Logo className="scale-90" />
-            </div>
-            <div className="ml-auto flex items-center gap-2">{topBadge}</div>
+            <Link href="/panel" aria-label="Ir al resumen" className="min-w-0 lg:hidden">
+              <Logo className="origin-left scale-90" />
+            </Link>
+            <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2">{topBadge}</div>
           </header>
-          <main className="mx-auto max-w-6xl px-4 py-8 md:px-8">{children}</main>
+          <main className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">{children}</main>
         </div>
       </div>
     </div>

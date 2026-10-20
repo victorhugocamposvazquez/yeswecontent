@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         Suplantación activa: <code className="font-mono">{impersonating}</code>. Todo lo que hagas en /panel se hará como ese usuario.
       </span>
       <form action={stopImpersonation}>
-        <button type="submit" className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-paper hover:bg-ink-2">
+        <button type="submit" className="rounded-full bg-ink px-3 py-2 text-xs font-semibold text-paper hover:bg-ink-2 sm:py-1">
           Terminar suplantación
         </button>
       </form>

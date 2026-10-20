@@ -35,7 +35,9 @@ export function ArticleEditor({
   const [body, setBody] = useState(article.body_md);
   const [faq, setFaq] = useState(article.faq ?? []);
   const [keyword, setKeyword] = useState(initialKeyword);
-  const [pane, setPane] = useState<"edit" | "preview">("edit");
+  // Pestañas en móvil/tablet (< lg). En escritorio todo se ve a la vez.
+  const [tab, setTab] = useState<"edit" | "preview" | "seo">("edit");
+  const mobileHidden = (t: typeof tab) => tab !== t && "max-lg:hidden";
 
   const [saveState, saveAction] = useActionState(actions.save, null);
   const [regenState, regenAction] = useActionState(actions.regenerate, null);
@@ -52,17 +54,38 @@ export function ArticleEditor({
   const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div role="tablist" aria-label="Modo del editor" className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-paper-2 p-1 lg:hidden">
+        {(
+          [
+            ["edit", "Editar"],
+            ["preview", "Vista previa"],
+            ["seo", "SEO"],
+          ] as const
+        ).map(([t, label]) => (
+          <button
+            key={t}
+            type="button"
+            role="tab"
+            aria-selected={tab === t}
+            onClick={() => setTab(t)}
+            className={cn("min-h-10 rounded-lg px-2 text-sm font-medium transition", tab === t ? "bg-card text-ink shadow-sm" : "text-ink-2")}
+          >
+            {label}
+            {t === "seo" && <span className="ml-1 tabular-nums text-ink-3">{score.score}</span>}
+          </button>
+        ))}
+      </div>
       <form action={saveAction} className="min-w-0 space-y-6">
         <input type="hidden" name="id" value={article.id} />
         <input type="hidden" name="faq" value={JSON.stringify(faq)} />
         <input type="hidden" name="body_md" value={body} />
 
-        <Card className="space-y-4 p-5 md:p-6">
+        <Card className={cn("space-y-4 p-5 md:p-6", tab === "preview" && "max-lg:hidden")}>
           <Field label="Título (H1 y título SEO)" hint={`${title.length}/60 caracteres recomendados`}>
             <Input name="title" value={title} onChange={(e) => setTitle(e.target.value)} className="font-semibold tracking-tight text-xl" />
           </Field>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className={cn("grid grid-cols-1 gap-4 md:grid-cols-2", mobileHidden("seo"))}>
             <Field label="Slug (URL)">
               <Input name="slug" value={slug} onChange={(e) => setSlug(slugify(e.target.value) || e.target.value)} />
             </Field>
@@ -70,10 +93,12 @@ export function ArticleEditor({
               <Input name="keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
             </Field>
           </div>
-          <Field label="Meta descripción" hint={`${meta.length}/160 caracteres`}>
-            <Textarea name="meta_description" rows={2} value={meta} onChange={(e) => setMeta(e.target.value)} />
-          </Field>
-          <div>
+          <div className={cn(mobileHidden("seo"))}>
+            <Field label="Meta descripción" hint={`${meta.length}/160 caracteres`}>
+              <Textarea name="meta_description" rows={2} value={meta} onChange={(e) => setMeta(e.target.value)} />
+            </Field>
+          </div>
+          <div className={cn(mobileHidden("seo"))}>
             <p className="mb-1.5 text-sm font-medium text-ink-2">Así se verá en Google</p>
             <div className="rounded-xl border border-line bg-white p-4 font-sans">
               <p className="truncate text-xs text-[#4d5156]">
@@ -85,27 +110,14 @@ export function ArticleEditor({
           </div>
         </Card>
 
-        <Card className="overflow-hidden">
+        <Card className={cn("overflow-hidden", tab === "seo" && "max-lg:hidden")}>
           <div className="flex items-center justify-between border-b border-line px-4 py-2">
-            <div className="flex gap-1 lg:hidden" role="tablist" aria-label="Modo del editor">
-              {(["edit", "preview"] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  role="tab"
-                  aria-selected={pane === p}
-                  onClick={() => setPane(p)}
-                  className={cn("rounded-full px-3 py-1 text-sm", pane === p ? "bg-ink text-paper" : "text-ink-2 hover:bg-paper-2")}
-                >
-                  {p === "edit" ? "Markdown" : "Vista previa"}
-                </button>
-              ))}
-            </div>
+            <p className="text-sm font-medium text-ink-2 lg:hidden">{tab === "preview" ? "Vista previa" : "Markdown"}</p>
             <p className="hidden text-sm font-medium text-ink-2 lg:block">Markdown · Vista previa en directo</p>
             <p className="text-xs text-ink-3">{score.word_count} palabras</p>
           </div>
-          <div className="grid lg:grid-cols-2">
-            <div className={cn(pane === "preview" && "hidden lg:block")}>
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            <div className={cn(tab !== "edit" && "hidden lg:block")}>
               <label htmlFor="body" className="sr-only">
                 Texto del artículo en Markdown
               </label>
@@ -114,10 +126,10 @@ export function ArticleEditor({
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 spellCheck
-                className="h-[560px] w-full resize-y border-0 bg-card p-4 font-mono text-[13px] leading-relaxed outline-none focus:ring-2 focus:ring-inset focus:ring-lime lg:border-r lg:border-line"
+                className="h-[65svh] min-h-80 w-full resize-y border-0 bg-card p-4 font-mono text-[13px] lg:h-[560px] leading-relaxed outline-none focus:ring-2 focus:ring-inset focus:ring-lime lg:border-r lg:border-line"
               />
             </div>
-            <div className={cn("h-[560px] overflow-y-auto bg-white p-5", pane === "edit" && "hidden lg:block")}>
+            <div className={cn("bg-white p-5 lg:h-[560px] lg:overflow-y-auto", tab !== "preview" && "hidden lg:block")}>
               <h1 className="mb-4 font-semibold tracking-tight text-xl leading-tight">{title}</h1>
               <div className={proseClass} dangerouslySetInnerHTML={{ __html: html }} />
               {faq.length > 0 && (
@@ -135,13 +147,13 @@ export function ArticleEditor({
           </div>
         </Card>
 
-        <Card className="p-5 md:p-6">
-          <div className="mb-4 flex items-center justify-between">
+        <Card className={cn("p-5 md:p-6", mobileHidden("edit"))}>
+          <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <h2 className="font-semibold">Preguntas frecuentes</h2>
               <p className="text-sm text-ink-3">Se publican al final del artículo y en el schema FAQPage.</p>
             </div>
-            <button type="button" onClick={() => setFaq([...faq, { q: "", a: "" }])} className="inline-flex items-center gap-1.5 rounded-full border border-ink px-3 py-1.5 text-sm font-medium hover:bg-ink hover:text-paper">
+            <button type="button" onClick={() => setFaq([...faq, { q: "", a: "" }])} className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-ink px-3 py-1.5 text-sm font-medium hover:bg-ink hover:text-paper lg:min-h-0">
               <Plus className="h-4 w-4" aria-hidden /> Añadir
             </button>
           </div>
@@ -159,7 +171,7 @@ export function ArticleEditor({
                     </label>
                     <Textarea id={`faq-a-${i}`} rows={2} placeholder="Respuesta breve y directa" value={f.a} onChange={(e) => setFaq(faq.map((x, j) => (j === i ? { ...x, a: e.target.value } : x)))} />
                   </div>
-                  <button type="button" onClick={() => setFaq(faq.filter((_, j) => j !== i))} className="rounded-full p-2 text-ink-3 hover:bg-paper-2 hover:text-bad" aria-label={`Eliminar pregunta ${i + 1}`}>
+                  <button type="button" onClick={() => setFaq(faq.filter((_, j) => j !== i))} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink-3 hover:bg-paper-2 hover:text-bad" aria-label={`Eliminar pregunta ${i + 1}`}>
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -169,19 +181,19 @@ export function ArticleEditor({
           </ol>
         </Card>
 
-        <details className="rounded-2xl border border-line bg-card">
-          <summary className="cursor-pointer px-5 py-3 text-sm font-medium">Datos estructurados (JSON-LD)</summary>
+        <details className={cn("rounded-2xl border border-line bg-card", mobileHidden("seo"))}>
+          <summary className="cursor-pointer px-5 py-3.5 text-sm font-medium lg:py-3">Datos estructurados (JSON-LD)</summary>
           <pre className="overflow-x-auto border-t border-line bg-paper p-4 text-xs">{jsonLd}</pre>
         </details>
 
-        <div className="sticky bottom-0 z-10 -mx-4 flex flex-wrap items-center gap-3 border-t border-line bg-paper/95 px-4 py-3 backdrop-blur md:mx-0 md:rounded-2xl md:border">
+        <div className="sticky bottom-0 z-10 -mx-4 flex flex-wrap items-center gap-3 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur md:mx-0 md:rounded-2xl md:border md:pb-3">
           <SubmitButton pendingLabel="Guardando…">Guardar cambios</SubmitButton>
           <Notice state={saveState} />
         </div>
       </form>
 
-      <aside className="space-y-6">
-        <Card className="p-5">
+      <aside className="min-w-0 space-y-6">
+        <Card className={cn("p-5", mobileHidden("seo"))}>
           <h2 className="font-semibold">Calidad</h2>
           <p className="mb-3 text-xs text-ink-3">Se recalcula mientras escribes.</p>
           <div className="flex justify-center">

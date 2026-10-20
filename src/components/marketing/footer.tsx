@@ -33,7 +33,7 @@ export function MarketingFooter() {
   return (
     <footer className="border-t border-line bg-ink text-paper">
       <div className="mx-auto max-w-6xl px-4 pt-16 pb-10 sm:px-6">
-        <div className="grid gap-12 lg:grid-cols-[1.3fr_2fr]">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.3fr_2fr]">
           <div>
             <Logo inverted />
             <p className="mt-5 max-w-sm font-display text-3xl leading-tight">
@@ -50,10 +50,10 @@ export function MarketingFooter() {
             {cols.map((c) => (
               <div key={c.title}>
                 <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-lime">{c.title}</p>
-                <ul className="mt-4 space-y-2.5 text-sm">
+                <ul className="mt-3 space-y-0.5 text-sm sm:mt-4 sm:space-y-2.5">
                   {c.links.map((l) => (
                     <li key={l.href}>
-                      <Link href={l.href} className="text-paper/75 hover:text-paper hover:underline">
+                      <Link href={l.href} className="inline-block py-2 text-paper/75 hover:text-paper hover:underline sm:py-0">
                         {l.label}
                       </Link>
                     </li>
@@ -66,14 +66,14 @@ export function MarketingFooter() {
 
         <div className="mt-16 flex flex-col gap-4 border-t border-paper/15 pt-8 text-xs text-paper/55 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} yeswecontent S.L. Hecho con café y criterio editorial.</p>
-          <div className="flex flex-wrap gap-5">
-            <Link href="/legal/privacidad" className="hover:text-paper">
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
+            <Link href="/legal/privacidad" className="inline-block py-2 hover:text-paper sm:py-0">
               Privacidad
             </Link>
-            <Link href="/legal/terminos" className="hover:text-paper">
+            <Link href="/legal/terminos" className="inline-block py-2 hover:text-paper sm:py-0">
               Términos
             </Link>
-            <a href="mailto:hola@yeswecontent.com" className="hover:text-paper">
+            <a href="mailto:hola@yeswecontent.com" className="inline-block py-2 hover:text-paper sm:py-0">
               hola@yeswecontent.com
             </a>
           </div>

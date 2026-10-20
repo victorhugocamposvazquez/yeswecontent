@@ -23,7 +23,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <>
-      <Link href="/admin/usuarios" className="mb-4 inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink">
+      <Link href="/admin/usuarios" className="mb-2 -mt-2 inline-flex min-h-10 items-center gap-1.5 text-sm text-ink-2 hover:text-ink sm:mt-0 sm:mb-4 sm:min-h-0">
         <ArrowLeft className="size-4" aria-hidden /> Usuarios
       </Link>
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
@@ -44,7 +44,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         </ActionForm>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="p-5">
           <h2 className="font-semibold">Espacio de trabajo</h2>
           {workspace ? (

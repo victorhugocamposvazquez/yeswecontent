@@ -84,3 +84,57 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ticker { animation: none; }
 }
+
+/* ───────── Móvil ───────── */
+
+/* iOS hace zoom al enfocar campos con fuente < 16px: lo evitamos en pantallas pequeñas. */
+@media (max-width: 639.98px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(21, 19, 15, 0.08);
+}
+
+/*
+ * Contenedor con scroll horizontal y sombras laterales que indican que hay más contenido.
+ * --scroll-bg: color del fondo del contenedor; --scroll-shadow: color de la sombra.
+ */
+.scroll-x {
+  position: relative;
+  /* No aporta su ancho de contenido al padre: evita que grids y flex se ensanchen. */
+  contain: inline-size;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(to right, var(--scroll-bg, var(--card)) 30%, transparent) left center / 32px 100% no-repeat local,
+    linear-gradient(to left, var(--scroll-bg, var(--card)) 30%, transparent) right center / 32px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--scroll-shadow, rgba(21, 19, 15, 0.16)), transparent) left center / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow, rgba(21, 19, 15, 0.16)), transparent) right center / 12px 100% no-repeat scroll;
+  background-color: var(--scroll-bg, var(--card));
+}
+
+/* Barras de chips con scroll horizontal sin barra visible. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Con viewport-fit=cover, el contenido no debe quedar bajo el notch en horizontal. */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

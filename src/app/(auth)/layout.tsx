@@ -4,13 +4,13 @@ import { isDemo } from "@/lib/env";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1fr_1fr]">
+    <div className="grid grid-cols-1 min-h-screen lg:grid-cols-[1fr_1fr]">
       <div className="flex flex-col px-4 py-6 sm:px-10">
         <div className="flex items-center justify-between">
           <Link href="/" aria-label="yeswecontent, inicio">
             <Logo />
           </Link>
-          <Link href="/" className="text-sm font-medium text-ink-2 hover:text-ink">
+          <Link href="/" className="-mr-2 inline-flex min-h-11 items-center px-2 text-sm font-medium text-ink-2 hover:text-ink">
             ← Volver a la web
           </Link>
         </div>

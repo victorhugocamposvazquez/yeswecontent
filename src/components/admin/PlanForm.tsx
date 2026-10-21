@@ -43,7 +43,7 @@ export function PlanForm({ plan, action }: { plan?: AdminPlan; action: (p: Actio
           <Field label="Mensual (€/mes)">
             <Input name="monthly_price" inputMode="decimal" defaultValue={p ? euros(p.monthly_price_eur) : ""} required className="tabular" />
           </Field>
-          <Field label="Anual (€/mes)">
+          <Field label="Anual (€/mes)" hint="Suele ser un 15 % menos que el mensual (lo que se cobra en Stripe al año es este importe × 12).">
             <Input name="yearly_price" inputMode="decimal" defaultValue={p ? euros(p.yearly_price_eur) : ""} required className="tabular" />
           </Field>
           <Field label="Stripe price mensual">

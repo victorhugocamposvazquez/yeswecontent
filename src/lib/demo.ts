@@ -41,7 +41,7 @@ export const plans: Plan[] = [
     id: "semilla",
     name: "Semilla",
     monthly_price_eur: 7900,
-    yearly_price_eur: 3900,
+    yearly_price_eur: 6715, // −15 % vs mensual
     articles_per_month: 20,
     tracked_prompts: 10,
     languages: 1,
@@ -56,7 +56,7 @@ export const plans: Plan[] = [
     id: "cosecha",
     name: "Cosecha",
     monthly_price_eur: 29900,
-    yearly_price_eur: 14900,
+    yearly_price_eur: 25415, // −15 % vs mensual
     articles_per_month: 80,
     tracked_prompts: 40,
     languages: 4,
@@ -340,8 +340,8 @@ export const leads: Lead[] = [
 
 export const adminUsers: AdminUserRow[] = [
   { id: "u_demo", email: "lucia@tierrafina.es", full_name: "Lucía Robles", workspace: "Tierrafina", sites: 2, plan_id: "cosecha", status: "active", mrr_eur: 29800, created_at: iso(-64) },
-  { id: "u2", email: "pablo@clinicaazahar.es", full_name: "Pablo Medina", workspace: "Clínica Azahar", sites: 1, plan_id: "semilla", status: "active", mrr_eur: 3900, created_at: iso(-120) },
-  { id: "u3", email: "ana@rutasnorte.com", full_name: "Ana Etxeberria", workspace: "Rutas Norte", sites: 1, plan_id: "cosecha", status: "active", mrr_eur: 14900, created_at: iso(-95) },
+  { id: "u2", email: "pablo@clinicaazahar.es", full_name: "Pablo Medina", workspace: "Clínica Azahar", sites: 1, plan_id: "semilla", status: "active", mrr_eur: 6715, created_at: iso(-120) },
+  { id: "u3", email: "ana@rutasnorte.com", full_name: "Ana Etxeberria", workspace: "Rutas Norte", sites: 1, plan_id: "cosecha", status: "active", mrr_eur: 25415, created_at: iso(-95) },
   { id: "u4", email: "javier@legalclaro.es", full_name: "Javier Prieto", workspace: "LegalClaro", sites: 1, plan_id: "semilla", status: "past_due", mrr_eur: 7900, created_at: iso(-40) },
   { id: "u5", email: "irene@nidostudio.es", full_name: "Irene Sanz", workspace: "Nido Studio (agencia)", sites: 18, plan_id: "agencia", status: "active", mrr_eur: 168000, created_at: iso(-210) },
   { id: "u6", email: "dani@pedalea.shop", full_name: "Dani Ortega", workspace: "Pedalea", sites: 1, plan_id: "semilla", status: "trialing", mrr_eur: 0, created_at: iso(-1) },

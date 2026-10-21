@@ -552,7 +552,7 @@ export default async function HomePage() {
               <Title className="mt-4">
                 Menos que un freelance, <span className="marker">más constante</span> que nadie.
               </Title>
-              <Lead className="mt-5 max-w-lg">Un precio por web, todo incluido. Pagando al año ahorras en torno a la mitad. Y si gestionas varias webs, hay descuento por volumen.</Lead>
+              <Lead className="mt-5 max-w-lg">Un precio por web, todo incluido. Pagando al año ahorras un 15&nbsp;%. Y si gestionas varias webs, hay descuento por volumen.</Lead>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <CtaLink href="/precios">Ver planes</CtaLink>
                 <TextLink href="/agencias">¿Eres agencia?</TextLink>

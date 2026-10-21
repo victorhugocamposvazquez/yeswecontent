@@ -2,6 +2,13 @@ import type { Plan } from "./types";
 
 export type PlanInterval = "month" | "year";
 
+/** Descuento estándar del pago anual frente al tarifario mensual. */
+export const ANNUAL_BILLING_DISCOUNT_PERCENT = 15;
+
+export function annualMonthlyCentsFromMonthly(monthlyCents: number) {
+  return Math.round(monthlyCents * (1 - ANNUAL_BILLING_DISCOUNT_PERCENT / 100));
+}
+
 /** Precio en céntimos por mes (con anual, la cuota mensual equivalente del pago anual). */
 export function planMonthlyCents(p: Pick<Plan, "monthly_price_eur" | "yearly_price_eur">, interval: PlanInterval) {
   return interval === "year" ? p.yearly_price_eur || p.monthly_price_eur : p.monthly_price_eur;

@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, Check, Globe, LoaderCircle, Phone, Plus, Sparkles, Users, WandSparkles, X } from "lucide-react";
 import { Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import type { Plan } from "@/lib/types";
+import {
+  maxPlanAnnualSavingsPercent,
+  planAnnualSavingsCents,
+  planAnnualSavingsPercent,
+  planMonthlyCents,
+  planYearlyTotalAtAnnualRate,
+  planYearlyTotalAtMonthlyRate,
+} from "@/lib/plans";
 import { cn, eur } from "@/lib/utils";
 import { finishOnboarding, saveOnboardingStep } from "./actions";
 import { ConnectionsStep, type OAuthReturn } from "./connections-step";
@@ -48,6 +56,7 @@ const DAYS: [string, string][] = [
 ];
 const TONES = ["Cercano y claro, con criterio experto", "Profesional y sobrio", "Divertido y directo", "Inspirador y cálido", "Técnico y preciso"];
 const SOURCES = ["Google", "ChatGPT u otra IA", "Recomendación", "LinkedIn", "Instagram o TikTok", "YouTube o podcast", "Un evento", "Otro"];
+const CMS_OPTIONS = ["WordPress", "Shopify", "Webflow", "Ghost", "Webhook", "Blog alojado", "Otro"] as const;
 
 const STORAGE_KEY = "ywc_onboarding";
 
@@ -69,6 +78,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
   const [aiLoading, setAiLoading] = useState(false);
   const [aiNote, setAiNote] = useState<string | null>(null);
   const [oauth, setOauth] = useState<OAuthReturn | null>(null);
+  const maxAnnualSave = useMemo(() => maxPlanAnnualSavingsPercent(plans), [plans]);
 
   // Vuelta de una conexión OAuth (?oauth=google&estado=ok|error&motivo=…): lo mostramos y limpiamos la URL.
   useEffect(() => {
@@ -509,14 +519,21 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
               <fieldset>
                 <legend className="mb-2 mt-3 text-sm font-medium text-ink-2">¿Dónde está tu blog?</legend>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {["WordPress", "Shopify", "Webflow", "Ghost", "Webhook", "Otro"].map((c) => (
+                  {CMS_OPTIONS.map((c) => (
                     <button key={c} type="button" aria-pressed={s.cms === c} onClick={() => set("cms", s.cms === c ? null : c)} className={cn("min-h-11 rounded-xl border px-3 py-2.5 text-[13px] font-medium transition-colors", s.cms === c ? "border-signal bg-signal-soft text-signal ring-1 ring-signal" : "border-line bg-card hover:bg-paper-2")}>
                       {c}
                     </button>
                   ))}
                 </div>
               </fieldset>
-              <p className="text-xs text-ink-3">Te pediremos las credenciales en Ajustes › Publicación cuando entres al panel.</p>
+              {s.cms === "Blog alojado" ? (
+                <p className="text-xs leading-relaxed text-ink-3">
+                  Te creamos un blog listo para publicar (SEO, sitemap y RSS). Puedes usar un <strong className="font-medium text-ink-2">subdominio</strong> (p. ej. blog.tudominio.com) o una{" "}
+                  <strong className="font-medium text-ink-2">carpeta</strong> (/blog) con un proxy en tu web. Lo activamos al terminar el onboarding; el dominio y la URL canónica los afinas en Panel › Integraciones › Blog alojado.
+                </p>
+              ) : (
+                <p className="text-xs text-ink-3">Te pediremos las credenciales en Ajustes › Publicación cuando entres al panel.</p>
+              )}
             </div>
           </StepHead>
         )}
@@ -526,7 +543,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
             <div className="mb-4 inline-flex rounded-full border border-line bg-paper-2 p-1" role="radiogroup" aria-label="Periodicidad del pago">
               {(
                 [
-                  ["year", "Anual · ahorra hasta 50%"],
+                  ["year", maxAnnualSave > 0 ? `Anual · ahorra hasta ${maxAnnualSave}%` : "Anual"],
                   ["month", "Mensual"],
                 ] as const
               ).map(([v, l]) => (
@@ -546,10 +563,25 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                   )}
                   <p className="text-lg font-semibold">{p.name}</p>
                   <p className="mt-1">
-                    <span className="font-semibold tracking-tight text-2xl">{eur(s.interval === "year" ? p.yearly_price_eur : p.monthly_price_eur)}</span>
+                    <span className="tabular font-semibold tracking-tight text-2xl">{eur(planMonthlyCents(p, s.interval))}</span>
                     <span className="text-sm text-ink-3">/mes</span>
                   </p>
-                  {s.interval === "year" && <p className="text-xs text-ink-3">facturado anualmente</p>}
+                  {s.interval === "year" ? (
+                    <div className="mt-1 space-y-0.5 text-xs text-ink-3">
+                      <p>
+                        <span className="tabular font-medium text-ink-2">{eur(planYearlyTotalAtAnnualRate(p))}</span> al año · ahorras{" "}
+                        <span className="tabular font-medium text-ok">{eur(planAnnualSavingsCents(p))}</span> ({planAnnualSavingsPercent(p)}%) frente a pagar mes a mes
+                      </p>
+                      <p className="tabular">
+                        <s>{eur(p.monthly_price_eur)}/mes</s> sin anual ({eur(planYearlyTotalAtMonthlyRate(p))}/año)
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-xs text-ink-3">
+                      <span className="tabular">{eur(planYearlyTotalAtMonthlyRate(p))}</span> al año · el anual baja a{" "}
+                      <span className="tabular font-medium text-ink-2">{eur(planYearlyTotalAtAnnualRate(p))}</span>
+                    </p>
+                  )}
                   <ul className="mt-3 space-y-1.5 text-sm text-ink-2">
                     <li className="flex gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />

@@ -80,8 +80,21 @@ export async function saveOnboardingStep(step: string, s: OnboardingState, siteI
         schedule: { days: s.days, time: s.time, mode: s.mode },
       });
     case "conectar": {
-      // Google, Meta y Reddit se conectan por OAuth (/api/oauth/…) desde el propio paso; aquí no hay nada que guardar.
-      // TODO: alta del CMS elegido (s.cms) desde el onboarding.
+      // Google, Meta y Reddit se conectan por OAuth (/api/oauth/…) desde el propio paso.
+      if (siteId && s.cms === "Blog alojado") {
+        const db = createServiceClient();
+        const { data: site } = await sb.from("sites").select("name").eq("id", siteId).maybeSingle();
+        const { error: blogErr } = await db.from("hosted_blogs").upsert(
+          {
+            site_id: siteId,
+            enabled: true,
+            title: site?.name ? `Blog de ${site.name}` : null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "site_id" },
+        );
+        if (blogErr) return { ok: false, error: blogErr.message };
+      }
       return updateSite({});
     }
     case "plan": {

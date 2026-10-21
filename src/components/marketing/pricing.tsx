@@ -6,22 +6,23 @@ import { Check, Minus, Plus } from "lucide-react";
 import { Stagger } from "./scroll-fx";
 import { cn, eur } from "@/lib/utils";
 import type { Plan } from "@/lib/types";
+import { maxPlanAnnualSavingsPercent, planAnnualSavingsPercent, planMonthlyCents, planYearlyTotalAtAnnualRate, type PlanInterval } from "@/lib/plans";
 import { Badge, Button, ButtonLink, Input, Label, Select } from "@/components/ui";
 import { Eyebrow, Title } from "./primitives";
 
-type Interval = "month" | "year";
+type Interval = PlanInterval;
 interface Discount {
   from: number;
   to: number | null;
   pct: number;
 }
 
-const price = (p: Plan, i: Interval) => (i === "year" ? p.yearly_price_eur || p.monthly_price_eur : p.monthly_price_eur);
-const savings = (p: Plan) => (p.monthly_price_eur && p.yearly_price_eur ? Math.round((1 - p.yearly_price_eur / p.monthly_price_eur) * 100) : 0);
+const price = (p: Plan, i: Interval) => planMonthlyCents(p, i);
+const savings = (p: Plan) => planAnnualSavingsPercent(p);
 
 export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discount[] }) {
   const [interval, setPeriod] = useState<Interval>("year");
-  const maxSave = Math.max(0, ...plans.map(savings));
+  const maxSave = maxPlanAnnualSavingsPercent(plans);
 
   return (
     <div>
@@ -74,7 +75,7 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
               <p className="mt-2 min-h-5 text-[13px] text-ink-3">
                 {interval === "year" ? (
                   <>
-                    {eur(price(p, "year") * 12)} al año · <s>{eur(p.monthly_price_eur)}/mes</s>
+                    {eur(planYearlyTotalAtAnnualRate(p))} al año · <s>{eur(p.monthly_price_eur)}/mes</s>
                   </>
                 ) : (
                   <>Ahorra un {savings(p)}% pagando al año</>

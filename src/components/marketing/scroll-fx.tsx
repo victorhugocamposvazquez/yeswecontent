@@ -590,9 +590,13 @@ function PanelGrow() {
       <div aria-hidden className="mt-2.5 h-1.5 shrink-0 overflow-hidden rounded-full bg-paper-3">
         <span className="sx-bar block h-full origin-left rounded-full bg-signal" />
       </div>
-      <ol className="relative mt-3 grid flex-1 content-start gap-2">
+      <ol className="relative mt-3 flex min-h-0 flex-1 flex-col justify-evenly">
         {timeline.map((row, i) => (
-          <li key={row.t} className="sx-at flex items-center gap-3" style={at(i + 1, stepsTotal)}>
+          <li
+            key={row.t}
+            className={cn("sx-at flex items-center gap-3", i > 0 && "border-t border-line/55 pt-2.5")}
+            style={at(i + 1, stepsTotal)}
+          >
             <span
               className={cn(
                 "grid h-8 w-8 shrink-0 place-items-center rounded-lg",

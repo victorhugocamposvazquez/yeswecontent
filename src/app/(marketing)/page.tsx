@@ -44,7 +44,7 @@ const steps = [
 
 const featureRows = [
   { slug: "redactor-ia", eyebrow: "Escritura", title: "Artículos que suenan a ti", text: "Aprendemos tu voz de tu propia web y la respetamos en cada texto. Cada artículo llega con nota de calidad, FAQ, datos estructurados e imágenes." },
-  { slug: "plan-de-contenidos", eyebrow: "Estrategia", title: "Un plan hecho para tu web, no para la media", text: "Investigamos qué búsquedas puedes ganar de verdad y las ordenamos en clústeres para que cada artículo empuje a los demás." },
+  { slug: "plan-de-contenidos", eyebrow: "Estrategia", title: "Un plan hecho para tu web o tienda online, no para la media", text: "Investigamos qué búsquedas puedes ganar de verdad y las ordenamos en clústeres para que cada artículo empuje a los demás." },
   { slug: "autopublicacion", eyebrow: "Publicación", title: "Se publica sin que toques nada", text: "WordPress, Shopify, Webflow, Ghost o una API. Elige días y hora; nosotros nos encargamos de maquetar y subir." },
   { slug: "red-de-enlaces", eyebrow: "Autoridad", title: "Enlaces sin pedir favores por email", text: "Una red de intercambio entre webs afines que se enlazan dentro de contenido útil. Tú revisas cada enlace." },
   { slug: "auditoria-geo", eyebrow: "Técnica", title: "Arreglamos lo que te frena", text: "Rastreo, etiquetas, velocidad, datos estructurados y preparación para IA, ordenados por impacto y con su solución." },
@@ -286,7 +286,7 @@ export default async function HomePage() {
           <div className="max-w-2xl">
             <Eyebrow>Por dentro</Eyebrow>
             <Title className="mt-4">
-              Así nace <span className="marker">un artículo</span>, de la búsqueda a tu web.
+              Así nace <span className="marker">un artículo</span>, de la búsqueda a tu web o tienda online.
             </Title>
           </div>
           <StepStory name="articulo" />
@@ -299,7 +299,7 @@ export default async function HomePage() {
         parts={[
           "Mientras los demás duermen, nosotros conseguimos que",
           { text: "Google y las IAs", tone: "accent" },
-          "hablen de ti.",
+          "hablen de ti y te recomienden.",
         ]}
       />
 
@@ -519,7 +519,7 @@ export default async function HomePage() {
 
       {/* ───────── FRASE: CADA SEMANA ───────── */}
       <Statement
-        parts={["Cada semana, más búsquedas que", { text: "terminan en tu web.", tone: "accent" }, "Sin reuniones. Sin excusas. Sin parar."]}
+        parts={["Cada semana, más búsquedas que", { text: "terminan en tu web o tienda online.", tone: "accent" }, "Sin reuniones. Sin parar!"]}
       />
 
       {/* ───────── CASOS ───────── */}

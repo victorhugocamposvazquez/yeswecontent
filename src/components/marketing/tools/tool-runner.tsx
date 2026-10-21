@@ -24,27 +24,38 @@ function scrollToResult(el: HTMLElement | null) {
   });
 }
 
-function AuditScopeNote() {
+function AuditScopeDetails() {
   return (
-    <div className="mb-4 rounded-2xl border border-line bg-paper-2 p-4 sm:p-5">
-      <p className="text-[13px] font-semibold uppercase tracking-wide text-ink-3">Qué es (y qué no es) este análisis</p>
-      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <details className="mt-3 text-sm">
+      <summary className="inline-flex min-h-11 cursor-pointer items-center font-medium text-ink-2 transition-colors duration-150 hover:text-ink sm:min-h-0">
+        ¿Gratis vs servicio completo?
+      </summary>
+      <div className="mt-3 grid grid-cols-1 gap-3 rounded-xl border border-line bg-paper-2 p-3.5 sm:grid-cols-2 sm:p-4">
         <div>
           <p className="text-sm font-semibold tracking-tight">Gratis · solo preparación</p>
-          <p className="mt-1 text-sm leading-relaxed text-ink-2">Una nota sobre robots, sitemap, etiquetas, schema y señales para IA. Para decidir si la base aguanta.</p>
+          <p className="mt-1 text-sm leading-relaxed text-ink-2">Nota sobre robots, sitemap, etiquetas, schema y señales para IA.</p>
         </div>
-        <div className="rounded-xl border border-signal/25 bg-signal-soft/40 p-3.5">
-          <p className="text-sm font-semibold tracking-tight">Con YesWeContent · ejecución</p>
-          <p className="mt-1 text-sm leading-relaxed text-ink-2">
-            Plan editorial, artículos en tu CMS, backlinks, auditoría completa, social, informes y seguimiento en ChatGPT, Perplexity y más.
-          </p>
+        <div className="rounded-lg border border-signal/25 bg-signal-soft/40 p-3">
+          <p className="text-sm font-semibold tracking-tight">Con YesWeContent</p>
+          <p className="mt-1 text-sm leading-relaxed text-ink-2">Contenido en tu CMS, backlinks, auditoría completa, social y seguimiento en IA.</p>
         </div>
       </div>
-    </div>
+    </details>
   );
 }
 
-export function ToolRunner({ slug, cta = "Analizar", initialUrl }: { slug: string; cta?: string; initialUrl?: string }) {
+export function ToolRunner({
+  slug,
+  cta = "Analizar",
+  initialUrl,
+  compact = false,
+}: {
+  slug: string;
+  cta?: string;
+  initialUrl?: string;
+  /** En auditoría: formulario arriba, sin bloque explicativo encima */
+  compact?: boolean;
+}) {
   const isAudit = slug === "auditoria-ia";
   const [url, setUrl] = useState(initialUrl ?? "");
   const [email, setEmail] = useState("");
@@ -95,31 +106,41 @@ export function ToolRunner({ slug, cta = "Analizar", initialUrl }: { slug: strin
 
   return (
     <div id="analizador" className={HEADER_SCROLL_MARGIN}>
-      {isAudit && <AuditScopeNote />}
       <div className="surface overflow-hidden shadow-[var(--shadow-md)]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             if (url.trim()) void run(url.trim());
           }}
-          className="p-4 sm:p-6"
+          className={cn("p-4", compact ? "sm:p-5" : "sm:p-6")}
         >
-          <Label htmlFor={`url-${slug}`}>URL de tu web</Label>
+          <Label htmlFor={`url-${slug}`}>{isAudit ? "URL de tu web o tienda online" : "URL de tu sitio"}</Label>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-ink-3" aria-hidden />
-              <Input id={`url-${slug}`} value={url} onChange={(e) => setUrl(e.target.value)} required inputMode="url" autoComplete="url" placeholder="https://tuweb.com" className="h-11 pl-10" />
+              <Input
+                id={`url-${slug}`}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                required
+                inputMode="url"
+                autoComplete="url"
+                placeholder={isAudit ? "https://tuweb.com o tutienda.com" : "https://tuweb.com"}
+                className="h-11 pl-10"
+              />
             </div>
             <Button type="submit" size="lg" disabled={loading} className="h-11">
               {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
               {loading ? "Analizando…" : cta}
             </Button>
           </div>
+          {isAudit && compact && <AuditScopeDetails />}
           <details className="mt-3 text-sm">
             <summary className="inline-flex min-h-11 cursor-pointer items-center text-ink-3 transition-colors duration-150 hover:text-ink sm:min-h-0">¿Quieres que te enviemos el informe? (opcional)</summary>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" autoComplete="email" aria-label="Email para recibir el informe" className="mt-2 h-11 max-w-sm" />
             <p className="mt-1 text-xs text-ink-3">Solo lo usaremos para enviarte el resultado y algún consejo. Sin spam.</p>
           </details>
+          {isAudit && !compact && <AuditScopeDetails />}
         </form>
 
         {showResults && (
@@ -128,7 +149,7 @@ export function ToolRunner({ slug, cta = "Analizar", initialUrl }: { slug: strin
               <div className="flex items-center gap-3 rounded-xl border border-dashed border-line-2 bg-card p-5 text-sm text-ink-2">
                 <Loader2 className="h-5 w-5 shrink-0 animate-spin text-signal" aria-hidden />
                 <div>
-                  <p className="font-semibold text-ink">Analizando tu web…</p>
+                  <p className="font-semibold text-ink">{isAudit ? "Analizando tu sitio…" : "Analizando…"}</p>
                   <p className="mt-0.5">El informe aparecerá aquí abajo. Suele tardar menos de 10 segundos.</p>
                 </div>
               </div>

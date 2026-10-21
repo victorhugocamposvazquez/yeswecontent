@@ -100,7 +100,7 @@ export default async function HomePage() {
             </span>
           </h1>
           <Lead className="rise rise-2 mt-6 max-w-2xl md:text-xl">
-            Escribimos, publicamos y posicionamos el contenido de tu web para que Google y los asistentes de IA te recomienden, sin que tengas que montar un equipo de SEO.
+            Escribimos, publicamos y posicionamos el contenido de tu web o tienda online para que Google y los asistentes de IA te recomienden, sin que tengas que montar un equipo de SEO.
           </Lead>
           <div className="rise rise-3 mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
             <CtaLink href="/registro" size="lg" className="w-full sm:w-auto">
@@ -613,19 +613,19 @@ export default async function HomePage() {
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
               <div>
                 <Eyebrow tone="ink">Gratis · solo diagnóstico</Eyebrow>
-                <Title className="mt-4">¿Tu web está preparada? Mira la nota. El trabajo empieza después.</Title>
+                <Title className="mt-4">¿Tu web o tienda está preparada? Mira la nota. El trabajo empieza después.</Title>
                 <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-2">
-                  El análisis gratuito mide la base técnica (0–100). Si sigues con YesWeContent, pasamos a generar artículos, backlinks, auditoría completa, social y seguimiento en IA — en automático.
+                  El análisis gratuito mide la base técnica (0–100) de cualquier sitio público. Si sigues con YesWeContent, pasamos a generar artículos, backlinks, auditoría completa, social y seguimiento en IA — en automático.
                 </p>
               </div>
               <form action="/herramientas/auditoria-ia#analizador" method="get" className="surface p-4 sm:p-5">
                 <label htmlFor="home-url" className="mb-1.5 block text-[13px] font-medium text-ink-2">
-                  Tu web
+                  URL de tu web o tienda
                 </label>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <div className="relative flex-1">
                     <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-3" aria-hidden />
-                    <Input id="home-url" name="url" required placeholder="tuweb.com" inputMode="url" autoComplete="url" className="h-11 pl-9" />
+                    <Input id="home-url" name="url" required placeholder="tuweb.com o tutienda.com" inputMode="url" autoComplete="url" className="h-11 pl-9" />
                   </div>
                   <Button type="submit" size="lg" className="h-11">
                     Ver diagnóstico

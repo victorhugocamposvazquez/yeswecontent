@@ -6,7 +6,6 @@ import { getTool, toolCategories, tools } from "@/lib/marketing/tools";
 import { ToolRunner } from "@/components/marketing/tools/tool-runner";
 import { KeywordDensityTool, RobotsGeneratorTool, SchemaGeneratorTool, SerpPreviewTool } from "@/components/marketing/tools/client-tools";
 import { Badge, Card } from "@/components/ui";
-import { cn } from "@/lib/utils";
 import { Container, CtaLink, Eyebrow, HoverCard, Lead, Section, Title } from "@/components/marketing/primitives";
 
 export const dynamicParams = false;
@@ -39,20 +38,45 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
 
   return (
     <>
-      <section className={cn("glow relative overflow-hidden border-b border-line", isAudit && "border-b-0")}>
-        <Container className={cn("relative", isAudit ? "py-6 sm:py-8" : "py-10 sm:py-14 md:py-16")}>
-          <Link href="/herramientas" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
-            <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
-          </Link>
-          <Eyebrow className={isAudit ? "mt-4" : "mt-8"}>{cat?.label} · {isAudit ? "diagnóstico gratuito" : "herramienta gratuita"}</Eyebrow>
-          <Title as="h1" size={isAudit ? "md" : "lg"} className="mt-3 max-w-4xl sm:mt-4">
-            {t.name}
-          </Title>
-          <Lead className={cn("max-w-2xl", isAudit ? "mt-3 text-base sm:text-lg" : "mt-5")}>{t.tagline}</Lead>
-        </Container>
-      </section>
+      {isAudit ? (
+        <section className="glow relative overflow-hidden border-b border-line">
+          <Container className="relative py-5 sm:py-7">
+            <Link href="/herramientas" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
+              <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
+            </Link>
+            <div className="mt-3 grid grid-cols-1 items-start gap-4 lg:mt-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-8 xl:gap-10">
+              <div className="order-2 max-w-lg lg:order-1 lg:max-w-none lg:pt-1">
+                <Eyebrow>{cat?.label} · diagnóstico gratuito</Eyebrow>
+                <Title as="h1" size="md" className="mt-2 sm:mt-3">
+                  {t.name}
+                </Title>
+                <p className="mt-2 text-sm leading-relaxed text-ink-2 sm:text-[15px]">
+                  Nota 0–100 sobre la base técnica de tu web o ecommerce, en un minuto y sin registro. Después, en YesWeContent: contenido, backlinks y visibilidad en IA.
+                </p>
+              </div>
+              <div className="order-1 lg:order-2">
+                {t.kind === "server" && <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} compact />}
+              </div>
+            </div>
+          </Container>
+        </section>
+      ) : (
+        <section className="glow relative overflow-hidden border-b border-line">
+          <Container className="relative py-10 sm:py-14 md:py-16">
+            <Link href="/herramientas" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
+              <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
+            </Link>
+            <Eyebrow className="mt-8">{cat?.label} · herramienta gratuita</Eyebrow>
+            <Title as="h1" size="lg" className="mt-4 max-w-4xl">
+              {t.name}
+            </Title>
+            <Lead className="mt-5 max-w-2xl">{t.tagline}</Lead>
+          </Container>
+        </section>
+      )}
 
-      <Section className={isAudit ? "pt-0 pb-10 sm:pb-12" : "py-10 sm:py-12 md:py-16 lg:py-16"}>
+      {!isAudit && (
+      <Section className="py-10 sm:py-12 md:py-16 lg:py-16">
         <Container>
           {t.kind === "server" && <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} />}
           {t.kind === "client" && clientTools[t.slug]?.()}
@@ -77,6 +101,7 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
           )}
         </Container>
       </Section>
+      )}
 
       <Section tone="paper-2">
         <Container className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">

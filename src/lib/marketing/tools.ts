@@ -32,7 +32,7 @@ export const tools: Tool[] = [
     category: "ia",
     kind: "server",
     tagline:
-      "Gratis y en un minuto: ves qué tan preparada está tu web para buscadores y asistentes. No es el servicio completo — es el punto de partida antes de generar contenido, backlinks y visibilidad con YesWeContent.",
+      "Gratis y en un minuto: ves qué tan preparado está tu sitio (web o tienda online) para buscadores y asistentes. No es el servicio completo — es el punto de partida antes de generar contenido, backlinks y visibilidad con YesWeContent.",
     checks: [
       "Acceso de los rastreadores de IA en robots.txt",
       "Sitemap localizable",

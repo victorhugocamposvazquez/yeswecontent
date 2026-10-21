@@ -43,7 +43,7 @@ export function MarketingFooter() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div className="col-span-2 sm:col-span-4 lg:col-span-1">
             <Logo />
-            <p className="text-pretty mt-4 max-w-xs text-sm leading-relaxed text-ink-2">Contenido, enlaces y visibilidad en Google y en los asistentes de IA, en piloto automático.</p>
+            <p className="text-pretty mt-4 max-w-xs text-sm leading-relaxed text-ink-2">Contenido, enlaces y visibilidad en Google y en los asistentes de IA para webs y tiendas online, en piloto automático.</p>
             <a href="mailto:hola@yeswecontent.com" className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-ink transition-colors duration-150 hover:text-signal sm:min-h-0">
               hola@yeswecontent.com
             </a>
@@ -65,7 +65,7 @@ export function MarketingFooter() {
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-3 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} yeswecontent S.L. Hecho con café y criterio editorial.</p>
+          <p>© yeswecontent. Idea y desarrollo - Hugo Campos. Aceleración - Google Labs.</p>
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             <Link href="/legal/privacidad" className="inline-block py-1.5 transition-colors duration-150 hover:text-ink sm:py-0">
               Privacidad

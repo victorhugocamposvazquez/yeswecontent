@@ -158,9 +158,29 @@ body {
   mask-image: radial-gradient(ellipse at center, #000 40%, transparent 75%);
 }
 
-/* Compatibilidad: el antiguo punteado ahora es un fondo liso */
+/* Textura punteada (se suma al color de fondo del componente) */
 .grain {
-  background: var(--paper-2);
+  background-image: radial-gradient(rgba(18, 18, 18, 0.07) 0.75px, transparent 0.75px);
+  background-size: 14px 14px;
+}
+
+/* Superficies tinta: negro con grano claro + halos de marca muy suaves */
+.grain-ink {
+  background-color: var(--ink);
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.075) 0.7px, transparent 0.7px),
+    linear-gradient(180deg, #161616 0%, var(--ink) 55%, #0e0e0e 100%);
+  background-size: 13px 13px, 100% 100%;
+}
+
+.ink-halo {
+  background-image:
+    radial-gradient(50% 60% at 50% 100%, rgba(255, 79, 31, 0.14), transparent 72%),
+    radial-gradient(28% 38% at 92% 4%, rgba(212, 245, 90, 0.1), transparent 70%);
+}
+
+.ink-halo-lime {
+  background-image: radial-gradient(80% 60% at 100% 0%, rgba(212, 245, 90, 0.12), transparent 62%);
 }
 
 /* Tarjeta elevada estándar */

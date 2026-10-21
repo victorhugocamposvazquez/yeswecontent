@@ -56,14 +56,15 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
               key={p.id}
               style={{ "--i": idx * 4 } as React.CSSProperties}
               className={cn(
-                "relative flex flex-col rounded-3xl border p-6 sm:p-8",
-                featured
-                  ? "border-ink bg-ink text-paper shadow-[var(--shadow-lg)] bg-[radial-gradient(80%_60%_at_100%_0%,rgba(212,245,90,0.14),transparent_60%),linear-gradient(180deg,#1b1b1a,#121212)]"
-                  : "border-line bg-card shadow-[var(--shadow-sm)]",
+                "relative flex flex-col overflow-hidden rounded-3xl border p-6 sm:p-8",
+                featured ? "grain-ink border-ink text-paper shadow-[var(--shadow-lg)]" : "border-line bg-card shadow-[var(--shadow-sm)]",
               )}
             >
               {featured && (
-                <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-lime px-3 py-1 text-xs font-semibold text-ink shadow-[var(--shadow-xs)]">Para crecer en serio</span>
+                <>
+                  <div aria-hidden className="ink-halo-lime pointer-events-none absolute inset-0" />
+                  <span className="absolute -top-3 left-6 z-[1] inline-flex items-center rounded-full bg-lime px-3 py-1 text-xs font-semibold text-ink shadow-[var(--shadow-xs)]">Para crecer en serio</span>
+                </>
               )}
               <p className={cn("text-[13px] font-semibold", featured ? "text-lime" : "text-signal")}>Plan</p>
               <h3 className="mt-1 text-[1.75rem] font-semibold tracking-tight">{p.name}</h3>
@@ -218,7 +219,7 @@ function VolumeCalculator({ plans, discounts, interval }: { plans: Plan[]; disco
               <dt className="text-[13px] text-ink-3">Descuento</dt>
               <dd className="tabular mt-0.5 text-2xl font-semibold tracking-tight">{pct ? `−${pct}%` : "—"}</dd>
             </div>
-            <div className="col-span-2 rounded-xl bg-ink p-4 text-paper">
+            <div className="grain-ink col-span-2 rounded-xl p-4 text-paper">
               <dt className="text-[13px] text-paper/60">Total {interval === "year" ? "(pago anual, por mes)" : "al mes"}</dt>
               <dd className="mt-1 flex flex-wrap items-baseline gap-x-3">
                 <span className="tabular text-[2.5rem] font-semibold leading-none tracking-tight">{eur(total)}</span>

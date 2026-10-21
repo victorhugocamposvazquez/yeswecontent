@@ -20,7 +20,13 @@ export function CarouselPreview({ slides, brand, channel }: { slides: string[]; 
         <span className="ml-auto capitalize text-ink-3">{channel}</span>
       </div>
       <div className="relative aspect-square overflow-hidden rounded-xl border border-line shadow-[var(--shadow-sm)]" aria-roledescription="carrusel" aria-label={`Diapositiva ${i + 1} de ${slides.length}`}>
-        <div className={cn("grain flex h-full flex-col justify-between p-6", THEMES[i === 0 ? 0 : i === last ? 3 : (i % 2) + 1])}>
+        <div
+          className={cn(
+            "flex h-full flex-col justify-between p-6",
+            i === last ? "grain-ink" : "grain",
+            THEMES[i === 0 ? 0 : i === last ? 3 : (i % 2) + 1],
+          )}
+        >
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">
             {i + 1}/{slides.length}
           </span>

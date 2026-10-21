@@ -188,15 +188,8 @@ export function CtaBand({
   return (
     <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
       <Container>
-        <div className="relative overflow-hidden rounded-3xl bg-ink px-6 py-14 text-center text-paper shadow-[var(--shadow-lg)] sm:px-12 md:py-20">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage:
-                "radial-gradient(50% 60% at 50% 100%, rgba(255,79,31,0.28), transparent 70%), radial-gradient(30% 40% at 90% 0%, rgba(212,245,90,0.16), transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.04), transparent)",
-            }}
-          />
+        <div className="grain-ink relative overflow-hidden rounded-3xl px-6 py-14 text-center text-paper shadow-[var(--shadow-lg)] sm:px-12 md:py-20">
+          <div aria-hidden className="ink-halo pointer-events-none absolute inset-0" />
           <div className="relative mx-auto max-w-3xl">
             <h2 className="font-display text-[clamp(1.875rem,4.4vw,3.25rem)]">{title}</h2>
             {text && <p className="text-pretty mx-auto mt-5 max-w-xl text-base text-paper/70 sm:text-lg">{text}</p>}

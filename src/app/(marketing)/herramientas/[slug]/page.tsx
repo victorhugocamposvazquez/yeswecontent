@@ -56,25 +56,21 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
     <>
       {isUrlTool ? (
         <section className="glow relative border-b border-line">
-          <Container className="relative py-5 sm:py-7">
+          <Container className="relative max-w-3xl py-5 sm:py-6">
             <Link
               href="/herramientas"
               prefetch={false}
-              className="mb-3 inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0"
+              className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0"
             >
               <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden /> Todas las herramientas
             </Link>
-            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-8 xl:gap-10">
-              <div className="order-2 max-w-lg lg:order-1 lg:max-w-none lg:pt-1">
-                <Eyebrow>{cat?.label} · {isAudit ? "diagnóstico gratuito" : "herramienta gratuita"}</Eyebrow>
-                <Title as="h1" size="md" className="mt-2 sm:mt-3">
-                  {t.name}
-                </Title>
-                <UrlToolIntro slug={t.slug} tagline={t.tagline} />
-              </div>
-              <div className="order-1 min-w-0 lg:order-2">
-                <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} compact={isAudit} />
-              </div>
+            <Eyebrow className="mt-4">{cat?.label} · {isAudit ? "diagnóstico gratuito" : "herramienta gratuita"}</Eyebrow>
+            <Title as="h1" size="md" className="mt-2">
+              {t.name}
+            </Title>
+            <UrlToolIntro slug={t.slug} tagline={t.tagline} />
+            <div className="mt-4 sm:mt-5">
+              <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} compact={isAudit} />
             </div>
           </Container>
         </section>

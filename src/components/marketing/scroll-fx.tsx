@@ -590,16 +590,16 @@ function PanelGrow() {
       <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-3">
         <span className="sx-bar block h-full origin-left rounded-full bg-signal" />
       </div>
-      <ol className="relative mt-5 flex min-h-0 flex-1 flex-col justify-between gap-3.5 py-1 sm:gap-4">
+      <ol className="relative mt-4 grid flex-1 content-start gap-2.5 overflow-y-auto overscroll-contain pr-0.5">
         {timeline.map((row, i) => (
           <li
             key={row.t}
-            className="sx-at flex items-center gap-3 rounded-xl border border-line/70 bg-card/80 px-3 py-2.5 shadow-[var(--shadow-xs)] sm:py-3"
+            className="sx-at flex items-center gap-2.5 rounded-lg border border-line/60 bg-card/70 px-2.5 py-2"
             style={at(i + 1, stepsTotal)}
           >
             <span
               className={cn(
-                "grid h-9 w-9 shrink-0 place-items-center rounded-lg sm:h-8 sm:w-8",
+                "grid h-8 w-8 shrink-0 place-items-center rounded-lg",
                 "engine" in row ? "bg-paper-2 ring-1 ring-line" : "bg-signal-soft text-signal",
               )}
             >
@@ -613,9 +613,9 @@ function PanelGrow() {
           </li>
         ))}
       </ol>
-      <div className="mt-4 flex shrink-0 items-center justify-between gap-3 border-t border-line pt-4">
-        <span className="text-[11px] text-ink-3">Informe del lunes · sin reuniones</span>
-        <span className="sx-at rounded-lg bg-lime-soft px-2.5 py-1 text-[11px] font-semibold text-ink" style={at(stepsTotal, stepsTotal + 1)}>
+      <div className="mt-3 flex shrink-0 items-center justify-between gap-2 border-t border-line pt-2.5">
+        <span className="text-[10.5px] text-ink-3">Informe del lunes</span>
+        <span className="sx-at rounded-md bg-lime-soft px-2 py-0.5 text-[10.5px] font-semibold text-ink" style={at(stepsTotal, stepsTotal + 1)}>
           Semana completa ✓
         </span>
       </div>

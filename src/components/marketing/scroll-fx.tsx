@@ -570,7 +570,7 @@ function PanelPlan() {
 }
 
 function PanelGrow() {
-  const stepsTotal = 7;
+  const stepsTotal = 6.5;
   const timeline: ({ t: string; s: string } & ({ I: typeof PenLine } | { engine: string }))[] = [
     { I: PenLine, t: "Artículo con el tono de tu marca", s: "Nota de calidad 91/100" },
     { I: Send, t: "Publicado en tu WordPress", s: "Jueves 9:00 · con FAQ y schema" },
@@ -580,45 +580,35 @@ function PanelGrow() {
     { engine: "Perplexity", t: "Perplexity te cita como fuente", s: "«¿Dónde comprar gres artesanal?»" },
   ];
   return (
-    <div className="flex h-full flex-col p-4 sm:p-6">
-      <div className="flex items-center justify-between gap-3">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden p-4 sm:p-5">
+      <div className="flex shrink-0 items-center justify-between gap-3">
         <p className="text-[13px] font-semibold">Esta semana en tierrafina.es</p>
         <span className="tabular text-[11px] text-ink-3">
-          clics <span className="sx-at font-semibold text-ok" style={at(stepsTotal, stepsTotal + 1)}>+38 %</span>
+          clics <span className="sx-at font-semibold text-ok" style={at(6, stepsTotal)}>+38 %</span>
         </span>
       </div>
-      <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-3">
+      <div aria-hidden className="mt-2.5 h-1.5 shrink-0 overflow-hidden rounded-full bg-paper-3">
         <span className="sx-bar block h-full origin-left rounded-full bg-signal" />
       </div>
-      <ol className="relative mt-4 grid flex-1 content-start gap-2.5 overflow-y-auto overscroll-contain pr-0.5">
+      <ol className="relative mt-3 grid flex-1 content-start gap-2">
         {timeline.map((row, i) => (
-          <li
-            key={row.t}
-            className="sx-at flex items-center gap-2.5 rounded-lg border border-line/60 bg-card/70 px-2.5 py-2"
-            style={at(i + 1, stepsTotal)}
-          >
+          <li key={row.t} className="sx-at flex items-center gap-3" style={at(i + 1, stepsTotal)}>
             <span
               className={cn(
                 "grid h-8 w-8 shrink-0 place-items-center rounded-lg",
                 "engine" in row ? "bg-paper-2 ring-1 ring-line" : "bg-signal-soft text-signal",
               )}
             >
-              {"engine" in row ? <EngineLogo name={row.engine} size={18} alt="" /> : <row.I className="h-4 w-4" aria-hidden />}
+              {"engine" in row ? <EngineLogo name={row.engine} size={17} alt="" /> : <row.I className="h-4 w-4" aria-hidden />}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-semibold leading-snug">{row.t}</span>
-              <span className="mt-0.5 block truncate text-[11.5px] leading-snug text-ink-3">{row.s}</span>
+              <span className="block truncate text-[13px] font-semibold">{row.t}</span>
+              <span className="block truncate text-[11.5px] text-ink-3">{row.s}</span>
             </span>
             <Check className="h-4 w-4 shrink-0 text-ok" aria-hidden />
           </li>
         ))}
       </ol>
-      <div className="mt-3 flex shrink-0 items-center justify-between gap-2 border-t border-line pt-2.5">
-        <span className="text-[10.5px] text-ink-3">Informe del lunes</span>
-        <span className="sx-at rounded-md bg-lime-soft px-2 py-0.5 text-[10.5px] font-semibold text-ink" style={at(stepsTotal, stepsTotal + 1)}>
-          Semana completa ✓
-        </span>
-      </div>
     </div>
   );
 }
@@ -700,7 +690,7 @@ export function ScrollSteps({ steps, panels = homePanels, className }: { steps: 
                   ))}
                 </span>
               </div>
-              <div className="relative h-[300px] bg-paper-2 sm:h-[360px] md:h-[400px]">
+              <div className="relative h-[336px] overflow-hidden bg-paper-2 sm:h-[392px] md:h-[424px]">
                 {panels.map(({ node }, k) => (
                   <div
                     key={k}

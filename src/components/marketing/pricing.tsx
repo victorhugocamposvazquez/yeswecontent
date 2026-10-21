@@ -63,7 +63,7 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
               )}
             >
               {featured && (
-                <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-lime px-3 py-1 text-xs font-semibold text-ink shadow-[var(--shadow-xs)]">Para crecer en serio</span>
+                <span className="mb-3 inline-flex w-fit items-center rounded-full bg-lime px-3 py-1 text-xs font-semibold text-ink shadow-[var(--shadow-xs)]">Para crecer en serio</span>
               )}
               <p className={cn("text-[13px] font-semibold", featured ? "text-ink-2" : "text-signal")}>Plan</p>
               <h3 className="mt-1 text-[1.75rem] font-semibold tracking-tight">{p.name}</h3>
@@ -83,8 +83,8 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
               <ButtonLink
                 href={`/registro?plan=${p.id}&periodo=${interval === "year" ? "anual" : "mensual"}`}
                 size="lg"
-                variant={featured ? "primary" : "ink"}
-                className={cn("mt-6 w-full", featured && "bg-lime text-ink shadow-[var(--shadow-xs)] hover:brightness-95")}
+                variant="primary"
+                className="mt-6 w-full"
               >
                 Probar 3 días gratis
               </ButtonLink>

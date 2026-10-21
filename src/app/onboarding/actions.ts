@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { isDemo } from "@/lib/env";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { buildHostedBlogRow } from "@/lib/headless/hosted-blog";
 import type { OnboardingState } from "./types";
 
 type Result = { ok: true; siteId: string | null } | { ok: false; error: string };
@@ -83,16 +84,16 @@ export async function saveOnboardingStep(step: string, s: OnboardingState, siteI
       // Google, Meta y Reddit se conectan por OAuth (/api/oauth/…) desde el propio paso.
       if (siteId && s.cms === "Blog alojado") {
         const db = createServiceClient();
-        const { data: site } = await sb.from("sites").select("name").eq("id", siteId).maybeSingle();
-        const { error: blogErr } = await db.from("hosted_blogs").upsert(
-          {
-            site_id: siteId,
-            enabled: true,
-            title: site?.name ? `Blog de ${site.name}` : null,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "site_id" },
-        );
+        const { data: site } = await sb.from("sites").select("name, url").eq("id", siteId).maybeSingle();
+        const row = buildHostedBlogRow({
+          siteId,
+          siteName: site?.name,
+          siteUrl: site?.url ?? s.url,
+          mode: s.hostedBlogMode,
+          customDomain: s.hostedBlogDomain.trim() || null,
+          enabled: true,
+        });
+        const { error: blogErr } = await db.from("hosted_blogs").upsert(row, { onConflict: "site_id" });
         if (blogErr) return { ok: false, error: blogErr.message };
       }
       return updateSite({});

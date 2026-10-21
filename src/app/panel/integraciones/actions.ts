@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { getCurrentSite, getProfile } from "@/lib/data";
 import { isDemo } from "@/lib/env";
 import { DEMO_API_KEY, DEMO_PUBLIC_KEY, generateApiKey, type ApiKeyKind } from "@/lib/headless/keys";
+import { buildHostedBlogRow, type HostedBlogDeliveryMode } from "@/lib/headless/hosted-blog";
+import { verifyHostedBlogDns } from "@/lib/headless/hosted-blog-dns";
 import { normalizeHost } from "@/lib/headless/hosts";
 import { openSecret, sealSecret } from "@/lib/headless/secrets";
 import { notifyFrameworkSite, type Framework, type FrameworkWebhookConfig } from "@/lib/headless/webhook";
@@ -150,8 +152,9 @@ export async function saveHostedBlog(_prev: ActionState, fd: FormData): Promise<
   const site = await getCurrentSite();
   if (!site) return fail("No hay ningún sitio seleccionado.");
   const enabled = str(fd, "enabled") === "on";
-  const domain = normalizeHost(str(fd, "custom_domain", 200).replace(/^https?:\/\//, "")) || null;
-  if (domain && !/^([a-z0-9-]+\.)+[a-z]{2,}$/.test(domain)) return fail("El dominio no parece válido. Ejemplo: blog.tudominio.com");
+  const mode = (str(fd, "delivery_mode") as HostedBlogDeliveryMode) || "platform";
+  const domainRaw = normalizeHost(str(fd, "custom_domain", 200).replace(/^https?:\/\//, "")) || null;
+  if (domainRaw && !/^([a-z0-9-]+\.)+[a-z]{2,}$/.test(domainRaw)) return fail("El dominio no parece válido. Ejemplo: blog.tudominio.com");
   let base = str(fd, "public_base_url", 300).replace(/\/$/, "") || null;
   if (base) {
     try {
@@ -161,15 +164,39 @@ export async function saveHostedBlog(_prev: ActionState, fd: FormData): Promise<
     } catch {
       return fail("La URL pública no es válida. Ejemplo: https://tudominio.com/blog");
     }
-  } else if (domain) base = `https://${domain}`;
+  }
+
+  const row = buildHostedBlogRow({
+    siteId: site.id,
+    siteName: site.name,
+    siteUrl: site.url,
+    mode,
+    customDomain: mode === "subdomain" ? domainRaw : null,
+    publicBaseUrl: mode === "folder" ? base : null,
+    enabled,
+  });
+  row.title = str(fd, "title", 120) || row.title;
+  row.tagline = str(fd, "tagline", 240) || null;
 
   if (isDemo) return ok(enabled ? "Blog alojado activado." : "Cambios guardados.");
   const sb = await createClient();
-  const { error } = await sb.from("hosted_blogs").upsert(
-    { site_id: site.id, enabled, custom_domain: domain, public_base_url: base, title: str(fd, "title", 120) || null, tagline: str(fd, "tagline", 240) || null, updated_at: new Date().toISOString() },
-    { onConflict: "site_id" },
-  );
+  const { error } = await sb.from("hosted_blogs").upsert(row, { onConflict: "site_id" });
   if (error) return fail(error.code === "23505" ? "Ese dominio ya está en uso en otro sitio." : `No se pudo guardar: ${error.message}`);
   revalidatePath(PATH);
-  return ok(enabled ? "Blog alojado activado. Si acabas de crear el CNAME, puede tardar unos minutos en propagarse." : "Cambios guardados.");
+  return ok(enabled ? "Blog alojado listo. Los artículos se publicarán en la URL configurada." : "Cambios guardados.");
+}
+
+export async function verifyHostedBlogDnsAction(hostname: string): Promise<{ ok: boolean; message: string }> {
+  const site = await getCurrentSite();
+  if (!site) return { ok: false, message: "No hay ningún sitio seleccionado." };
+  const host = normalizeHost(hostname);
+  if (!host) return { ok: false, message: "Indica el subdominio." };
+  const check = await verifyHostedBlogDns(host);
+  if (!check.ok) return { ok: false, message: check.message };
+  if (!isDemo) {
+    const sb = await createClient();
+    await sb.from("hosted_blogs").update({ verified_at: new Date().toISOString(), custom_domain: host }).eq("site_id", site.id);
+    revalidatePath(PATH);
+  }
+  return { ok: true, message: "DNS correcto. El blog puede servirse en tu subdominio." };
 }

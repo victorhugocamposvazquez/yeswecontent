@@ -18,11 +18,13 @@ export type HeadlessSite = Pick<Site, "id" | "name" | "url" | "language" | "desc
 export interface HostedBlogConfig {
   site_id: string;
   enabled: boolean;
+  delivery_mode?: "platform" | "subdomain" | "folder";
   custom_domain: string | null;
   public_base_url: string | null;
   title: string | null;
   tagline: string | null;
   theme: { accent?: string; background?: string; text?: string; font?: "sans" | "serif" };
+  verified_at?: string | null;
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -44,6 +46,7 @@ const demoPublished = (): HeadlessArticle[] =>
 const demoHosted: HostedBlogConfig = {
   site_id: demo.demoSite.id,
   enabled: true,
+  delivery_mode: "subdomain",
   custom_domain: "blog.tierrafina.es",
   public_base_url: "https://blog.tierrafina.es",
   title: "Diario del taller",
@@ -101,7 +104,7 @@ export const getPublishedBySlug = cache(async (siteId: string, slug: string, lan
 export const getHostedBlog = cache(async (siteId: string): Promise<HostedBlogConfig | null> => {
   if (isDemo) return siteId === demo.demoSite.id ? demoHosted : null;
   const sb = createServiceClient();
-  const { data } = await sb.from("hosted_blogs").select("site_id, enabled, custom_domain, public_base_url, title, tagline, theme").eq("site_id", siteId).maybeSingle();
+  const { data } = await sb.from("hosted_blogs").select("site_id, enabled, delivery_mode, custom_domain, public_base_url, title, tagline, theme, verified_at").eq("site_id", siteId).maybeSingle();
   return (data as HostedBlogConfig | null) ?? null;
 });
 

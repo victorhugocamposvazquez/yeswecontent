@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, Check, Globe, LoaderCircle, Phone, Plus, Sparkles, Users, WandSparkles, X } from "lucide-react";
 import { Badge, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import type { Plan } from "@/lib/types";
+import { platformHostedBlogUrl, suggestHostedBlogUrls } from "@/lib/headless/hosted-blog";
 import {
   maxPlanAnnualSavingsPercent,
   planAnnualSavingsCents,
@@ -79,6 +80,8 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
   const [aiNote, setAiNote] = useState<string | null>(null);
   const [oauth, setOauth] = useState<OAuthReturn | null>(null);
   const maxAnnualSave = useMemo(() => maxPlanAnnualSavingsPercent(plans), [plans]);
+  const blogHints = useMemo(() => suggestHostedBlogUrls(s.url || "https://ejemplo.com"), [s.url]);
+  const platformBlogUrl = siteId ? platformHostedBlogUrl(siteId) : null;
 
   // Vuelta de una conexión OAuth (?oauth=google&estado=ok|error&motivo=…): lo mostramos y limpiamos la URL.
   useEffect(() => {
@@ -526,14 +529,50 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
                   ))}
                 </div>
               </fieldset>
-              {s.cms === "Blog alojado" ? (
-                <p className="text-xs leading-relaxed text-ink-3">
-                  Te creamos un blog listo para publicar (SEO, sitemap y RSS). Puedes usar un <strong className="font-medium text-ink-2">subdominio</strong> (p. ej. blog.tudominio.com) o una{" "}
-                  <strong className="font-medium text-ink-2">carpeta</strong> (/blog) con un proxy en tu web. Lo activamos al terminar el onboarding; el dominio y la URL canónica los afinas en Panel › Integraciones › Blog alojado.
-                </p>
-              ) : (
-                <p className="text-xs text-ink-3">Te pediremos las credenciales en Ajustes › Publicación cuando entres al panel.</p>
+              {s.cms === "Blog alojado" && (
+                <fieldset className="mt-3 space-y-2">
+                  <legend className="mb-1 text-sm font-medium text-ink-2">¿Dónde quieres el blog?</legend>
+                  {(
+                    [
+                      ["platform", "Empezar ya (sin DNS)", platformBlogUrl ? `Publicamos en ${platformBlogUrl}` : "URL en yeswecontent; puedes cambiarla después."],
+                      ["subdomain", "Subdominio en mi dominio", `CNAME a nuestros servidores · p. ej. ${blogHints.subdomainHost}`],
+                      ["folder", "Carpeta /blog", `Misma web · canónico ${blogHints.folderBaseUrl}`],
+                    ] as const
+                  ).map(([mode, title, desc]) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      aria-pressed={s.hostedBlogMode === mode}
+                      onClick={() => set("hostedBlogMode", mode)}
+                      className={cn(
+                        "flex w-full flex-col rounded-xl border px-3 py-2.5 text-left transition-colors",
+                        s.hostedBlogMode === mode ? "border-signal bg-signal-soft text-signal ring-1 ring-signal" : "border-line bg-card hover:bg-paper-2",
+                      )}
+                    >
+                      <span className="text-[13px] font-semibold">{title}</span>
+                      <span className={cn("mt-0.5 text-xs", s.hostedBlogMode === mode ? "text-signal/90" : "text-ink-3")}>{desc}</span>
+                    </button>
+                  ))}
+                  {s.hostedBlogMode === "subdomain" && (
+                    <div className="mt-2">
+                    <Field label="Subdominio">
+                      <Input
+                        value={s.hostedBlogDomain}
+                        onChange={(e) => set("hostedBlogDomain", e.target.value)}
+                        placeholder={blogHints.subdomainHost}
+                        autoCapitalize="off"
+                        spellCheck={false}
+                      />
+                    </Field>
+                    </div>
+                  )}
+                  <p className="text-xs leading-relaxed text-ink-3">
+                    Lo activamos al continuar. Los artículos se publican solos; el DNS o el proxy los afinas en Panel › Integraciones › Blog alojado.
+                  </p>
+                </fieldset>
               )}
+              {s.cms && s.cms !== "Blog alojado" && <p className="text-xs text-ink-3">Te pediremos las credenciales en Ajustes › Publicación cuando entres al panel.</p>}
+              {!s.cms && <p className="text-xs text-ink-3">Opcional: elige dónde publicar o configúralo más tarde.</p>}
             </div>
           </StepHead>
         )}

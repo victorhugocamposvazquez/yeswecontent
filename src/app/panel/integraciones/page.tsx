@@ -7,7 +7,8 @@ import { Badge, Card, CardHeader, Field, Input, PageHeader, Select } from "@/com
 import { getCurrentSite } from "@/lib/data";
 import { isDemo, siteUrl } from "@/lib/env";
 import { cn, fmtDate } from "@/lib/utils";
-import { createApiKey, revokeApiKey, saveFrameworkWebhook, saveGithub, saveHostedBlog, testFrameworkWebhook } from "./actions";
+import { createApiKey, revokeApiKey, saveFrameworkWebhook, saveGithub, testFrameworkWebhook } from "./actions";
+import { HostedBlogForm } from "./hosted-blog-form";
 import { getFrameworkWebhook, getGithub, getHostedBlogForPanel, listApiKeys } from "./data";
 import { CopyCode, RevealForm } from "./forms";
 import { snippet, type SnippetId } from "./snippets";
@@ -454,25 +455,7 @@ export default async function IntegracionesPage({ searchParams }: Props) {
                 Ver vista previa <ExternalLink className="h-3.5 w-3.5" aria-hidden />
               </a>
             </div>
-            <ActionForm action={saveHostedBlog}>
-              <label className="flex min-h-11 items-center gap-2 text-sm font-medium">
-                <input type="checkbox" name="enabled" defaultChecked={hosted?.enabled ?? false} className="h-4 w-4 accent-[var(--signal)]" /> Activar el blog alojado
-              </label>
-              <Field label="Dominio propio" hint="Un subdominio que apunte a nosotros por CNAME.">
-                <Input name="custom_domain" placeholder="blog.tudominio.com" defaultValue={hosted?.custom_domain ?? ""} autoCapitalize="off" spellCheck={false} />
-              </Field>
-              <Field label="URL pública canónica (opcional)" hint="Solo si lo sirves en una carpeta con proxy inverso, p. ej. https://tudominio.com/blog">
-                <Input name="public_base_url" placeholder="https://tudominio.com/blog" defaultValue={hosted?.public_base_url ?? ""} />
-              </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Título del blog">
-                  <Input name="title" placeholder={`Blog de ${site.name}`} defaultValue={hosted?.title ?? ""} />
-                </Field>
-                <Field label="Subtítulo">
-                  <Input name="tagline" placeholder="Lo que sabemos, contado claro." defaultValue={hosted?.tagline ?? ""} />
-                </Field>
-              </div>
-            </ActionForm>
+            <HostedBlogForm siteId={site.id} siteName={site.name} siteUrl={site.url} hosted={hosted} cnameTarget={cnameTarget} previewPath={`${origin}/blog-hosted/${site.id}`} />
           </Section>
           <div className="min-w-0 space-y-4 md:space-y-5">
             <Section title="Opción A · Subdominio (recomendada)">

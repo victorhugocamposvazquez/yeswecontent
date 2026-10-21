@@ -22,6 +22,8 @@ export interface OnboardingState {
   mode: "drip" | "batch";
   gsc: boolean;
   cms: string | null;
+  hostedBlogMode: "platform" | "subdomain" | "folder";
+  hostedBlogDomain: string;
   planId: string;
   interval: "month" | "year";
   survey: string;
@@ -53,6 +55,8 @@ export const initialState: OnboardingState = {
   mode: "drip",
   gsc: false,
   cms: null,
+  hostedBlogMode: "platform",
+  hostedBlogDomain: "",
   planId: "",
   interval: "year",
   survey: "",

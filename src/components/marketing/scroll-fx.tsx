@@ -590,25 +590,35 @@ function PanelGrow() {
       <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-3">
         <span className="sx-bar block h-full origin-left rounded-full bg-signal" />
       </div>
-      <ol className="relative mt-4 grid flex-1 content-start gap-2">
+      <ol className="relative mt-5 flex min-h-0 flex-1 flex-col justify-between gap-3.5 py-1 sm:gap-4">
         {timeline.map((row, i) => (
-          <li key={row.t} className="sx-at flex items-center gap-3" style={at(i + 1, stepsTotal)}>
+          <li
+            key={row.t}
+            className="sx-at flex items-center gap-3 rounded-xl border border-line/70 bg-card/80 px-3 py-2.5 shadow-[var(--shadow-xs)] sm:py-3"
+            style={at(i + 1, stepsTotal)}
+          >
             <span
               className={cn(
-                "grid h-8 w-8 shrink-0 place-items-center rounded-lg",
+                "grid h-9 w-9 shrink-0 place-items-center rounded-lg sm:h-8 sm:w-8",
                 "engine" in row ? "bg-paper-2 ring-1 ring-line" : "bg-signal-soft text-signal",
               )}
             >
               {"engine" in row ? <EngineLogo name={row.engine} size={18} alt="" /> : <row.I className="h-4 w-4" aria-hidden />}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-semibold">{row.t}</span>
-              <span className="block truncate text-[11.5px] text-ink-3">{row.s}</span>
+              <span className="block truncate text-[13px] font-semibold leading-snug">{row.t}</span>
+              <span className="mt-0.5 block truncate text-[11.5px] leading-snug text-ink-3">{row.s}</span>
             </span>
             <Check className="h-4 w-4 shrink-0 text-ok" aria-hidden />
           </li>
         ))}
       </ol>
+      <div className="mt-4 flex shrink-0 items-center justify-between gap-3 border-t border-line pt-4">
+        <span className="text-[11px] text-ink-3">Informe del lunes · sin reuniones</span>
+        <span className="sx-at rounded-lg bg-lime-soft px-2.5 py-1 text-[11px] font-semibold text-ink" style={at(stepsTotal, stepsTotal + 1)}>
+          Semana completa ✓
+        </span>
+      </div>
     </div>
   );
 }

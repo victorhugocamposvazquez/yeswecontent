@@ -37,7 +37,7 @@ const steps = [
   },
   {
     n: "03",
-    title: "Tu web empieza a crecer",
+    title: "Tu proyecto empieza a crecer",
     text: "Cada artículo se escribe, se puntúa, se enlaza y se publica solo. Tú miras el resumen del lunes con un café.",
   },
 ];

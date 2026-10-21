@@ -7,7 +7,7 @@
  * Con prefers-reduced-motion todo aparece en su estado final.
  */
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
-import { Check, Globe, PenLine, Send, Sparkles, TrendingUp } from "lucide-react";
+import { Check, Globe, PenLine, Send, TrendingUp } from "lucide-react";
 import { cn, num } from "@/lib/utils";
 import { EngineLogo } from "./primitives";
 
@@ -570,32 +570,40 @@ function PanelPlan() {
 }
 
 function PanelGrow() {
-  const timeline = [
-    { I: PenLine, t: "Artículo escrito con tu voz", s: "Nota de calidad 91/100" },
+  const stepsTotal = 7;
+  const timeline: ({ t: string; s: string } & ({ I: typeof PenLine } | { engine: string }))[] = [
+    { I: PenLine, t: "Artículo con el tono de tu marca", s: "Nota de calidad 91/100" },
     { I: Send, t: "Publicado en tu WordPress", s: "Jueves 9:00 · con FAQ y schema" },
     { I: TrendingUp, t: "Entra en el top 3 de Google", s: "«vajilla de gres» · #3" },
-    { I: Sparkles, t: "Perplexity te cita como fuente", s: "«¿Dónde comprar gres artesanal?»" },
+    { engine: "ChatGPT", t: "ChatGPT te recomienda", s: "«Tiendas de cerámica artesanal en España»" },
+    { engine: "Claude", t: "Claude habla de ti", s: "«Gres hecho a mano: marcas fiables»" },
+    { engine: "Perplexity", t: "Perplexity te cita como fuente", s: "«¿Dónde comprar gres artesanal?»" },
   ];
   return (
     <div className="flex h-full flex-col p-4 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <p className="text-[13px] font-semibold">Esta semana en tierrafina.es</p>
         <span className="tabular text-[11px] text-ink-3">
-          clics <span className="sx-at font-semibold text-ok" style={at(4, 6)}>+38 %</span>
+          clics <span className="sx-at font-semibold text-ok" style={at(stepsTotal, stepsTotal + 1)}>+38 %</span>
         </span>
       </div>
       <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-3">
         <span className="sx-bar block h-full origin-left rounded-full bg-signal" />
       </div>
-      <ol className="relative mt-4 grid flex-1 content-start gap-2.5">
-        {timeline.map(({ I, t, s }, i) => (
-          <li key={t} className="sx-at flex items-center gap-3" style={at(i + 1, 5.5)}>
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-signal-soft text-signal">
-              <I className="h-4 w-4" aria-hidden />
+      <ol className="relative mt-4 grid flex-1 content-start gap-2">
+        {timeline.map((row, i) => (
+          <li key={row.t} className="sx-at flex items-center gap-3" style={at(i + 1, stepsTotal)}>
+            <span
+              className={cn(
+                "grid h-8 w-8 shrink-0 place-items-center rounded-lg",
+                "engine" in row ? "bg-paper-2 ring-1 ring-line" : "bg-signal-soft text-signal",
+              )}
+            >
+              {"engine" in row ? <EngineLogo name={row.engine} size={18} alt="" /> : <row.I className="h-4 w-4" aria-hidden />}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-semibold">{t}</span>
-              <span className="block truncate text-[11.5px] text-ink-3">{s}</span>
+              <span className="block truncate text-[13px] font-semibold">{row.t}</span>
+              <span className="block truncate text-[11.5px] text-ink-3">{row.s}</span>
             </span>
             <Check className="h-4 w-4 shrink-0 text-ok" aria-hidden />
           </li>

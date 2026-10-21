@@ -188,17 +188,16 @@ export function CtaBand({
   return (
     <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
       <Container>
-        <div className="grain-ink relative overflow-hidden rounded-3xl px-6 py-14 text-center text-paper shadow-[var(--shadow-lg)] sm:px-12 md:py-20">
-          <div aria-hidden className="ink-halo pointer-events-none absolute inset-0" />
+        <div className="glow relative overflow-hidden rounded-3xl border border-line bg-paper-2 px-6 py-14 text-center shadow-[var(--shadow-md)] sm:px-12 md:py-20">
           <div className="relative mx-auto max-w-3xl">
-            <h2 className="font-display text-[clamp(1.875rem,4.4vw,3.25rem)]">{title}</h2>
-            {text && <p className="text-pretty mx-auto mt-5 max-w-xl text-base text-paper/70 sm:text-lg">{text}</p>}
+            <h2 className="font-display text-[clamp(1.875rem,4.4vw,3.25rem)] text-ink">{title}</h2>
+            {text && <p className="text-pretty mx-auto mt-5 max-w-xl text-base text-ink-2 sm:text-lg">{text}</p>}
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <CtaLink href={href} size="lg">
                 {cta}
               </CtaLink>
               {secondary && (
-                <Link href={secondary.href} className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-paper/80 transition-colors duration-150 hover:text-paper">
+                <Link href={secondary.href} className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-ink">
                   {secondary.label}
                 </Link>
               )}

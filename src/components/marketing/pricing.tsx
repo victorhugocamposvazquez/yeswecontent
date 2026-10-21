@@ -57,22 +57,21 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
               style={{ "--i": idx * 4 } as React.CSSProperties}
               className={cn(
                 "relative flex flex-col overflow-hidden rounded-3xl border p-6 sm:p-8",
-                featured ? "grain-ink border-ink text-paper shadow-[var(--shadow-lg)]" : "border-line bg-card shadow-[var(--shadow-sm)]",
+                featured
+                  ? "border-lime/60 bg-lime-soft/35 shadow-[var(--shadow-md)] ring-1 ring-lime/25"
+                  : "border-line bg-card shadow-[var(--shadow-sm)]",
               )}
             >
               {featured && (
-                <>
-                  <div aria-hidden className="ink-halo-lime pointer-events-none absolute inset-0" />
-                  <span className="absolute -top-3 left-6 z-[1] inline-flex items-center rounded-full bg-lime px-3 py-1 text-xs font-semibold text-ink shadow-[var(--shadow-xs)]">Para crecer en serio</span>
-                </>
+                <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-lime px-3 py-1 text-xs font-semibold text-ink shadow-[var(--shadow-xs)]">Para crecer en serio</span>
               )}
-              <p className={cn("text-[13px] font-semibold", featured ? "text-lime" : "text-signal")}>Plan</p>
+              <p className={cn("text-[13px] font-semibold", featured ? "text-ink-2" : "text-signal")}>Plan</p>
               <h3 className="mt-1 text-[1.75rem] font-semibold tracking-tight">{p.name}</h3>
               <div className="mt-5 flex items-end gap-2">
                 <span className="tabular text-[2.75rem] font-semibold leading-none tracking-tight sm:text-[3.25rem]">{eur(price(p, interval))}</span>
-                <span className={cn("pb-1 text-sm", featured ? "text-paper/60" : "text-ink-3")}>/mes por web</span>
+                <span className="pb-1 text-sm text-ink-3">/mes por web</span>
               </div>
-              <p className={cn("mt-2 min-h-5 text-[13px]", featured ? "text-paper/60" : "text-ink-3")}>
+              <p className="mt-2 min-h-5 text-[13px] text-ink-3">
                 {interval === "year" ? (
                   <>
                     {eur(price(p, "year") * 12)} al año · <s>{eur(p.monthly_price_eur)}/mes</s>
@@ -84,12 +83,12 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
               <ButtonLink
                 href={`/registro?plan=${p.id}&periodo=${interval === "year" ? "anual" : "mensual"}`}
                 size="lg"
-                variant={featured ? "outline" : "ink"}
-                className={cn("mt-6 w-full", featured && "border-0 bg-lime text-ink shadow-none hover:border-0 hover:bg-lime hover:brightness-95")}
+                variant={featured ? "primary" : "ink"}
+                className={cn("mt-6 w-full", featured && "bg-lime text-ink shadow-[var(--shadow-xs)] hover:brightness-95")}
               >
                 Probar 3 días gratis
               </ButtonLink>
-              <ul className={cn("mt-7 space-y-2.5 border-t pt-6 text-sm", featured ? "border-paper/15" : "border-line")}>
+              <ul className="mt-7 space-y-2.5 border-t border-line pt-6 text-sm">
                 <Li featured={featured}>
                   <strong>{p.articles_per_month} artículos</strong> al mes
                 </Li>
@@ -121,11 +120,11 @@ export function Pricing({ plans, discounts }: { plans: Plan[]; discounts: Discou
 
 function Li({ children, featured }: { children: React.ReactNode; featured: boolean }) {
   return (
-    <li className={cn("flex gap-2.5", featured ? "text-paper/85" : "text-ink-2")}>
-      <span className={cn("mt-0.5 grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full", featured ? "bg-lime/20 text-lime" : "bg-signal-soft text-signal")}>
+    <li className="flex gap-2.5 text-ink-2">
+      <span className={cn("mt-0.5 grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full", featured ? "bg-lime/50 text-ink" : "bg-signal-soft text-signal")}>
         <Check className="h-3 w-3" aria-hidden />
       </span>
-      <span className={cn(featured && "[&_strong]:text-paper")}>{children}</span>
+      <span>{children}</span>
     </li>
   );
 }
@@ -219,8 +218,8 @@ function VolumeCalculator({ plans, discounts, interval }: { plans: Plan[]; disco
               <dt className="text-[13px] text-ink-3">Descuento</dt>
               <dd className="tabular mt-0.5 text-2xl font-semibold tracking-tight">{pct ? `−${pct}%` : "—"}</dd>
             </div>
-            <div className="grain-ink col-span-2 rounded-xl p-4 text-paper">
-              <dt className="text-[13px] text-paper/60">Total {interval === "year" ? "(pago anual, por mes)" : "al mes"}</dt>
+            <div className="col-span-2 rounded-xl border border-line bg-paper-2 p-4">
+              <dt className="text-[13px] text-ink-3">Total {interval === "year" ? "(pago anual, por mes)" : "al mes"}</dt>
               <dd className="mt-1 flex flex-wrap items-baseline gap-x-3">
                 <span className="tabular text-[2.5rem] font-semibold leading-none tracking-tight">{eur(total)}</span>
                 {saved > 0 && (

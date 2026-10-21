@@ -27,6 +27,21 @@ const clientTools: Record<string, () => React.ReactNode> = {
   "generador-robots": () => <RobotsGeneratorTool />,
 };
 
+function UrlToolIntro({ slug, tagline }: { slug: string; tagline: string }) {
+  if (slug === "auditoria-ia") {
+    return (
+      <p className="mt-2 text-sm leading-relaxed text-ink-2 sm:text-[15px]">
+        Nota 0–100 sobre la base técnica de tu web o ecommerce, en un minuto y sin registro. Después, en YesWeContent: contenido, backlinks y visibilidad en IA.
+      </p>
+    );
+  }
+  return (
+    <p className="mt-2 text-sm leading-relaxed text-ink-2 sm:text-[15px]">
+      {tagline}
+    </p>
+  );
+}
+
 export default async function ToolPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ url?: string | string[] }> }) {
   const t = getTool((await params).slug);
   if (!t || t.kind === "soon") notFound();
@@ -34,76 +49,82 @@ export default async function ToolPage({ params, searchParams }: { params: Promi
   const initialUrl = typeof sp.url === "string" ? sp.url.slice(0, 2048) : undefined;
   const cat = toolCategories.find((c) => c.id === t.category);
   const siblings = tools.filter((x) => x.category === t.category && x.slug !== t.slug && x.kind !== "soon").slice(0, 3);
+  const isUrlTool = t.kind === "server";
   const isAudit = t.slug === "auditoria-ia";
 
   return (
     <>
-      {isAudit ? (
-        <section className="glow relative overflow-hidden border-b border-line">
+      {isUrlTool ? (
+        <section className="glow relative border-b border-line">
           <Container className="relative py-5 sm:py-7">
-            <Link href="/herramientas" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
-              <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
+            <Link
+              href="/herramientas"
+              prefetch={false}
+              className="mb-3 inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0"
+            >
+              <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden /> Todas las herramientas
             </Link>
-            <div className="mt-3 grid grid-cols-1 items-start gap-4 lg:mt-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-8 xl:gap-10">
+            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-8 xl:gap-10">
               <div className="order-2 max-w-lg lg:order-1 lg:max-w-none lg:pt-1">
-                <Eyebrow>{cat?.label} · diagnóstico gratuito</Eyebrow>
+                <Eyebrow>{cat?.label} · {isAudit ? "diagnóstico gratuito" : "herramienta gratuita"}</Eyebrow>
                 <Title as="h1" size="md" className="mt-2 sm:mt-3">
                   {t.name}
                 </Title>
-                <p className="mt-2 text-sm leading-relaxed text-ink-2 sm:text-[15px]">
-                  Nota 0–100 sobre la base técnica de tu web o ecommerce, en un minuto y sin registro. Después, en YesWeContent: contenido, backlinks y visibilidad en IA.
-                </p>
+                <UrlToolIntro slug={t.slug} tagline={t.tagline} />
               </div>
-              <div className="order-1 lg:order-2">
-                {t.kind === "server" && <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} compact />}
+              <div className="order-1 min-w-0 lg:order-2">
+                <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} compact={isAudit} />
               </div>
             </div>
           </Container>
         </section>
       ) : (
-        <section className="glow relative overflow-hidden border-b border-line">
-          <Container className="relative py-10 sm:py-14 md:py-16">
-            <Link href="/herramientas" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0">
-              <ArrowLeft className="h-4 w-4" aria-hidden /> Todas las herramientas
-            </Link>
-            <Eyebrow className="mt-8">{cat?.label} · herramienta gratuita</Eyebrow>
-            <Title as="h1" size="lg" className="mt-4 max-w-4xl">
-              {t.name}
-            </Title>
-            <Lead className="mt-5 max-w-2xl">{t.tagline}</Lead>
-          </Container>
-        </section>
+        <>
+          <section className="glow relative overflow-hidden border-b border-line">
+            <Container className="relative py-10 sm:py-14 md:py-16">
+              <Link
+                href="/herramientas"
+                prefetch={false}
+                className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-semibold text-ink-2 transition-colors duration-150 hover:text-signal sm:min-h-0"
+              >
+                <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden /> Todas las herramientas
+              </Link>
+              <Eyebrow className="mt-6 sm:mt-8">{cat?.label} · herramienta gratuita</Eyebrow>
+              <Title as="h1" size="lg" className="mt-4 max-w-4xl">
+                {t.name}
+              </Title>
+              <Lead className="mt-5 max-w-2xl">{t.tagline}</Lead>
+            </Container>
+          </section>
+
+          <Section className="py-10 sm:py-12 md:py-16 lg:py-16">
+            <Container>
+              {t.kind === "client" && clientTools[t.slug]?.()}
+              {t.kind === "signup" && (
+                <Card className="grid grid-cols-1 gap-8 bg-sky-soft p-7 md:grid-cols-[1.3fr_1fr] md:items-center md:p-12">
+                  <div>
+                    <Badge className="bg-card">
+                      <Clock className="h-3.5 w-3.5" aria-hidden /> Incluida en la prueba gratuita
+                    </Badge>
+                    <Title className="mt-5">Esta comprobación consulta a los modelos en tiempo real.</Title>
+                    <p className="mt-4 text-[15px] leading-relaxed text-ink-2">{t.why}</p>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <CtaLink href="/registro" size="lg">
+                      Probar 3 días gratis
+                    </CtaLink>
+                    <Link href="/herramientas/auditoria-ia" prefetch={false} className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-ink underline decoration-signal decoration-2 underline-offset-4">
+                      Mientras tanto, haz la auditoría exprés
+                    </Link>
+                  </div>
+                </Card>
+              )}
+            </Container>
+          </Section>
+        </>
       )}
 
-      {!isAudit && (
-      <Section className="py-10 sm:py-12 md:py-16 lg:py-16">
-        <Container>
-          {t.kind === "server" && <ToolRunner slug={t.slug} cta={t.cta} initialUrl={initialUrl} />}
-          {t.kind === "client" && clientTools[t.slug]?.()}
-          {t.kind === "signup" && (
-            <Card className="grid grid-cols-1 gap-8 bg-sky-soft p-7 md:grid-cols-[1.3fr_1fr] md:items-center md:p-12">
-              <div>
-                <Badge className="bg-card">
-                  <Clock className="h-3.5 w-3.5" aria-hidden /> Incluida en la prueba gratuita
-                </Badge>
-                <Title className="mt-5">Esta comprobación consulta a los modelos en tiempo real.</Title>
-                <p className="mt-4 text-[15px] leading-relaxed text-ink-2">{t.why}</p>
-              </div>
-              <div className="flex flex-col gap-3">
-                <CtaLink href="/registro" size="lg">
-                  Probar 3 días gratis
-                </CtaLink>
-                <Link href="/herramientas/auditoria-ia" className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-ink underline decoration-signal decoration-2 underline-offset-4">
-                  Mientras tanto, haz la auditoría exprés
-                </Link>
-              </div>
-            </Card>
-          )}
-        </Container>
-      </Section>
-      )}
-
-      <Section tone="paper-2">
+      <Section tone="paper-2" className={isUrlTool ? "pt-10 sm:pt-12" : undefined}>
         <Container className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <Eyebrow>Qué revisa</Eyebrow>

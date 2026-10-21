@@ -15,12 +15,15 @@ const statusIcon: Record<CheckStatus, { I: typeof CircleCheck; cls: string; labe
   info: { I: Info, cls: "text-ink-3", label: "Información" },
 };
 
-const HEADER_SCROLL_MARGIN = "scroll-mt-[5.5rem]";
+const STICKY_TOP = "top-16";
+const HEADER_SCROLL_MARGIN = "scroll-mt-[4.25rem]";
 
 function scrollToResult(el: HTMLElement | null) {
   if (!el) return;
   requestAnimationFrame(() => {
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   });
 }
 
@@ -66,6 +69,7 @@ export function ToolRunner({
   const scoreRef = useRef<HTMLDivElement>(null);
   const autorun = useRef(false);
   const showResults = loading || !!error || !!result;
+  const pinned = showResults;
 
   const run = useCallback(
     async (target: string) => {
@@ -106,17 +110,27 @@ export function ToolRunner({
 
   return (
     <div id="analizador" className={HEADER_SCROLL_MARGIN}>
-      <div className="surface overflow-hidden shadow-[var(--shadow-md)]">
+      <div
+        className={cn(
+          "surface z-30 shadow-[var(--shadow-md)]",
+          pinned && cn("sticky", STICKY_TOP, "border border-line bg-paper/95 shadow-[var(--shadow-md)] backdrop-blur-md supports-[backdrop-filter]:bg-paper/90"),
+        )}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
             if (url.trim()) void run(url.trim());
           }}
-          className={cn("p-4", compact ? "sm:p-5" : "sm:p-6")}
+          className={cn("p-4", pinned ? "py-3 sm:p-4" : compact ? "sm:p-5" : "sm:p-6")}
         >
-          <Label htmlFor={`url-${slug}`}>{isAudit ? "URL de tu web o tienda online" : "URL de tu sitio"}</Label>
+          <Label htmlFor={`url-${slug}`} className={cn(pinned && "sr-only")}>
+            {isAudit ? "URL de tu web o tienda online" : "URL de tu sitio"}
+          </Label>
+          {pinned && (
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink-3">{loading ? "Analizando ahora" : "Sitio analizado"}</p>
+          )}
           <div className="flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1">
+            <div className="relative min-w-0 flex-1">
               <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-ink-3" aria-hidden />
               <Input
                 id={`url-${slug}`}
@@ -129,40 +143,47 @@ export function ToolRunner({
                 className="h-11 pl-10"
               />
             </div>
-            <Button type="submit" size="lg" disabled={loading} className="h-11">
+            <Button type="submit" size="lg" disabled={loading} className="h-11 shrink-0">
               {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-              {loading ? "Analizando…" : cta}
+              {loading ? "Analizando…" : pinned ? "Reanalizar" : cta}
             </Button>
           </div>
-          {isAudit && compact && <AuditScopeDetails />}
-          <details className="mt-3 text-sm">
-            <summary className="inline-flex min-h-11 cursor-pointer items-center text-ink-3 transition-colors duration-150 hover:text-ink sm:min-h-0">¿Quieres que te enviemos el informe? (opcional)</summary>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" autoComplete="email" aria-label="Email para recibir el informe" className="mt-2 h-11 max-w-sm" />
-            <p className="mt-1 text-xs text-ink-3">Solo lo usaremos para enviarte el resultado y algún consejo. Sin spam.</p>
-          </details>
-          {isAudit && !compact && <AuditScopeDetails />}
+          {!pinned && isAudit && compact && <AuditScopeDetails />}
+          {!pinned && (
+            <details className="mt-3 text-sm">
+              <summary className="inline-flex min-h-11 cursor-pointer items-center text-ink-3 transition-colors duration-150 hover:text-ink sm:min-h-0">¿Quieres que te enviemos el informe? (opcional)</summary>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" autoComplete="email" aria-label="Email para recibir el informe" className="mt-2 h-11 max-w-sm" />
+              <p className="mt-1 text-xs text-ink-3">Solo lo usaremos para enviarte el resultado y algún consejo. Sin spam.</p>
+            </details>
+          )}
+          {!pinned && isAudit && !compact && <AuditScopeDetails />}
         </form>
-
-        {showResults && (
-          <div ref={resultRef} id="resultado" aria-live="polite" className="border-t border-line bg-paper-2/80 px-4 py-5 sm:px-6 sm:py-6">
-            {loading && (
-              <div className="flex items-center gap-3 rounded-xl border border-dashed border-line-2 bg-card p-5 text-sm text-ink-2">
-                <Loader2 className="h-5 w-5 shrink-0 animate-spin text-signal" aria-hidden />
-                <div>
-                  <p className="font-semibold text-ink">{isAudit ? "Analizando tu sitio…" : "Analizando…"}</p>
-                  <p className="mt-0.5">El informe aparecerá aquí abajo. Suele tardar menos de 10 segundos.</p>
-                </div>
-              </div>
-            )}
-            {error && (
-              <p role="alert" className="rounded-xl border border-bad/30 bg-bad-soft p-5 text-sm font-medium text-bad">
-                {error}
-              </p>
-            )}
-            {result && <ResultView result={result} scoreRef={scoreRef} />}
-          </div>
-        )}
       </div>
+
+      {showResults && (
+        <div
+          ref={resultRef}
+          id="resultado"
+          aria-live="polite"
+          className={cn("surface -mt-px rounded-t-none border border-t-0 border-line bg-paper-2/80 px-4 py-5 sm:px-6 sm:py-6", HEADER_SCROLL_MARGIN)}
+        >
+          {loading && (
+            <div className="flex items-center gap-3 rounded-xl border border-dashed border-line-2 bg-card p-5 text-sm text-ink-2">
+              <Loader2 className="h-5 w-5 shrink-0 animate-spin text-signal" aria-hidden />
+              <div>
+                <p className="font-semibold text-ink">{isAudit ? "Analizando tu sitio…" : "Analizando…"}</p>
+                <p className="mt-0.5">El informe empieza justo debajo. Suele tardar menos de 10 segundos.</p>
+              </div>
+            </div>
+          )}
+          {error && (
+            <p role="alert" className="rounded-xl border border-bad/30 bg-bad-soft p-5 text-sm font-medium text-bad">
+              {error}
+            </p>
+          )}
+          {result && <ResultView result={result} scoreRef={scoreRef} />}
+        </div>
+      )}
     </div>
   );
 }

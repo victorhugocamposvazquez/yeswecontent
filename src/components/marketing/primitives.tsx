@@ -118,9 +118,10 @@ export function IconBox({ children, className, tone = "signal" }: { children: Re
 }
 
 /** Tarjeta interactiva: borde fino, sombra xs y elevación al pasar el ratón. */
-export function HoverCard({ className, ...p }: ComponentProps<typeof Link>) {
+export function HoverCard({ className, prefetch = false, ...p }: ComponentProps<typeof Link> & { prefetch?: boolean }) {
   return (
     <Link
+      prefetch={prefetch}
       className={cn(
         "group block rounded-2xl border border-line bg-card shadow-[var(--shadow-xs)] transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-line-2 hover:shadow-[var(--shadow-md)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         className,

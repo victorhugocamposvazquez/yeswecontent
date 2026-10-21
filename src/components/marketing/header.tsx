@@ -17,10 +17,10 @@ export interface ProductNavItem {
 }
 
 const links = [
-  { href: "/herramientas", label: "Herramientas gratis" },
-  { href: "/precios", label: "Precios" },
-  { href: "/casos", label: "Casos" },
-  { href: "/agencias", label: "Agencias" },
+  { href: "/herramientas", label: "Herramientas gratis", prefetch: false as const },
+  { href: "/precios", label: "Precios", prefetch: true as const },
+  { href: "/casos", label: "Casos", prefetch: true as const },
+  { href: "/agencias", label: "Agencias", prefetch: true as const },
 ];
 
 const navItem = "inline-flex h-9 items-center gap-1 rounded-lg px-3 text-sm font-medium text-ink-2 transition-colors duration-150 hover:bg-paper-2 hover:text-ink";
@@ -122,7 +122,7 @@ export function MarketingHeader({ products }: { products: ProductNavItem[] }) {
               )}
             </div>
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className={cn(navItem, active(l.href) && "bg-paper-2 text-ink")}>
+              <Link key={l.href} href={l.href} prefetch={l.prefetch} className={cn(navItem, active(l.href) && "bg-paper-2 text-ink")}>
                 {l.label}
               </Link>
             ))}
@@ -169,7 +169,7 @@ export function MarketingHeader({ products }: { products: ProductNavItem[] }) {
             </div>
             <div className="mt-5 divide-y divide-line border-y border-line">
               {links.map((l) => (
-                <Link key={l.href} href={l.href} onClick={close} aria-current={active(l.href) ? "page" : undefined} className="flex min-h-14 items-center justify-between text-lg font-semibold tracking-tight">
+                <Link key={l.href} href={l.href} prefetch={l.prefetch} onClick={close} aria-current={active(l.href) ? "page" : undefined} className="flex min-h-14 items-center justify-between text-lg font-semibold tracking-tight">
                   {l.label} <ArrowRight className="h-4 w-4 text-ink-3" aria-hidden />
                 </Link>
               ))}

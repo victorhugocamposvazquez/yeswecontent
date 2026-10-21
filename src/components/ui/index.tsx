@@ -122,8 +122,8 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 /** Logotipo propio: "yes!" en una burbuja de diálogo + wordmark "yeswecontent!". */
 export function Logo({ className, inverted = false, compact = false }: { className?: string; inverted?: boolean; compact?: boolean }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5 font-semibold tracking-tight", className)}>
-      <svg viewBox="0 0 40 32" className="h-9 w-auto sm:h-10" aria-hidden>
+    <span className={cn("inline-flex items-end gap-2.5 font-semibold tracking-tight", className)}>
+      <svg viewBox="0 0 40 32" className="h-9 w-auto translate-y-[2px] sm:h-10 sm:translate-y-1" aria-hidden>
         <path
           d="M4 2h32a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H16l-8 6v-6H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"
           fill="var(--signal)"

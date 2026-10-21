@@ -11,7 +11,7 @@ import { HeroVisual } from "@/components/marketing/hero-visual";
 import { RotatingWord } from "@/components/marketing/rotating-word";
 import { RatingPill } from "@/components/marketing/rating-pill";
 import { EngineWordmark } from "@/components/marketing/engine-wordmark";
-import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup, SocialMockup } from "@/components/marketing/mockups";
+import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup } from "@/components/marketing/mockups";
 import { ENGINES } from "@/lib/marketing/social-proof";
 import { StepStory } from "@/components/marketing/step-stories";
 import { AiCitations, GrowthChart, RankClimb, Reveal, FloatingEngines, ScrollStatement, ScrollSteps, Stagger, StickyShowcase, TiltIn, Watch, type StatementPart } from "@/components/marketing/scroll-fx";
@@ -302,28 +302,6 @@ export default async function HomePage() {
           "hablen de ti y te recomienden.",
         ]}
       />
-
-      {/* ───────── SOCIAL ───────── */}
-      <Section>
-        <Container>
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-16">
-            <div>
-              <Eyebrow>Visibilidad social</Eyebrow>
-              <Title className="mt-4">
-                También donde la gente <span className="marker">pregunta en voz alta</span>.
-              </Title>
-              <Lead className="mt-5 max-w-lg">
-                Reddit y Quora son de las fuentes que más consultan los asistentes. Te proponemos respuestas útiles basadas en tus artículos, y convertimos cada artículo en un carrusel para tus redes.
-              </Lead>
-              <CtaLink href="/producto/social" tone="paper" className="mt-8">
-                Cómo funciona
-              </CtaLink>
-            </div>
-            <SocialMockup />
-          </div>
-          <StepStory name="social" className="mt-16 md:mt-24" />
-        </Container>
-      </Section>
 
       {/* ───────── VISIBILIDAD IA ───────── */}
       <Section tone="ink" className="relative overflow-hidden">

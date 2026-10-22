@@ -88,7 +88,7 @@ const withUs = [
 ];
 
 /** Horas al mes que costaría hacerlo con equipo propio, por plan. Cálculo orientativo. */
-const HOUR_COST_EUR = 25;
+const HOUR_COST_EUR = 40;
 const FULL_TIME_HOURS = 160;
 const savingsTasks: { task: string; tech: string; hours: Record<"semilla" | "cosecha", number> }[] = [
   { task: "Decidir sobre qué escribir", tech: "keyword research y plan editorial", hours: { semilla: 6, cosecha: 12 } },
@@ -100,7 +100,8 @@ const savingsTasks: { task: string; tech: string; hours: Record<"semilla" | "cos
 ];
 const savingsPlans = ["semilla", "cosecha"] as const;
 const teamHours = (plan: (typeof savingsPlans)[number]) => savingsTasks.reduce((sum, t) => sum + t.hours[plan], 0);
-const decimal = (n: number) => new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 }).format(n);
+/** Personas a jornada completa (160 h/mes), redondeando siempre hacia arriba. */
+const teamHeadcount = (plan: (typeof savingsPlans)[number]) => Math.ceil(teamHours(plan) / FULL_TIME_HOURS);
 /** Redondea a centenas y agrupa siempre los miles, como en «≈ 2.700 €» (es-ES no agrupa cifras de 4 dígitos). */
 const approxEur = (n: number) =>
   new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0, useGrouping: "always" }).format(Math.round(n / 100) * 100);
@@ -128,8 +129,8 @@ export default async function HomePage() {
         <Container className="relative flex flex-col items-center pt-14 text-center sm:pt-20 md:pt-24">
           <Eyebrow className="rise">SEO + GEO en piloto automático · para webs y tiendas online</Eyebrow>
           <h1 className="rise rise-2 mt-5 w-full max-w-[1100px] font-display text-[clamp(2.125rem,6.4vw,4.75rem)]">
-            <span className="sr-only">Consigue clientes que te encuentran cuando preguntan a Google, ChatGPT, Gemini, Perplexity o Claude.</span>
-            <span aria-hidden className="block">Consigue clientes que te encuentran</span>
+            <span className="sr-only">Clientes que te encuentran cuando preguntan a Google, ChatGPT, Gemini, Perplexity o Claude.</span>
+            <span aria-hidden className="block">Clientes que te encuentran</span>
             <span aria-hidden className="block md:whitespace-nowrap">
               cuando preguntan a <RotatingWord className="max-sm:mx-auto max-sm:block" />
             </span>
@@ -311,24 +312,24 @@ export default async function HomePage() {
                 <tr className="border-t border-line-2 bg-paper-2 font-semibold">
                   <th scope="row" className="px-5 py-3.5">Horas de tu equipo al mes</th>
                   {savingsPlans.map((id) => (
-                    <td key={id} className="px-5 py-3.5 text-right">
-                      <del className="text-ink-3">{teamHours(id)} h</del>
+                    <td key={id} className="px-5 py-3.5 text-right text-ink">
+                      {teamHours(id)} h
                     </td>
                   ))}
                 </tr>
                 <tr className="border-t border-line">
                   <th scope="row" className="px-5 py-3.5 font-medium">Personas en plantilla</th>
                   {savingsPlans.map((id) => (
-                    <td key={id} className="px-5 py-3.5 text-right">
-                      <del className="text-ink-3">{decimal(teamHours(id) / FULL_TIME_HOURS)} personas</del>
+                    <td key={id} className="px-5 py-3.5 text-right font-medium text-ink">
+                      {teamHeadcount(id)} {teamHeadcount(id) === 1 ? "persona" : "personas"}
                     </td>
                   ))}
                 </tr>
-                <tr className="border-t border-line">
-                  <th scope="row" className="px-5 py-3.5 font-medium">Coste con tu equipo propio ({HOUR_COST_EUR} €/h)</th>
+                <tr className="border-t border-line bg-paper-2/80">
+                  <th scope="row" className="px-5 py-3.5 font-semibold">Coste con tu equipo propio ({HOUR_COST_EUR} €/h)</th>
                   {savingsPlans.map((id) => (
-                    <td key={id} className="px-5 py-3.5 text-right">
-                      <del className="text-ink-3">≈ {approxEur(teamHours(id) * HOUR_COST_EUR)}/mes</del>
+                    <td key={id} className="px-5 py-3.5 text-right text-base font-semibold text-ink">
+                      ≈ {approxEur(teamHours(id) * HOUR_COST_EUR)}/mes
                     </td>
                   ))}
                 </tr>
@@ -347,7 +348,7 @@ export default async function HomePage() {
             </table>
           </Card>
           <p className="mt-5 text-xs text-ink-3">
-            Cálculo orientativo con {FULL_TIME_HOURS} h/mes por persona y {HOUR_COST_EUR} €/hora (salario más cotizaciones de un perfil junior de marketing).
+            Cálculo orientativo con {FULL_TIME_HOURS} h/mes por persona y {HOUR_COST_EUR} €/hora (salario más cotizaciones de un perfil senior de marketing o SEO).
           </p>
         </Container>
       </Section>

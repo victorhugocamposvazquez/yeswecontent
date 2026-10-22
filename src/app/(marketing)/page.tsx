@@ -100,8 +100,9 @@ const savingsTasks: { task: string; tech: string; hours: Record<"semilla" | "cos
 ];
 const savingsPlans = ["semilla", "cosecha"] as const;
 const teamHours = (plan: (typeof savingsPlans)[number]) => savingsTasks.reduce((sum, t) => sum + t.hours[plan], 0);
-/** Personas a jornada completa (160 h/mes), redondeando siempre hacia arriba. */
-const teamHeadcount = (plan: (typeof savingsPlans)[number]) => Math.ceil(teamHours(plan) / FULL_TIME_HOURS);
+/** Personas en plantilla (orientativo; el reparto real mezcla SEO, redacción y publicación). */
+const TEAM_HEADCOUNT: Record<(typeof savingsPlans)[number], number> = { semilla: 2, cosecha: 4 };
+const teamHeadcount = (plan: (typeof savingsPlans)[number]) => TEAM_HEADCOUNT[plan];
 /** Redondea a centenas y agrupa siempre los miles, como en «≈ 2.700 €» (es-ES no agrupa cifras de 4 dígitos). */
 const approxEur = (n: number) =>
   new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0, useGrouping: "always" }).format(Math.round(n / 100) * 100);
@@ -334,7 +335,12 @@ export default async function HomePage() {
                   ))}
                 </tr>
                 <tr className="border-t border-line bg-lime text-base font-semibold">
-                  <th scope="row" className="px-5 py-4">Con yeswecontent: 0 h de tu equipo</th>
+                  <th scope="row" className="px-5 py-4 align-top">
+                    <span className="block">Con yeswecontent: 0 h de tu equipo</span>
+                    <span className="mt-1.5 block text-sm font-normal leading-snug text-ink-2">
+                      (Sin despidos, sin nóminas, sin bajas laborales, sin dolores de cabeza…)
+                    </span>
+                  </th>
                   {savingsPlans.map((id) => {
                     const plan = plans.find((p) => p.id === id);
                     return (

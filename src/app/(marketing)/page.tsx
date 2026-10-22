@@ -136,9 +136,14 @@ export default async function HomePage() {
               cuando preguntan a <RotatingWord className="max-sm:mx-auto max-sm:block" />
             </span>
           </h1>
-          <Lead className="rise rise-2 mt-6 max-w-2xl md:text-xl">
-            Escribimos, publicamos y posicionamos cada semana los artículos que tus clientes buscan antes de comprar. Todo el trabajo de un equipo de SEO y contenidos, por menos de lo que cuesta una comida al día.
-          </Lead>
+          <div className="rise rise-2 mt-6 max-w-3xl">
+            <Lead className="md:text-xl">
+              Contenido automatizado creado por expertos en posicionamiento en SEO + GEO (Google + IAs) que no cobran nóminas, seguros y tampoco cogen bajas.
+            </Lead>
+            <Lead className="mt-4 md:text-xl">
+              <span className="font-semibold text-ink">Por eso</span> escribimos, publicamos y posicionamos cada semana los artículos que tus clientes buscan antes de comprar. Todo el trabajo de un equipo de SEO y contenidos, por menos de lo que cuesta una comida al día.
+            </Lead>
+          </div>
           <div className="rise rise-3 mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
             <CtaLink href="/registro" size="lg" className="w-full sm:w-auto">
               Prueba gratis 3 días

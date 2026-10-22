@@ -12,7 +12,14 @@ export async function getBlogContext(siteId: string) {
 
   // Enlaces: raíz en dominio propio, prefijo del proxy inverso, o ruta interna.
   const prefix = h.get("x-forwarded-prefix");
-  const base = h.get(HOSTED_HEADER) ? "" : prefix && /^\/[a-z0-9/_-]*$/i.test(prefix) ? prefix.replace(/\/$/, "") : `/blog-hosted/${siteId}`;
+  const pretty = h.get("x-ywc-blog-base");
+  const base = h.get(HOSTED_HEADER)
+    ? ""
+    : pretty && /^\/b\/[a-z0-9-]+$/i.test(pretty)
+      ? pretty
+      : prefix && /^\/[a-z0-9/_-]*$/i.test(prefix)
+        ? prefix.replace(/\/$/, "")
+        : `/blog-hosted/${siteId}`;
 
   return {
     site,

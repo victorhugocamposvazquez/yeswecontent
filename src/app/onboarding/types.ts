@@ -22,8 +22,12 @@ export interface OnboardingState {
   mode: "drip" | "batch";
   gsc: boolean;
   cms: string | null;
+  publishIntent: "create" | "existing" | "domain";
   hostedBlogMode: "platform" | "subdomain" | "folder";
   hostedBlogDomain: string;
+  blogLook: "editorial" | "claro" | "tienda" | "oscuro";
+  blogColor: "naranja" | "bosque" | "marino" | "terracota" | "tinta" | "noche";
+  blogLogoUrl: string;
   planId: string;
   interval: "month" | "year";
   survey: string;
@@ -55,8 +59,12 @@ export const initialState: OnboardingState = {
   mode: "drip",
   gsc: false,
   cms: null,
+  publishIntent: "create",
   hostedBlogMode: "platform",
   hostedBlogDomain: "",
+  blogLook: "claro",
+  blogColor: "naranja",
+  blogLogoUrl: "",
   planId: "",
   interval: "year",
   survey: "",

@@ -1,5 +1,6 @@
 import { siteUrl } from "@/lib/env";
 import { normalizeHost } from "@/lib/headless/hosts";
+import { platformBlogUrl, type BlogThemeChoice } from "@/lib/headless/looks";
 
 export type HostedBlogDeliveryMode = "platform" | "subdomain" | "folder";
 
@@ -36,9 +37,11 @@ export function buildHostedBlogRow(input: {
   customDomain?: string | null;
   publicBaseUrl?: string | null;
   enabled?: boolean;
+  slug?: string | null;
+  theme?: BlogThemeChoice | null;
 }) {
   const hints = input.siteUrl ? suggestHostedBlogUrls(input.siteUrl) : null;
-  const platformUrl = platformHostedBlogUrl(input.siteId);
+  const platformUrl = input.slug ? platformBlogUrl(input.slug) : platformHostedBlogUrl(input.siteId);
   let custom_domain: string | null = null;
   let public_base_url: string | null = null;
 
@@ -57,8 +60,10 @@ export function buildHostedBlogRow(input: {
     delivery_mode: input.mode,
     custom_domain,
     public_base_url,
+    ...(input.slug ? { slug: input.slug } : {}),
     title: input.siteName ? `Blog de ${input.siteName}` : null,
     tagline: null as string | null,
+    ...(input.theme ? { theme: input.theme } : {}),
     updated_at: new Date().toISOString(),
   };
 }

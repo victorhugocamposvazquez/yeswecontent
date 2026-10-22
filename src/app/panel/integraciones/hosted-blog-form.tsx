@@ -4,6 +4,8 @@ import { useMemo, useState, useTransition } from "react";
 import { ActionForm } from "@/components/panel/action-form";
 import { Badge, Button, Field, Input } from "@/components/ui";
 import type { HostedBlogConfig } from "@/lib/headless/content";
+import { DesignPicker } from "@/components/blog/design-picker";
+import { BLOG_COLORS, platformBlogHost, type BlogColorId, type BlogLook } from "@/lib/headless/looks";
 import { suggestHostedBlogUrls } from "@/lib/headless/hosted-blog";
 import { cn } from "@/lib/utils";
 import { saveHostedBlog, verifyHostedBlogDnsAction } from "./actions";
@@ -26,6 +28,8 @@ type Props = {
 export function HostedBlogForm({ siteId, siteName, siteUrl, hosted, cnameTarget, previewPath }: Props) {
   const hints = useMemo(() => suggestHostedBlogUrls(siteUrl), [siteUrl]);
   const [mode, setMode] = useState<"platform" | "subdomain" | "folder">(hosted?.delivery_mode ?? "platform");
+  const [look, setLook] = useState<BlogLook>(hosted?.theme?.look ?? "claro");
+  const [color, setColor] = useState<BlogColorId>(BLOG_COLORS.find((c) => c.accent === hosted?.theme?.accent)?.id ?? "naranja");
   const [verifyMsg, setVerifyMsg] = useState<string | null>(null);
   const [pending, startVerify] = useTransition();
 
@@ -60,6 +64,15 @@ export function HostedBlogForm({ siteId, siteName, siteUrl, hosted, cnameTarget,
 
       <ActionForm action={saveHostedBlog} className="space-y-4">
         <input type="hidden" name="delivery_mode" value={mode} readOnly />
+        <input type="hidden" name="blog_look" value={look} readOnly />
+        <input type="hidden" name="blog_color" value={color} readOnly />
+        <input type="hidden" name="logo_url" value={hosted?.theme?.logo_url ?? ""} readOnly />
+        {hosted?.slug && (
+          <p className="text-sm text-ink-2">
+            Dirección: <strong className="font-semibold text-ink">{platformBlogHost(hosted.slug)}</strong>
+          </p>
+        )}
+        <DesignPicker look={look} color={color} onLook={setLook} onColor={setColor} />
         <label className="flex min-h-11 items-center gap-2 text-sm font-medium">
           <input type="checkbox" name="enabled" defaultChecked={hosted?.enabled ?? true} className="h-4 w-4 accent-[var(--signal)]" /> Blog alojado activo
         </label>

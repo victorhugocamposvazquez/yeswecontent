@@ -3,7 +3,9 @@
 import { cookies } from "next/headers";
 import { isDemo } from "@/lib/env";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { uploadArticleImage } from "@/lib/images/storage";
 import { buildHostedBlogRow } from "@/lib/headless/hosted-blog";
+import { platformBlogUrl, slugifyBlogName, themeFromChoice } from "@/lib/headless/looks";
 import type { OnboardingState } from "./types";
 
 type Result = { ok: true; siteId: string | null } | { ok: false; error: string };
@@ -82,17 +84,32 @@ export async function saveOnboardingStep(step: string, s: OnboardingState, siteI
       });
     case "conectar": {
       // Google, Meta y Reddit se conectan por OAuth (/api/oauth/…) desde el propio paso.
-      if (siteId && s.cms === "Blog alojado") {
+      if (siteId && s.publishIntent !== "existing") {
         const db = createServiceClient();
         const { data: site } = await sb.from("sites").select("name, url").eq("id", siteId).maybeSingle();
+        const name = site?.name || s.name || "blog";
+        const { data: prev } = await db.from("hosted_blogs").select("slug").eq("site_id", siteId).maybeSingle();
+        let slug = prev?.slug || slugifyBlogName(name);
+        if (!prev?.slug) {
+          for (let n = 2; n < 8; n++) {
+            const { data: taken } = await db.from("hosted_blogs").select("site_id").eq("slug", slug).maybeSingle();
+            if (!taken || taken.site_id === siteId) break;
+            slug = `${slugifyBlogName(name)}-${n}`;
+          }
+        }
+        const mode = s.publishIntent === "domain" ? s.hostedBlogMode : "platform";
         const row = buildHostedBlogRow({
           siteId,
-          siteName: site?.name,
+          siteName: name,
           siteUrl: site?.url ?? s.url,
-          mode: s.hostedBlogMode,
-          customDomain: s.hostedBlogDomain.trim() || null,
+          mode,
+          slug,
+          customDomain: mode === "subdomain" ? s.hostedBlogDomain.trim() || null : null,
+          theme: themeFromChoice(s.blogLook, s.blogColor, s.blogLogoUrl || null),
           enabled: true,
         });
+        // Hasta que el dominio del cliente responda, la dirección real es la nuestra.
+        if (mode === "subdomain") row.public_base_url = platformBlogUrl(slug);
         const { error: blogErr } = await db.from("hosted_blogs").upsert(row, { onConflict: "site_id" });
         if (blogErr) return { ok: false, error: blogErr.message };
       }
@@ -140,4 +157,17 @@ export async function finishOnboarding(siteId: string | null): Promise<void> {
   if (isDemo) return;
   const sb = await createClient();
   await sb.from("sites").update({ onboarding_step: "done" }).eq("id", siteId);
+}
+
+export async function uploadBlogLogo(siteId: string, fd: FormData): Promise<{ url: string | null; error?: string }> {
+  if (isDemo) return { url: null, error: "En la demo no se guarda el archivo. En producción queda en la cabecera del blog." };
+  const file = fd.get("file");
+  if (!(file instanceof File) || file.size === 0) return { url: null, error: "Elige una imagen." };
+  if (file.size > 1_500_000) return { url: null, error: "El logo pesa más de 1,5 MB." };
+  const url = await uploadArticleImage(new Uint8Array(await file.arrayBuffer()), {
+    siteId,
+    name: `logo-${Date.now().toString(36)}`,
+    contentType: file.type || "image/png",
+  });
+  return url ? { url } : { url: null, error: "No se pudo guardar el logo. El blog usará el nombre del sitio." };
 }

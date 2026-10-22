@@ -1,7 +1,8 @@
 /** Tema del blog alojado a partir del estilo visual del sitio ("terracota y crema", "#0f766e"…). */
 import type { HostedBlogConfig } from "./content";
+import type { BlogLook } from "./looks";
 
-export interface BlogTheme { accent: string; background: string; surface: string; text: string; muted: string; line: string; serif: boolean }
+export interface BlogTheme { accent: string; background: string; surface: string; text: string; muted: string; line: string; serif: boolean; look: BlogLook; logoUrl: string | null }
 
 const NAMED: Record<string, string> = {
   terracota: "#b4532a", teja: "#b4532a", barro: "#9a5b3c", óxido: "#a3471f", oxido: "#a3471f",
@@ -37,6 +38,7 @@ export function blogTheme(visual: { style?: string; palette?: string } | null | 
   const text = isHex(hosted?.theme?.text) ? hosted!.theme.text! : dark ? "#f5f5f4" : "#1c1917";
   const style = (visual?.style ?? "").toLowerCase();
   const serif = hosted?.theme?.font ? hosted.theme.font === "serif" : /editorial|clásic|clasic|artesan|cálid|calid|elegan/.test(style + palette);
+  const look = hosted?.theme?.look ?? (serif ? "editorial" : "claro");
 
   return {
     accent,
@@ -45,6 +47,8 @@ export function blogTheme(visual: { style?: string; palette?: string } | null | 
     text,
     muted: dark ? "#a8a29e" : "#57534e",
     line: dark ? "#ffffff1f" : "#1c19171a",
-    serif,
+    serif: look === "editorial" || serif,
+    look,
+    logoUrl: hosted?.theme?.logo_url ?? null,
   };
 }

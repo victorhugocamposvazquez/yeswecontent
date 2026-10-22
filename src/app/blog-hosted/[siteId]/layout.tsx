@@ -11,7 +11,7 @@ export default async function HostedBlogLayout({ children, params }: { children:
   const { siteId } = await params;
   const ctx = await getBlogContext(siteId);
   if (!ctx) notFound();
-  const { theme: t, site, base, title } = ctx;
+  const { theme: t, site, base } = ctx;
 
   const vars = {
     "--b-accent": t.accent,
@@ -24,9 +24,11 @@ export default async function HostedBlogLayout({ children, params }: { children:
   } as CSSProperties;
 
   return (
-    <div style={vars} className="ywc-blog min-h-dvh">
+    <div style={vars} data-look={t.look} className="ywc-blog min-h-dvh">
       <style>{`
 .ywc-blog{background:var(--b-bg);color:var(--b-text);font-family:var(--font-body),system-ui,sans-serif}
+.ywc-blog[data-look="tienda"] .b-wrap{max-width:64rem}
+.ywc-blog[data-look="editorial"] .b-head{font-weight:500}
 .ywc-blog a:focus-visible{outline:2px solid var(--b-accent);outline-offset:2px;border-radius:4px}
 .ywc-blog .b-head{font-family:var(--b-font);letter-spacing:-.025em;text-wrap:balance}
 .ywc-blog .b-tag{display:inline-flex;align-items:center;min-height:2rem;padding:0 .7rem;border-radius:999px;border:1px solid var(--b-line);font-size:.75rem;font-weight:500;transition:background-color .15s}
@@ -45,16 +47,21 @@ export default async function HostedBlogLayout({ children, params }: { children:
 .ywc-prose .ywc-faq{margin-top:3em;padding-top:1.5em;border-top:1px solid var(--b-line)}
 `}</style>
       <header className="sticky top-0 z-10 border-b backdrop-blur" style={{ borderColor: "var(--b-line)", background: "color-mix(in srgb, var(--b-bg) 90%, transparent)" }}>
-        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href={base || "/"} className="b-head min-w-0 truncate text-lg font-semibold">
-            {title}
+        <div className="b-wrap mx-auto flex h-16 max-w-3xl items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href={base || "/"} className="flex min-w-0 items-center gap-2.5">
+            {t.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={t.logoUrl} alt="" className="h-8 w-auto max-w-[10rem] object-contain" />
+            ) : (
+              <span className="b-head truncate text-lg font-semibold">{site.name}</span>
+            )}
           </Link>
           <a href={site.url} className="inline-flex min-h-11 shrink-0 items-center text-sm font-medium underline-offset-4 hover:underline" style={{ color: "var(--b-accent)" }}>
             Ir a {site.name.length > 18 ? "la web" : site.name} →
           </a>
         </div>
       </header>
-      <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">{children}</main>
+      <main className="b-wrap mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">{children}</main>
       <footer className="border-t" style={{ borderColor: "var(--b-line)" }}>
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm sm:px-6" style={{ color: "var(--b-muted)" }}>
           <span>

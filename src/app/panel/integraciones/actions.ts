@@ -6,6 +6,7 @@ import { getCurrentSite, getProfile } from "@/lib/data";
 import { isDemo } from "@/lib/env";
 import { DEMO_API_KEY, DEMO_PUBLIC_KEY, generateApiKey, type ApiKeyKind } from "@/lib/headless/keys";
 import { buildHostedBlogRow, type HostedBlogDeliveryMode } from "@/lib/headless/hosted-blog";
+import { slugifyBlogName, themeFromChoice, type BlogColorId, type BlogLook } from "@/lib/headless/looks";
 import { verifyHostedBlogDns } from "@/lib/headless/hosted-blog-dns";
 import { normalizeHost } from "@/lib/headless/hosts";
 import { openSecret, sealSecret } from "@/lib/headless/secrets";
@@ -166,13 +167,24 @@ export async function saveHostedBlog(_prev: ActionState, fd: FormData): Promise<
     }
   }
 
+  const look = (str(fd, "blog_look") || "claro") as BlogLook;
+  const color = (str(fd, "blog_color") || "naranja") as BlogColorId;
+  const logo = str(fd, "logo_url", 500) || null;
+  let slug = slugifyBlogName(site.name);
+  if (!isDemo) {
+    const sb = await createClient();
+    const { data: prev } = await sb.from("hosted_blogs").select("slug").eq("site_id", site.id).maybeSingle();
+    if (prev?.slug) slug = prev.slug;
+  }
   const row = buildHostedBlogRow({
     siteId: site.id,
     siteName: site.name,
     siteUrl: site.url,
     mode,
+    slug,
     customDomain: mode === "subdomain" ? domainRaw : null,
     publicBaseUrl: mode === "folder" ? base : null,
+    theme: themeFromChoice(look, color, logo),
     enabled,
   });
   row.title = str(fd, "title", 120) || row.title;

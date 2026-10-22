@@ -68,9 +68,9 @@ export default async function HostedBlogIndex({ params, searchParams }: Props) {
       </div>
 
       {items.length ? (
-        <ul className="divide-y" style={{ borderColor: "var(--b-line)" }}>
+        <ul className={ctx.theme.look === "tienda" ? "grid gap-4 sm:grid-cols-2" : "divide-y"} style={{ borderColor: "var(--b-line)" }}>
           {items.map((a) => (
-            <li key={a.id} className="py-8 first:pt-0" style={{ borderColor: "var(--b-line)" }}>
+            <li key={a.id} className={ctx.theme.look === "tienda" ? "rounded-2xl border p-5" : "py-8 first:pt-0"} style={{ borderColor: "var(--b-line)", background: ctx.theme.look === "tienda" ? "var(--b-surface)" : undefined }}>
               <article>
                 <p className="text-sm" style={{ color: "var(--b-muted)" }}>
                   <time dateTime={a.published_at ?? undefined}>{fmtLongDate(a.published_at, a.language)}</time>

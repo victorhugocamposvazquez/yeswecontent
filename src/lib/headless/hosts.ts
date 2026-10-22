@@ -1,3 +1,5 @@
+import { blogSlugFromHost } from "@/lib/headless/looks";
+
 /**
  * Mapeo dominio propio → sitio para el blog alojado (blog.cliente.com por CNAME).
  * Compatible con el runtime Edge del middleware: sin `node:*` ni `server-only`,
@@ -14,6 +16,7 @@ const TTL_MS = 60_000;
 const cache = new Map<string, { siteId: string | null; at: number }>();
 
 const DEMO_HOSTS: Record<string, string> = { "blog.tierrafina.es": "s_tierrafina", "tierrafina.localhost": "s_tierrafina" };
+const DEMO_SLUGS: Record<string, string> = { tierrafina: "s_tierrafina" };
 
 /** Hosts de la propia plataforma (nunca se tratan como blog alojado). */
 export function isPlatformHost(host: string): boolean {
@@ -39,29 +42,43 @@ function fromEnv(h: string): string | null {
 
 const isDemoEnv = () => !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+async function lookup(query: string, cacheKey: string): Promise<string | null> {
+  const hit = cache.get(cacheKey);
+  if (hit && Date.now() - hit.at < TTL_MS) return hit.siteId;
+  let siteId: string | null = null;
+  try {
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/hosted_blogs?select=site_id&${query}&limit=1`, {
+      headers: { apikey: key, authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(2500),
+    });
+    if (res.ok) siteId = ((await res.json()) as { site_id: string }[])[0]?.site_id ?? null;
+  } catch {
+    siteId = hit?.siteId ?? null;
+  }
+  cache.set(cacheKey, { siteId, at: Date.now() });
+  if (cache.size > 2000) cache.delete(cache.keys().next().value!);
+  return siteId;
+}
+
+/** tienda.blogs.yeswecontent.com o el slug de /b/tienda */
+export async function resolveSiteIdForBlogSlug(slug: string): Promise<string | null> {
+  if (!/^[a-z0-9][a-z0-9-]{0,40}$/.test(slug)) return null;
+  if (isDemoEnv()) return DEMO_SLUGS[slug] ?? null;
+  return lookup(`enabled=eq.true&slug=eq.${encodeURIComponent(slug)}`, `slug:${slug}`);
+}
+
 /** Devuelve el siteId del blog alojado en ese host, o null. */
 export async function resolveSiteIdForHost(host: string | null | undefined): Promise<string | null> {
   const h = normalizeHost(host);
+  const ownSlug = h ? blogSlugFromHost(h) : null;
+  if (ownSlug) return resolveSiteIdForBlogSlug(ownSlug);
   if (!h || isPlatformHost(h)) return null;
   const env = fromEnv(h);
   if (env) return env;
   if (isDemoEnv()) return DEMO_HOSTS[h] ?? null;
 
-  const hit = cache.get(h);
-  if (hit && Date.now() - hit.at < TTL_MS) return hit.siteId;
-
-  let siteId: string | null = null;
-  try {
-    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/hosted_blogs?select=site_id&enabled=eq.true&custom_domain=eq.${encodeURIComponent(h)}&limit=1`;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-    const res = await fetch(url, { headers: { apikey: key, authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(2500) });
-    if (res.ok) siteId = ((await res.json()) as { site_id: string }[])[0]?.site_id ?? null;
-  } catch {
-    siteId = hit?.siteId ?? null; // ante un fallo, sirve el último valor conocido
-  }
-  cache.set(h, { siteId, at: Date.now() });
-  if (cache.size > 2000) cache.delete(cache.keys().next().value!);
-  return siteId;
+  return lookup(`enabled=eq.true&custom_domain=eq.${encodeURIComponent(h)}`, h);
 }
 
 /** Rutas del blog alojado que se reescriben; el resto (/_next, /api, favicon…) pasa tal cual. */

@@ -51,6 +51,6 @@ export async function getFrameworkWebhook(siteId: string): Promise<PublicWebhook
 export async function getHostedBlogForPanel(siteId: string): Promise<HostedBlogConfig | null> {
   if (isDemo) return getHostedBlog(siteId);
   const sb = await createClient();
-  const { data } = await sb.from("hosted_blogs").select("site_id, enabled, delivery_mode, custom_domain, public_base_url, title, tagline, theme, verified_at").eq("site_id", siteId).maybeSingle();
+  const { data } = await sb.from("hosted_blogs").select("site_id, enabled, delivery_mode, slug, custom_domain, public_base_url, title, tagline, theme, verified_at").eq("site_id", siteId).maybeSingle();
   return (data as HostedBlogConfig | null) ?? null;
 }

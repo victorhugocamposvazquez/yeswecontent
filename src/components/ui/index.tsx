@@ -137,7 +137,7 @@ export function Logo({ className, inverted = false, compact = false }: { classNa
       {!compact && (
         <span
           className={cn(
-            "whitespace-nowrap text-[22px] leading-none -translate-y-[13px] sm:-translate-y-[15px] sm:text-2xl",
+            "self-center -translate-y-0.5 whitespace-nowrap text-[22px] leading-none sm:-translate-y-1 sm:text-2xl",
             inverted ? "text-paper" : "text-ink",
           )}
         >

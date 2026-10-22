@@ -1,7 +1,7 @@
 import { Fragment, type CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, Check, Globe, Quote, Search } from "lucide-react";
+import { ArrowUpRight, BookOpen, Check, Globe, Quote, Search, X } from "lucide-react";
 import { listPlans } from "@/lib/data";
 import { cn, eur, num } from "@/lib/utils";
 import { getProduct } from "@/lib/marketing/products";
@@ -18,9 +18,9 @@ import { AiCitations, GrowthChart, RankClimb, Reveal, FloatingEngines, ScrollSta
 import { Container, CtaBand, CtaLink, EngineLogo, Eyebrow, Faq, HoverCard, IconBox, Lead, ProductGlyph, Section, TextLink, Title } from "@/components/marketing/primitives";
 
 export const metadata: Metadata = {
-  title: { absolute: "yeswecontent · Tráfico orgánico desde Google y la IA, en piloto automático" },
+  title: { absolute: "yeswecontent · Más clientes desde Google y la IA: SEO y GEO en piloto automático" },
   description:
-    "Plan de contenidos, artículos con tu voz, publicación automática, enlaces y seguimiento en ChatGPT, Claude, Gemini y Perplexity. Prueba 3 días gratis.",
+    "Plan de contenidos con tu esencia, publicación automática, enlaces y seguimiento en Google, ChatGPT, Claude, Gemini y Perplexity. El trabajo de un equipo experto en SEO/GEO desde 67 €/mes. Prueba 3 días gratis.",
   alternates: { canonical: "/" },
 };
 
@@ -28,25 +28,25 @@ const steps = [
   {
     n: "01",
     title: "Nos cuentas quién eres",
-    text: "Pegas la URL de tu web. Leemos lo que vendes, cómo hablas y contra quién compites. Ajustas tono y temas en cinco minutos.",
+    text: "Tu tiempo: 5 min, una vez. Pegas la dirección de tu web. Leemos qué vendes, cómo hablas y quién es tu competencia.",
   },
   {
     n: "02",
     title: "Aprobamos el plan juntos",
-    text: "Recibes un calendario de temas con su porqué: volumen, intención y dificultad. Quitas, añades o lo dejas tal cual.",
+    text: "Tu tiempo: 10 min al mes. Recibes el calendario de temas y por qué cada uno puede traerte clientes: volumen de búsqueda, intención de compra y dificultad. Quitas, añades o lo dejas tal cual.",
   },
   {
     n: "03",
     title: "Tu proyecto empieza a crecer",
-    text: "Cada artículo se escribe, se puntúa, se enlaza y se publica solo. Tú miras el resumen del lunes con un café.",
+    text: "Tu tiempo: cero. Cada artículo se escribe, se puntúa, se enlaza y se publica solo en tu web. El lunes miras el resumen con un café.",
   },
 ];
 
 const featureRows = [
-  { slug: "redactor-ia", eyebrow: "Escritura", title: "Artículos que suenan a ti", text: "Aprendemos tu voz de tu propia web y la respetamos en cada texto. Cada artículo llega con nota de calidad, FAQ, datos estructurados e imágenes." },
-  { slug: "plan-de-contenidos", eyebrow: "Estrategia", title: "Un plan hecho para tu web o tienda online, no para la media", text: "Investigamos qué búsquedas puedes ganar de verdad y las ordenamos en clústeres para que cada artículo empuje a los demás." },
+  { slug: "redactor-ia", eyebrow: "Escritura", title: "Artículos que suenan a ti", text: "Aprendemos tu voz de tu propia web y la respetamos en cada texto. Cada artículo llega con nota de calidad, FAQ, datos estructurados e imágenes, listo para publicar." },
+  { slug: "plan-de-contenidos", eyebrow: "Estrategia", title: "Un plan hecho para tu web o tienda online, no para la media", text: "Investigamos qué búsquedas puedes ganar de verdad a tu competencia y las agrupamos por temas (clústeres) para que cada artículo empuje a los demás." },
   { slug: "autopublicacion", eyebrow: "Publicación", title: "Se publica sin que toques nada", text: "WordPress, Shopify, Webflow, Ghost o una API. Elige días y hora; nosotros nos encargamos de maquetar y subir." },
-  { slug: "red-de-enlaces", eyebrow: "Autoridad", title: "Enlaces sin pedir favores por email", text: "Una red de intercambio entre webs afines que se enlazan dentro de contenido útil. Tú revisas cada enlace." },
+  { slug: "red-de-enlaces", eyebrow: "Autoridad", title: "Que otras webs hablen de ti", text: "Link building en una red de webs afines, con enlaces dentro de contenido útil. Sin pedir favores por email y aprobando cada enlace." },
   { slug: "auditoria-geo", eyebrow: "Técnica", title: "Arreglamos lo que te frena", text: "Rastreo, etiquetas, velocidad, datos estructurados y preparación para IA, ordenados por impacto y con su solución." },
 ];
 
@@ -64,11 +64,46 @@ const guides = [
 
 const faqs = [
   { q: "No sé nada de SEO. ¿Esto es para mí?", a: "Sí. Está pensado precisamente para quien no quiere aprender SEO para poder vender. Tú aportas lo que sabes de tu negocio; nosotros, el método." },
+  { q: "¿Qué es eso de SEO y GEO?", a: "SEO es aparecer en Google cuando alguien busca lo que vendes. GEO es aparecer en las respuestas de ChatGPT y otras IAs. Hacemos las dos cosas por ti." },
+  { q: "¿Tengo que escribir o revisar algo?", a: "No es obligatorio. Puedes aprobar los temas del mes en 10 minutos y dejar que todo se publique solo, o revisar cada artículo si lo prefieres." },
+  { q: "¿Sustituye a mi agencia o a mi redactor?", a: "Hace el trabajo repetitivo que suele ocupar a un redactor y a un especialista en SEO: elegir temas, escribir, publicar, conseguir menciones y medir. Si ya tienes equipo, lo libera para lo que solo pueden hacer personas." },
   { q: "¿En cuánto tiempo se notan resultados?", a: "Las primeras impresiones en Google suelen aparecer en semanas, pero el crecimiento sólido llega entre el tercer y el sexto mes. Quien te prometa resultados en días, te está vendiendo otra cosa." },
   { q: "¿Google castiga el contenido escrito con IA?", a: "Google castiga el contenido que no ayuda a nadie. Medimos la calidad de cada artículo, añadimos experiencia real de tu marca y citamos fuentes. Y puedes revisar todo antes de publicar." },
   { q: "¿Cómo funciona eso de que la IA me recomiende?", a: "Los asistentes responden a partir de lo que encuentran y entienden en la web. Publicar contenido claro, bien estructurado y citado por otras webs aumenta las opciones de aparecer. Lo medimos a diario para que veas si funciona." },
   { q: "¿Puedo cancelar cuando quiera?", a: "Sí, sin permanencia y desde el propio panel. Además, si en 60 días no ves más tráfico orgánico, te devolvemos el dinero." },
 ];
+
+const withoutUs = [
+  "Tu web es un escaparate que solo encuentra quien ya conoce tu nombre.",
+  "Cada visita te cuesta dinero en anuncios. Si dejas de pagar, desapareces.",
+  "El blog lleva meses parado porque nunca hay tiempo.",
+  "ChatGPT recomienda a tu competencia y no lo sabes.",
+];
+
+const withUs = [
+  "Te encuentra gente que no te conocía, justo cuando busca lo que vendes.",
+  "Las visitas llegan gratis y se acumulan: un artículo de hoy sigue trayendo clientes dentro de un año.",
+  "Tu web publica cada semana, con tu forma de hablar, sin que escribas una línea.",
+  "Sabes cada día si ChatGPT, Gemini, Claude o Perplexity te recomiendan.",
+];
+
+/** Horas al mes que costaría hacerlo con equipo propio, por plan. Cálculo orientativo. */
+const HOUR_COST_EUR = 25;
+const FULL_TIME_HOURS = 160;
+const savingsTasks: { task: string; tech: string; hours: Record<"semilla" | "cosecha", number> }[] = [
+  { task: "Decidir sobre qué escribir", tech: "keyword research y plan editorial", hours: { semilla: 6, cosecha: 12 } },
+  { task: "Escribir los artículos", tech: "redacción SEO, ≈4 h cada uno", hours: { semilla: 80, cosecha: 320 } },
+  { task: "Maquetar y publicar", tech: "CMS, imágenes, schema, enlazado interno", hours: { semilla: 10, cosecha: 40 } },
+  { task: "Que otras webs te enlacen", tech: "link building", hours: { semilla: 8, cosecha: 20 } },
+  { task: "Estar en las conversaciones", tech: "Reddit y Quora", hours: { semilla: 0, cosecha: 20 } },
+  { task: "Vigilar Google y la IA", tech: "rank tracking y visibilidad en IA", hours: { semilla: 4, cosecha: 12 } },
+];
+const savingsPlans = ["semilla", "cosecha"] as const;
+const teamHours = (plan: (typeof savingsPlans)[number]) => savingsTasks.reduce((sum, t) => sum + t.hours[plan], 0);
+const decimal = (n: number) => new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 }).format(n);
+/** Redondea a centenas y agrupa siempre los miles, como en «≈ 2.700 €» (es-ES no agrupa cifras de 4 dígitos). */
+const approxEur = (n: number) =>
+  new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0, useGrouping: "always" }).format(Math.round(n / 100) * 100);
 
 function Statement({ parts, tone = "paper", engines = false }: { parts: StatementPart[]; tone?: "paper" | "paper-2"; engines?: boolean }) {
   return (
@@ -91,16 +126,16 @@ export default async function HomePage() {
       <section className="glow relative overflow-hidden">
         <div aria-hidden className="grid-bg pointer-events-none absolute inset-x-0 top-0 h-[36rem]" />
         <Container className="relative flex flex-col items-center pt-14 text-center sm:pt-20 md:pt-24">
-          <Eyebrow className="rise">SEO + GEO · en piloto automático</Eyebrow>
+          <Eyebrow className="rise">SEO + GEO en piloto automático · para webs y tiendas online</Eyebrow>
           <h1 className="rise rise-2 mt-5 w-full max-w-[1100px] font-display text-[clamp(2.125rem,6.4vw,4.75rem)]">
-            <span className="sr-only">Automatiza que te encuentren cuando buscan en Google, ChatGPT, Gemini, Perplexity o Claude.</span>
-            <span aria-hidden className="block">Automatiza que te encuentren</span>
+            <span className="sr-only">Consigue clientes que te encuentran cuando preguntan a Google, ChatGPT, Gemini, Perplexity o Claude.</span>
+            <span aria-hidden className="block">Consigue clientes que te encuentran</span>
             <span aria-hidden className="block md:whitespace-nowrap">
-              cuando buscan en <RotatingWord className="max-sm:mx-auto max-sm:block" />
+              cuando preguntan a <RotatingWord className="max-sm:mx-auto max-sm:block" />
             </span>
           </h1>
           <Lead className="rise rise-2 mt-6 max-w-2xl md:text-xl">
-            Escribimos, publicamos y posicionamos el contenido de tu web o tienda online para que Google y los asistentes de IA te recomienden, sin que tengas que montar un equipo de SEO.
+            Escribimos, publicamos y posicionamos cada semana los artículos que tus clientes buscan antes de comprar. Todo el trabajo de un equipo de SEO y contenidos, por menos de lo que cuesta una comida al día.
           </Lead>
           <div className="rise rise-3 mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
             <CtaLink href="/registro" size="lg" className="w-full sm:w-auto">
@@ -110,7 +145,8 @@ export default async function HomePage() {
               Ver cómo funciona
             </CtaLink>
           </div>
-          <div className="rise rise-3 mt-7">
+          <p className="rise rise-3 mt-5 max-w-xl text-sm text-ink-3">3 días gratis · Sin permanencia · Si en 60 días no crece tu tráfico, te devolvemos el dinero</p>
+          <div className="rise rise-3 mt-6">
             <RatingPill />
           </div>
 
@@ -158,12 +194,55 @@ export default async function HomePage() {
       {/* ───────── FRASE: EQUIPO ───────── */}
       <Statement
         parts={[
-          "Tu equipo de expertos en SEO y GEO que trabaja sin descanso,",
-          { text: "yeswecan,", tone: "accent" },
+          "Tu equipo de SEO y GEO, sin tener que contratarlo y sin descanso.",
+          { text: "¡yeswecan,", tone: "accent" },
           "con",
           { text: "yeswecontent!", tone: "brand" },
         ]}
       />
+
+      {/* ───────── QUÉ ES ───────── */}
+      <Section tone="paper-2">
+        <Container>
+          <div className="max-w-3xl">
+            <Eyebrow>Qué es yeswecontent</Eyebrow>
+            <Title className="mt-4">
+              Hoy, antes de comprar, la gente pregunta. Si tu web no tiene la respuesta, <span className="marker">recomiendan a otro</span>.
+            </Title>
+            <Lead className="mt-5 max-w-2xl">
+              Para aparecer en Google y en ChatGPT hace falta publicar contenido útil cada semana (SEO), que otras webs te enlacen (autoridad) y que la IA te entienda y te cite (GEO). Es trabajo de un equipo que casi ninguna pyme puede pagar. Nosotros lo hacemos por ti, en automático.
+            </Lead>
+          </div>
+          <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 md:grid-cols-2">
+            <Card className="p-7 md:p-10">
+              <Eyebrow tone="ink">Sin yeswecontent</Eyebrow>
+              <ul className="mt-5 space-y-3.5">
+                {withoutUs.map((x) => (
+                  <li key={x} className="flex gap-2.5 text-[15px] text-ink-2">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-bad-soft text-bad">
+                      <X className="h-3 w-3" aria-hidden />
+                    </span>
+                    {x}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+            <div className="rounded-2xl border border-ink bg-ink p-7 text-paper shadow-[var(--shadow-xs)] md:p-10">
+              <Eyebrow tone="paper">Con yeswecontent</Eyebrow>
+              <ul className="mt-5 space-y-3.5">
+                {withUs.map((x) => (
+                  <li key={x} className="flex gap-2.5 text-[15px] text-paper/80">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-lime text-ink">
+                      <Check className="h-3 w-3" aria-hidden />
+                    </span>
+                    {x}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Container>
+      </Section>
 
       {/* ───────── 3 PASOS ───────── */}
       <Section id="como-funciona">
@@ -185,7 +264,7 @@ export default async function HomePage() {
                 Un artículo se escribe, se publica… y <span className="marker">la IA lo cita</span>.
               </Title>
               <Lead className="mt-4 max-w-md text-base">
-                Ejemplo con una marca ficticia: el artículo sale con nota de calidad, FAQ y schema, se publica a su hora y acaba como fuente en la respuesta de un asistente.
+                Ejemplo con una marca ficticia: el artículo sale con nota de calidad, FAQ y datos estructurados (schema), se publica a su hora y acaba siendo la fuente que cita un asistente.
               </Lead>
             </div>
             <HeroVisual />
@@ -193,8 +272,88 @@ export default async function HomePage() {
         </Container>
       </Section>
 
+      {/* ───────── LO QUE TE AHORRAS ───────── */}
+      <Section tone="paper-2">
+        <Container>
+          <div className="max-w-3xl">
+            <Eyebrow>Lo que te ahorras</Eyebrow>
+            <Title className="mt-4">
+              El trabajo de un equipo de SEO y contenidos, <span className="marker">por menos que una comida al día</span>.
+            </Title>
+            <Lead className="mt-5 max-w-2xl">Esto es lo que tendría que hacer, y hacer bien, alguien de tu equipo cada mes para conseguir lo mismo.</Lead>
+          </div>
+          <Card className="mt-10 overflow-x-auto md:mt-12">
+            <table className="w-full min-w-[560px] text-left text-[15px]">
+              <caption className="sr-only">Horas y coste al mes con equipo propio frente a yeswecontent, por plan</caption>
+              <thead>
+                <tr className="bg-paper-2 text-[13px] text-ink-2">
+                  <th scope="col" className="px-5 py-3 font-semibold">Con tu equipo propio tendrías que…</th>
+                  {savingsPlans.map((id) => (
+                    <th key={id} scope="col" className="px-5 py-3 text-right font-semibold">
+                      {plans.find((p) => p.id === id)?.name ?? id}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="tabular">
+                {savingsTasks.map((t) => (
+                  <tr key={t.task} className="border-t border-line">
+                    <th scope="row" className="px-5 py-3.5 font-medium">
+                      {t.task} <span className="font-normal text-ink-3">· {t.tech}</span>
+                    </th>
+                    {savingsPlans.map((id) => (
+                      <td key={id} className="px-5 py-3.5 text-right text-ink-2">
+                        {t.hours[id] ? `${t.hours[id]} h` : "—"}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                <tr className="border-t border-line-2 bg-paper-2 font-semibold">
+                  <th scope="row" className="px-5 py-3.5">Horas de tu equipo al mes</th>
+                  {savingsPlans.map((id) => (
+                    <td key={id} className="px-5 py-3.5 text-right">
+                      <del className="text-ink-3">{teamHours(id)} h</del>
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-t border-line">
+                  <th scope="row" className="px-5 py-3.5 font-medium">Personas en plantilla</th>
+                  {savingsPlans.map((id) => (
+                    <td key={id} className="px-5 py-3.5 text-right">
+                      <del className="text-ink-3">{decimal(teamHours(id) / FULL_TIME_HOURS)} personas</del>
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-t border-line">
+                  <th scope="row" className="px-5 py-3.5 font-medium">Coste con tu equipo propio ({HOUR_COST_EUR} €/h)</th>
+                  {savingsPlans.map((id) => (
+                    <td key={id} className="px-5 py-3.5 text-right">
+                      <del className="text-ink-3">≈ {approxEur(teamHours(id) * HOUR_COST_EUR)}/mes</del>
+                    </td>
+                  ))}
+                </tr>
+                <tr className="border-t border-line bg-lime text-base font-semibold">
+                  <th scope="row" className="px-5 py-4">Con yeswecontent: 0 h de tu equipo</th>
+                  {savingsPlans.map((id) => {
+                    const plan = plans.find((p) => p.id === id);
+                    return (
+                      <td key={id} className="px-5 py-4 text-right">
+                        {plan ? `${eur(plan.monthly_price_eur)}/mes` : "—"}
+                      </td>
+                    );
+                  })}
+                </tr>
+              </tbody>
+            </table>
+          </Card>
+          <p className="mt-5 text-xs text-ink-3">
+            Cálculo orientativo con {FULL_TIME_HOURS} h/mes por persona y {HOUR_COST_EUR} €/hora (salario más cotizaciones de un perfil junior de marketing).
+          </p>
+        </Container>
+      </Section>
+
       {/* ───────── ANTES Y DESPUÉS ───────── */}
-      <Section className="pt-0 sm:pt-0 md:pt-0 lg:pt-0">
+      <Section>
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             <Eyebrow>Antes y después</Eyebrow>
@@ -202,7 +361,7 @@ export default async function HomePage() {
               La semana 20 empezó a publicar. <span className="marker">Mira la curva</span>.
             </Title>
             <Lead className="mx-auto mt-5 max-w-2xl">
-              Así se ve en Search Console una web que pasa de publicar cuando puede a publicar cada semana con plan, enlaces y datos estructurados.
+              Así se ve en Search Console una web que pasa de publicar «cuando puede» a publicar cada semana con plan, enlaces y datos estructurados. Más artículos, más puertas de entrada, más clientes.
             </Lead>
           </div>
           <Reveal className="mt-10 md:mt-14">
@@ -228,9 +387,9 @@ export default async function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <Eyebrow>El sistema completo</Eyebrow>
             <Title className="mt-4">
-              Visibilidad <span className="marker">sin trabajo manual</span>
+              Todo el trabajo de SEO y GEO, <span className="marker">sin trabajo manual</span>
             </Title>
-            <Lead className="mt-5">Cinco piezas que normalmente necesitan cinco proveedores. Aquí funcionan juntas y se hablan entre sí.</Lead>
+            <Lead className="mt-5">Cinco piezas que normalmente se reparten un redactor, un consultor SEO y una agencia de link building. Aquí funcionan juntas y se hablan entre sí.</Lead>
           </div>
           <StickyShowcase className="mt-14 grid grid-cols-1 lg:mt-12 lg:grid-cols-2 lg:gap-x-16">
             {featureRows.map((f, i) => {
@@ -297,9 +456,9 @@ export default async function HomePage() {
       <Statement
         engines
         parts={[
-          "Mientras los demás duermen, nosotros conseguimos que",
-          { text: "Google y las IAs", tone: "accent" },
-          "hablen de ti y te recomienden.",
+          "Un anuncio se apaga cuando dejas de pagar.",
+          { text: "Un artículo sigue trayéndote clientes", tone: "accent" },
+          "dentro de un año.",
         ]}
       />
 
@@ -319,7 +478,7 @@ export default async function HomePage() {
               </Title>
             </div>
             <p className="text-pretty text-base leading-relaxed text-paper/70 sm:text-lg">
-              Eliges las preguntas que haría tu cliente. Cada día se las hacemos a cuatro asistentes y apuntamos si sales, en qué posición, con qué fuentes y junto a qué competidores.
+              Eliges las preguntas que haría tu cliente, como «¿qué fisio me recomiendas en Valencia?». Cada día se las hacemos a ChatGPT, Claude, Gemini y Perplexity y te contamos si te recomiendan, en qué lugar y a qué competidores nombran.
             </p>
           </div>
           <div className="mt-10 flex flex-wrap items-center gap-2 md:mt-12">
@@ -354,7 +513,7 @@ export default async function HomePage() {
                 No traducimos: investigamos las búsquedas de cada mercado y escribimos para ese lector. Ideal si vendes fuera o si tu público es bilingüe.
               </Lead>
               <p className="mt-5 inline-flex items-center gap-2 text-sm text-ink-3">
-                <Globe className="h-4 w-4" aria-hidden /> Con hreflang y versiones enlazadas entre sí.
+                <Globe className="h-4 w-4" aria-hidden /> Con hreflang: cada lector ve su idioma y Google sabe qué versión mostrar a quién.
               </p>
             </div>
             <Stagger as="ul" className="flex flex-wrap gap-2" label="Algunos de los idiomas disponibles">
@@ -379,7 +538,7 @@ export default async function HomePage() {
             <Title className="mt-4">
               Así queda un texto <span className="marker">recién salido</span> del horno.
             </Title>
-            <Lead className="mt-5">Ejemplo ficticio para una clínica de fisioterapia. Fíjate en la respuesta directa arriba, las preguntas frecuentes y los enlaces internos.</Lead>
+            <Lead className="mt-5">Ejemplo ficticio para una clínica de fisioterapia. Fíjate en la respuesta directa arriba, las preguntas frecuentes y los enlaces internos que llevan al lector a pedir cita.</Lead>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 lg:grid-cols-[1.7fr_1fr]">
             <EditorMockup />
@@ -395,6 +554,7 @@ export default async function HomePage() {
                 </ul>
               </Card>
               <div className="rounded-2xl border border-line bg-ink p-5 font-mono text-[12px] leading-relaxed text-paper shadow-[var(--shadow-xs)]">
+                <p className="mb-3 font-sans text-[13px] text-paper/65">Datos estructurados (JSON-LD): el lector no los ve, pero ayudan a Google y a la IA a entender la página.</p>
                 <p className="text-lime">{'<script type="application/ld+json">'}</p>
                 <p className="pl-3 text-paper/80">{'"@type": "FAQPage",'}</p>
                 <p className="pl-3 text-paper/80">{'"mainEntity": [ … 3 ]'}</p>
@@ -402,7 +562,7 @@ export default async function HomePage() {
               </div>
               <Card className="bg-lime-soft p-5 sm:col-span-2 lg:col-span-1">
                 <p className="text-[13px] font-medium text-ink-2">Incluido</p>
-                <p className="mt-1.5 text-sm leading-relaxed">Meta descripción · 4 enlaces internos · imagen de portada con alt · programado para el jueves 9:00</p>
+                <p className="mt-1.5 text-sm leading-relaxed">Meta descripción · 4 enlaces internos · imagen de portada con texto alternativo · programado para el jueves a las 9:00</p>
               </Card>
             </aside>
           </div>
@@ -424,7 +584,7 @@ export default async function HomePage() {
                 Una red que se hace <span className="marker">más fuerte</span> con cada web que entra.
               </Title>
               <Lead className="mt-5 max-w-lg">
-                Cada cliente aporta enlaces desde sus artículos y recibe enlaces de webs de su temática. Cuantas más webs se suman, más opciones relevantes hay para todos. Sin granjas, sin reciprocidad obvia y con tu visto bueno.
+                Cada cliente aporta enlaces desde sus artículos y recibe enlaces de webs de su temática. Cuantas más webs se suman, más fuerte es para todos. Sin granjas de enlaces ni intercambios evidentes que Google penalice, y siempre con tu visto bueno.
               </Lead>
               <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {[
@@ -455,7 +615,7 @@ export default async function HomePage() {
                 Aparece en las respuestas de la IA
               </Title>
               <p className="mt-4 text-[15px] leading-relaxed text-ink-2">
-                Contenido con respuestas directas, datos estructurados, fuentes citadas y presencia en las conversaciones que leen los modelos. Todo lo que facilita que te mencionen.
+                Lo que la IA necesita para entenderte y citarte: respuestas directas, datos estructurados, fuentes citadas y presencia en Reddit y Quora, los foros que leen los asistentes.
               </p>
               <div className="mt-6 rounded-xl border border-line bg-card p-4 text-sm shadow-[var(--shadow-xs)]">
                 <p className="flex items-center gap-2 text-ink-3">
@@ -497,7 +657,7 @@ export default async function HomePage() {
 
       {/* ───────── FRASE: CADA SEMANA ───────── */}
       <Statement
-        parts={["Cada semana, más búsquedas que", { text: "terminan en tu web o tienda online.", tone: "accent" }, "Sin reuniones. Sin parar!"]}
+        parts={["Cada semana, más búsquedas que", { text: "terminan en tu web o tienda online.", tone: "accent" }, "Sin reuniones. ¡Sin parar!"]}
       />
 
       {/* ───────── CASOS ───────── */}
@@ -552,7 +712,9 @@ export default async function HomePage() {
               <Title className="mt-4">
                 Menos que un freelance, <span className="marker">más constante</span> que nadie.
               </Title>
-              <Lead className="mt-5 max-w-lg">Un precio por web, todo incluido. Pagando al año ahorras un 15&nbsp;%. Y si gestionas varias webs, hay descuento por volumen.</Lead>
+              <Lead className="mt-5 max-w-lg">
+                Un precio por web, todo incluido. Semilla hace el trabajo de unas {teamHours("semilla")} horas al mes; Cosecha, el de unas {teamHours("cosecha")}. Pagando al año ahorras un 15&nbsp;%.
+              </Lead>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <CtaLink href="/precios">Ver planes</CtaLink>
                 <TextLink href="/agencias">¿Eres agencia?</TextLink>
@@ -564,7 +726,7 @@ export default async function HomePage() {
                   <div>
                     <p className="text-lg font-semibold tracking-tight">{p.name}</p>
                     <p className={`text-[13px] ${i === plans.length - 1 && plans.length > 1 ? "text-paper/65" : "text-ink-2"}`}>
-                      {p.articles_per_month} artículos/mes · {p.tracked_prompts} preguntas en IA
+                      {p.articles_per_month} artículos/mes · {p.tracked_prompts} preguntas vigiladas en IA
                     </p>
                   </div>
                   <p className="text-right">
@@ -591,9 +753,9 @@ export default async function HomePage() {
             <div className="relative grid grid-cols-1 gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
               <div>
                 <Eyebrow tone="ink">Gratis · solo diagnóstico</Eyebrow>
-                <Title className="mt-4">¿Tu web o tienda está preparada? Mira la nota. El trabajo empieza después.</Title>
+                <Title className="mt-4">¿Está tu web lista para Google y la IA? Mira tu nota gratis.</Title>
                 <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-2">
-                  El análisis gratuito mide la base técnica (0–100) de cualquier sitio público. Si sigues con YesWeContent, pasamos a generar artículos, backlinks, auditoría completa, social y seguimiento en IA — en automático.
+                  Medimos la base técnica de tu web de 0 a 100 (rastreo, velocidad, datos estructurados y preparación para IA) y te decimos qué falla. Si sigues, lo arreglamos y empezamos a publicar por ti.
                 </p>
               </div>
               <form action="/herramientas/auditoria-ia#analizador" method="get" className="surface p-4 sm:p-5">

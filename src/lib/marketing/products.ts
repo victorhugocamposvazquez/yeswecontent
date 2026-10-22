@@ -81,7 +81,7 @@ export const products: Product[] = [
     features: [
       { title: "Voz de marca", text: "Tuteo o usted, frases cortas o largas, palabras que nunca usarías. Lo definimos una vez y se respeta siempre." },
       { title: "Nota de calidad 0–100", text: "Puntuamos legibilidad, cobertura del tema, estructura, originalidad y señales SEO antes de publicar." },
-      { title: "Listo para los buscadores", text: "Meta descripción, FAQ, datos estructurados JSON-LD y enlaces internos incluidos de serie." },
+      { title: "Listo para los buscadores", text: "Meta descripción, FAQ, datos estructurados (JSON-LD) y enlaces internos incluidos de serie, para que Google y la IA lo entiendan a la primera." },
       { title: "Imágenes a juego", text: "Portadas e ilustraciones en el estilo visual que elijas, con textos alternativos descriptivos." },
       { title: "Datos con fuente", text: "Cuando citamos una cifra, enlazamos de dónde sale. Sin inventos." },
     ],
@@ -117,8 +117,8 @@ export const products: Product[] = [
     intro:
       "Nada de escribir por escribir. Partimos de una investigación de palabras clave y de lo que ya tienes publicado para construir un calendario que crece por clústeres y no se pisa a sí mismo.",
     features: [
-      { title: "Investigación de palabras clave", text: "Volumen, dificultad e intención de cada búsqueda, filtrados por lo que tu web puede ganar." },
-      { title: "Clústeres temáticos", text: "Agrupamos temas para que tus artículos se refuercen entre sí y ganes autoridad en lo tuyo." },
+      { title: "Investigación de palabras clave", text: "Qué busca tu cliente y cuánto: volumen, dificultad e intención de cada búsqueda, filtrados por lo que tu web puede ganar." },
+      { title: "Clústeres temáticos", text: "Agrupamos los temas para que tus artículos se refuercen entre sí y Google te vea como referente en lo tuyo." },
       { title: "Actualizaciones", text: "Detectamos artículos antiguos que pierden posiciones y los metemos en el plan para renovarlos." },
       { title: "Tú tienes la última palabra", text: "Arrastra, descarta o añade temas. El plan se recoloca solo." },
     ],
@@ -156,7 +156,7 @@ export const products: Product[] = [
     features: [
       { title: "Integraciones nativas", text: "WordPress, Shopify, Webflow y Ghost. Para todo lo demás, webhook o API." },
       { title: "Calendario a tu ritmo", text: "Elige días y hora, o publica en lote. Cambia el ritmo cuando quieras." },
-      { title: "Todo en su sitio", text: "Slug, categoría, autor, imagen destacada, meta descripción y schema ya colocados." },
+      { title: "Todo en su sitio", text: "Slug, categoría, autor, imagen destacada, meta descripción y schema ya colocados: el artículo sale listo, sin retoques." },
       { title: "Sin sorpresas", text: "Si una publicación falla, te avisamos y la reintentamos. Nada se pierde." },
     ],
     steps: [
@@ -230,7 +230,7 @@ export const products: Product[] = [
     features: [
       { title: "Afinidad temática", text: "Solo emparejamos webs con temáticas relacionadas. Un enlace de una tienda de cerámica a una de bicicletas no le sirve a nadie." },
       { title: "Dentro de contenido real", text: "Los enlaces viven en artículos que alguien querría leer, no en páginas de enlaces." },
-      { title: "Sin intercambios recíprocos obvios", text: "Repartimos los enlaces en triángulos para que no parezcan acuerdos de 'tú a mí, yo a ti'." },
+      { title: "Sin intercambios recíprocos obvios", text: "Repartimos los enlaces en triángulos para que no parezcan acuerdos de 'tú a mí, yo a ti', que Google penaliza." },
       { title: "Control total", text: "Revisa cada enlace recibido y dado, y excluye las webs que no quieras." },
     ],
     steps: [
@@ -302,8 +302,8 @@ export const products: Product[] = [
     intro:
       "Revisamos tu web como lo harían Google y los asistentes de IA: rastreo, indexación, velocidad, etiquetas, datos estructurados y legibilidad para modelos. Cada problema viene con su explicación y su arreglo, y el informe se puede compartir con un enlace.",
     features: [
-      { title: "Técnica clásica", text: "Errores de rastreo, redirecciones, canonicals, títulos duplicados, imágenes sin alt." },
-      { title: "Preparación para IA", text: "Acceso de rastreadores de IA, llms.txt, respuestas directas y datos estructurados." },
+      { title: "Técnica clásica", text: "Lo que Google ve y tú no: errores de rastreo, redirecciones, canonicals, títulos duplicados, imágenes sin alt." },
+      { title: "Preparación para IA", text: "Que ChatGPT y compañía puedan leerte: acceso de sus rastreadores, llms.txt, respuestas directas y datos estructurados." },
       { title: "Prioridades claras", text: "Ordenamos por impacto: primero lo que más pesa, después lo cosmético." },
       { title: "Informe compartible", text: "Un enlace público para enseñárselo a tu desarrollador o a tu cliente." },
     ],

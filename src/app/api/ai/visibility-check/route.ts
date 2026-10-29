@@ -33,12 +33,14 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: "Escribe una pregunta de entre 3 y 500 caracteres." }, { status: 400 });
 
   let brand = parsed.data.brand;
+  let usageSite: { siteId: string; workspaceId: string } | undefined;
   if (!brand) {
     const site = await getCurrentSite();
     if (!site) return NextResponse.json({ error: "No hay ningún sitio activo." }, { status: 404 });
     const comps = await listCompetitors(site.id);
     brand = { name: site.name, domain: domainOf(site.url), competitors: comps.map((c) => ({ name: c.name ?? domainOf(c.url), domain: domainOf(c.url) })) };
+    usageSite = { siteId: site.id, workspaceId: site.workspace_id };
   }
-  const results = await runVisibilityCheck(parsed.data.prompt, brand, parsed.data.models ?? MODELS);
+  const results = await runVisibilityCheck(parsed.data.prompt, brand, parsed.data.models ?? MODELS, usageSite ? { ...usageSite, purpose: "visibility" } : { purpose: "visibility" });
   return NextResponse.json({ prompt: parsed.data.prompt, results });
 }

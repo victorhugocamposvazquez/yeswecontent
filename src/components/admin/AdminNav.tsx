@@ -14,6 +14,7 @@ import {
   Settings,
   Trophy,
   Users,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export const adminNav = [
     group: "Operación",
     items: [
       { href: "/admin/cola", label: "Cola de contenido", icon: ListOrdered },
+      { href: "/admin/costes", label: "Coste IA", icon: Wallet },
       { href: "/admin/enlaces", label: "Red de enlaces", icon: Link2 },
       { href: "/admin/leads", label: "Leads", icon: Inbox },
     ],

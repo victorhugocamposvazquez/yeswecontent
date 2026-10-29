@@ -52,23 +52,13 @@ Si faltan `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`, la app e
    psql "$DATABASE_URL" -f supabase/seed.sql   # planes iniciales
    ```
 
-   Si usas el editor SQL, ejecuta primero `supabase/migrations/0001_init.sql` y después `supabase/seed.sql`.
+   Si usas el editor SQL, ejecuta las migraciones `0001`–`0010` en orden y después `supabase/seed.sql`.
 
-3. **Ajustes globales del admin.** El panel de administración guarda los ajustes globales, los descuentos por volumen y los dominios vetados en una tabla clave-valor. Mientras no exista una migración que la cree, ejecuta esto:
-
-   ```sql
-   create table if not exists public.app_settings (
-     key text primary key,          -- 'global' | 'volume_discounts' | 'banned_domains'
-     value jsonb not null,
-     updated_at timestamptz not null default now()
-   );
-   alter table public.app_settings enable row level security;
-   create policy "ajustes admin" on public.app_settings for all using (public.is_admin());
-   ```
-
-   Si la tabla no existe, el admin muestra los valores por defecto y avisa al intentar guardar.
+3. **Ajustes globales del admin.** La tabla `app_settings` (ajustes globales, descuentos por volumen y dominios vetados) se crea en `supabase/migrations/0002_app_settings.sql`. Si la tabla no existe, el admin muestra valores por defecto y avisa al intentar guardar.
 
 4. En Authentication → URL Configuration, pon tu dominio como Site URL y añade `http://localhost:3000/**` a las Redirect URLs.
+
+Estado actual del piloto y checklist smoke: [`docs/piloto-estado.md`](docs/piloto-estado.md).
 
 ### Dar acceso de administrador a un usuario
 
@@ -196,13 +186,13 @@ Quora no tiene API pública para publicar. Las sugerencias se quedan en Social �
 
 1. Importa el repositorio en Vercel. El framework se detecta solo.
 2. Añade todas las variables de entorno en Production y Preview. `NEXT_PUBLIC_SITE_URL` debe ser el dominio final.
-3. **Crons** (definidos en `vercel.json`):
-   - `/api/cron/publish`, cada hora: publica los artículos programados.
-   - `/api/cron/visibility`, a diario a las 05:00 UTC: consulta los asistentes de IA.
-   - `/api/cron/analytics`, a diario a las 04:00 UTC: sincroniza Search Console y GA4 en `analytics_daily`.
-   - `/api/cron/social`, cada 15 minutos: publica en Instagram, Facebook y Reddit lo programado (necesita el plan Pro de Vercel; en Hobby los crons solo pueden ser diarios).
+3. **Crons** (definidos en `vercel.json`; todos **1×/día** en UTC):
+   - `/api/cron/analytics` — 04:00: sincroniza Search Console y GA4 en `analytics_daily`.
+   - `/api/cron/visibility` — 05:00: consulta los asistentes de IA.
+   - `/api/cron/publish` — 06:00: publica los artículos programados.
+   - `/api/cron/social` — 07:00: publica en Instagram, Facebook y Reddit lo programado.
 
-   Vercel envía `Authorization: Bearer $CRON_SECRET` y los endpoints rechazan cualquier otra llamada.
+   No hay cron de **redacción**: los artículos se generan con «Escribir ya» en el panel (prioridad siguiente del piloto: automatizarlo). Vercel envía `Authorization: Bearer $CRON_SECRET` y los endpoints rechazan cualquier otra llamada.
 4. Configura el webhook de Stripe con el dominio de producción y verifica el dominio de envío en Resend.
 
 ## Estructura del proyecto

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getCurrentSite } from "@/lib/data";
 import { hasClaude, isDemo } from "@/lib/env";
 import { requireUser } from "@/lib/panel/auth";
-import { CLAUDE_MODEL } from "@/lib/panel/claude";
+import { CLAUDE_MODEL, trackClaudeMessageUsage } from "@/lib/panel/claude";
 import { buildSystemPrompt, demoAnswer, getSpecialistContext, specialistTools, toolUseToProposal } from "@/lib/panel/specialist";
 import { threadTitle, type Proposal, type StreamEvent } from "@/lib/panel/specialist-types";
 import { createClient } from "@/lib/supabase/server";
@@ -166,6 +166,7 @@ async function streamClaude(
     const s = getClient().messages.stream({ model: CLAUDE_MODEL, max_tokens: 2000, system, tools, messages: convo }, { signal });
     s.on("text", onText);
     const msg = await s.finalMessage();
+    trackClaudeMessageUsage(msg, { siteId: ctx.site.id, workspaceId: ctx.site.workspace_id, purpose: "specialist" });
     const toolUses = msg.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
     if (msg.stop_reason !== "tool_use" || !toolUses.length) return;
 

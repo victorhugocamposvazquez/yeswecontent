@@ -11,10 +11,13 @@ import type { AdminUserRow, CaseStudy, Lead, ProductUpdate, Role, Subscription }
 import { adminDb } from "./guard";
 import { mrrFor } from "./mrr";
 import * as ademo from "./demo";
+import { usdToEur } from "@/lib/ai/usage";
 import type {
   AdminPlan,
   AdminSiteRow,
   AdminSubscriptionRow,
+  AiCostOverview,
+  AiCostSiteRow,
   AppSettings,
   ModerationLink,
   Overview,
@@ -362,5 +365,146 @@ export async function getOverview(): Promise<Overview> {
     planMix: [...mix].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value),
     recentSignups: [...users].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6),
     failedJobs: queue.filter((q) => q.stage === "failed"),
+  };
+}
+
+/** Coste interno de APIs de IA del mes en curso, por sitio / empresa. */
+export async function getAiCostOverview(): Promise<AiCostOverview> {
+  const t = now();
+  const monthStart = new Date(t.getFullYear(), t.getMonth(), 1).toISOString();
+  const month_label = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(t);
+
+  if (isDemo) {
+    const sites: AiCostSiteRow[] = [
+      {
+        site_id: "s_tierrafina",
+        site_name: "Tierrafina",
+        workspace_id: "w1",
+        workspace_name: "Tierrafina SL",
+        owner_email: "demo@yeswecontent.com",
+        calls: 48,
+        input_tokens: 920_000,
+        output_tokens: 410_000,
+        cost_usd: 8.92,
+        by_purpose: [
+          { purpose: "article", cost_usd: 6.4, calls: 12 },
+          { purpose: "visibility", cost_usd: 1.2, calls: 24 },
+          { purpose: "specialist", cost_usd: 1.32, calls: 12 },
+        ],
+      },
+      {
+        site_id: "s_ywc",
+        site_name: "yeswecontent",
+        workspace_id: "w_ywc",
+        workspace_name: "yeswecontent (dogfood)",
+        owner_email: "hola@yeswecontent.com",
+        calls: 22,
+        input_tokens: 380_000,
+        output_tokens: 160_000,
+        cost_usd: 3.41,
+        by_purpose: [
+          { purpose: "article", cost_usd: 2.5, calls: 6 },
+          { purpose: "plan", cost_usd: 0.91, calls: 2 },
+        ],
+      },
+    ];
+    const total_usd = sites.reduce((a, s) => a + s.cost_usd, 0);
+    return {
+      month_label,
+      total_usd,
+      total_eur: usdToEur(total_usd),
+      total_calls: sites.reduce((a, s) => a + s.calls, 0),
+      sites,
+      by_provider: [
+        { provider: "anthropic", cost_usd: total_usd * 0.85, calls: 55 },
+        { provider: "openai", cost_usd: total_usd * 0.15, calls: 15 },
+      ],
+    };
+  }
+
+  const { db } = await adminDb();
+  const { data: events, error } = await db
+    .from("ai_usage_events")
+    .select("site_id, workspace_id, provider, purpose, input_tokens, output_tokens, cost_usd")
+    .gte("created_at", monthStart)
+    .limit(20_000);
+  if (error) {
+    console.warn("[ai_usage overview]", error.message);
+    return { month_label, total_usd: 0, total_eur: 0, total_calls: 0, sites: [], by_provider: [] };
+  }
+
+  const rows = events ?? [];
+  const siteIds = [...new Set(rows.map((e) => e.site_id).filter(Boolean))] as string[];
+  const wsIds = [...new Set(rows.map((e) => e.workspace_id).filter(Boolean))] as string[];
+  const [{ data: sites }, { data: workspaces }, { data: profiles }] = await Promise.all([
+    siteIds.length ? db.from("sites").select("id, name, workspace_id").in("id", siteIds) : Promise.resolve({ data: [] }),
+    wsIds.length ? db.from("workspaces").select("id, name, owner_id").in("id", wsIds) : Promise.resolve({ data: [] }),
+    db.from("profiles").select("id, email").limit(5000),
+  ]);
+  const siteMap = new Map((sites ?? []).map((s) => [s.id, s]));
+  const wsMap = new Map((workspaces ?? []).map((w) => [w.id, w]));
+  const emailByOwner = new Map((profiles ?? []).map((p) => [p.id, p.email]));
+
+  type Acc = AiCostSiteRow & { purposeMap: Map<string, { cost_usd: number; calls: number }> };
+  const bySite = new Map<string, Acc>();
+  const providerMap = new Map<string, { cost_usd: number; calls: number }>();
+
+  for (const e of rows) {
+    const key = e.site_id ?? e.workspace_id ?? "_none";
+    const site = e.site_id ? siteMap.get(e.site_id) : undefined;
+    const wsId = e.workspace_id ?? site?.workspace_id ?? null;
+    const ws = wsId ? wsMap.get(wsId) : undefined;
+    let acc = bySite.get(key);
+    if (!acc) {
+      acc = {
+        site_id: e.site_id,
+        site_name: site?.name ?? (e.site_id ? "Sitio eliminado" : "Sin sitio"),
+        workspace_id: wsId,
+        workspace_name: ws?.name ?? "—",
+        owner_email: ws ? (emailByOwner.get(ws.owner_id) ?? null) : null,
+        calls: 0,
+        input_tokens: 0,
+        output_tokens: 0,
+        cost_usd: 0,
+        by_purpose: [],
+        purposeMap: new Map(),
+      };
+      bySite.set(key, acc);
+    }
+    const cost = Number(e.cost_usd) || 0;
+    acc.calls += 1;
+    acc.input_tokens += e.input_tokens ?? 0;
+    acc.output_tokens += e.output_tokens ?? 0;
+    acc.cost_usd += cost;
+    const p = acc.purposeMap.get(e.purpose) ?? { cost_usd: 0, calls: 0 };
+    p.cost_usd += cost;
+    p.calls += 1;
+    acc.purposeMap.set(e.purpose, p);
+
+    const pr = providerMap.get(e.provider) ?? { cost_usd: 0, calls: 0 };
+    pr.cost_usd += cost;
+    pr.calls += 1;
+    providerMap.set(e.provider, pr);
+  }
+
+  const siteRows = [...bySite.values()]
+    .map(({ purposeMap, ...rest }) => ({
+      ...rest,
+      by_purpose: [...purposeMap.entries()]
+        .map(([purpose, v]) => ({ purpose, ...v }))
+        .sort((a, b) => b.cost_usd - a.cost_usd),
+    }))
+    .sort((a, b) => b.cost_usd - a.cost_usd);
+
+  const total_usd = siteRows.reduce((a, s) => a + s.cost_usd, 0);
+  return {
+    month_label,
+    total_usd,
+    total_eur: usdToEur(total_usd),
+    total_calls: siteRows.reduce((a, s) => a + s.calls, 0),
+    sites: siteRows,
+    by_provider: [...providerMap.entries()]
+      .map(([provider, v]) => ({ provider, ...v }))
+      .sort((a, b) => b.cost_usd - a.cost_usd),
   };
 }

@@ -39,7 +39,7 @@ export async function GET(req: Request) {
       domain: domainOf(site.url),
       competitors: (comps ?? []).filter((c) => c.site_id === p.site_id).map((c) => ({ name: c.name ?? domainOf(c.url), domain: domainOf(c.url) })),
     };
-    const results = await runVisibilityCheck(p.prompt as string, brand);
+    const results = await runVisibilityCheck(p.prompt as string, brand, undefined, { siteId: p.site_id as string, purpose: "visibility" });
     // No guardamos resultados simulados: solo los de modelos con clave configurada.
     const rows = results
       .filter((r) => !r.stubbed)

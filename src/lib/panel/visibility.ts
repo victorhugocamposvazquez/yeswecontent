@@ -1,4 +1,5 @@
 import "server-only";
+import { estimateOpenAiChatCostUsd, recordAiUsage, type UsageContext } from "@/lib/ai/usage";
 import { hasClaude } from "@/lib/env";
 import type { AiCheck, AiModel } from "@/lib/types";
 import { askClaude } from "./claude";
@@ -54,7 +55,14 @@ export function detectMention(answer: string, brand: Brand): Omit<VisibilityResu
   };
 }
 
-async function openAiCompatible(url: string, key: string, model: string, prompt: string) {
+async function openAiCompatible(
+  url: string,
+  key: string,
+  model: string,
+  prompt: string,
+  provider: "openai" | "perplexity",
+  usage?: UsageContext,
+) {
   const res = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
@@ -62,29 +70,55 @@ async function openAiCompatible(url: string, key: string, model: string, prompt:
     signal: AbortSignal.timeout(60_000),
   });
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
-  const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  const json = (await res.json()) as {
+    choices?: { message?: { content?: string } }[];
+    usage?: { prompt_tokens?: number; completion_tokens?: number };
+  };
+  const inputTokens = json.usage?.prompt_tokens ?? 0;
+  const outputTokens = json.usage?.completion_tokens ?? 0;
+  void recordAiUsage({
+    provider,
+    model,
+    purpose: usage?.purpose ?? "visibility",
+    inputTokens,
+    outputTokens,
+    costUsd: estimateOpenAiChatCostUsd(inputTokens, outputTokens),
+    siteId: usage?.siteId,
+    workspaceId: usage?.workspaceId,
+  });
   return json.choices?.[0]?.message?.content ?? "";
 }
 
-async function askModel(model: AiModel, prompt: string): Promise<string | null> {
+async function askModel(model: AiModel, prompt: string, usage?: UsageContext): Promise<string | null> {
   const p = visibilityPrompt(prompt);
   switch (model) {
     case "claude":
-      return hasClaude ? askClaude({ prompt: p, maxTokens: 1500 }) : null;
+      return hasClaude ? askClaude({ prompt: p, maxTokens: 1500, usage: { ...usage, purpose: "visibility" } }) : null;
     case "chatgpt":
-      // TODO: revisar el modelo por defecto cuando cambie la gama de OpenAI.
       return process.env.OPENAI_API_KEY
-        ? openAiCompatible("https://api.openai.com/v1/chat/completions", process.env.OPENAI_API_KEY, process.env.OPENAI_MODEL ?? "gpt-4o-mini", p)
+        ? openAiCompatible(
+            "https://api.openai.com/v1/chat/completions",
+            process.env.OPENAI_API_KEY,
+            process.env.OPENAI_MODEL ?? "gpt-4o-mini",
+            p,
+            "openai",
+            usage,
+          )
         : null;
     case "perplexity":
-      // TODO: Perplexity devuelve también `citations`; guardarlas en cited_urls.
       return process.env.PERPLEXITY_API_KEY
-        ? openAiCompatible("https://api.perplexity.ai/chat/completions", process.env.PERPLEXITY_API_KEY, process.env.PERPLEXITY_MODEL ?? "sonar", p)
+        ? openAiCompatible(
+            "https://api.perplexity.ai/chat/completions",
+            process.env.PERPLEXITY_API_KEY,
+            process.env.PERPLEXITY_MODEL ?? "sonar",
+            p,
+            "perplexity",
+            usage,
+          )
         : null;
     case "gemini": {
       const key = process.env.GEMINI_API_KEY;
       if (!key) return null;
-      // TODO: activar grounding con Google Search para respuestas más parecidas a las de la app.
       const m = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
         method: "POST",
@@ -93,7 +127,22 @@ async function askModel(model: AiModel, prompt: string): Promise<string | null> 
         signal: AbortSignal.timeout(60_000),
       });
       if (!res.ok) throw new Error(`gemini → ${res.status}`);
-      const json = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+      const json = (await res.json()) as {
+        candidates?: { content?: { parts?: { text?: string }[] } }[];
+        usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number };
+      };
+      const inputTokens = json.usageMetadata?.promptTokenCount ?? 0;
+      const outputTokens = json.usageMetadata?.candidatesTokenCount ?? 0;
+      void recordAiUsage({
+        provider: "gemini",
+        model: m,
+        purpose: "visibility",
+        inputTokens,
+        outputTokens,
+        costUsd: estimateOpenAiChatCostUsd(inputTokens, outputTokens),
+        siteId: usage?.siteId,
+        workspaceId: usage?.workspaceId,
+      });
       return json.candidates?.[0]?.content?.parts?.map((x) => x.text ?? "").join("") ?? "";
     }
   }
@@ -117,11 +166,16 @@ function stub(model: AiModel, prompt: string, brand: Brand): VisibilityResult {
   };
 }
 
-export async function runVisibilityCheck(prompt: string, brand: Brand, models: AiModel[] = MODELS): Promise<VisibilityResult[]> {
+export async function runVisibilityCheck(
+  prompt: string,
+  brand: Brand,
+  models: AiModel[] = MODELS,
+  usage?: UsageContext,
+): Promise<VisibilityResult[]> {
   return Promise.all(
     models.map(async (model) => {
       try {
-        const answer = await askModel(model, prompt);
+        const answer = await askModel(model, prompt, usage);
         if (answer == null) return stub(model, prompt, brand);
         return { model, ...detectMention(answer, brand), stubbed: false };
       } catch {

@@ -20,11 +20,13 @@ export async function POST(req: Request) {
   if (error) return error;
   const parsed = input.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "Datos no válidos." }, { status: 400 });
-  const current = parsed.data.site ? null : await getCurrentSite();
-  const site = parsed.data.site ?? current;
+  const current = await getCurrentSite();
+  const site = current;
   if (!site) return NextResponse.json({ error: "No hay ningún sitio activo." }, { status: 404 });
-  const existing = current ? (await listContentItems(current.id)).map((c) => c.title) : [];
+  // Si el cliente manda datos de marca, se fusionan sobre el sitio autenticado (conserva id/workspace).
+  const merged = parsed.data.site ? { ...site, ...parsed.data.site } : site;
+  const existing = (await listContentItems(site.id)).map((c) => c.title);
   const month = parsed.data.month ?? new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date());
-  const result = await generatePlan(site, parsed.data.count, existing, month);
+  const result = await generatePlan(merged, parsed.data.count, existing, month);
   return NextResponse.json(result);
 }

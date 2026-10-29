@@ -9,7 +9,6 @@ import { growth, listPublishedCases } from "@/lib/marketing/cases";
 import { Badge, Button, Card, Input } from "@/components/ui";
 import { HeroVisual } from "@/components/marketing/hero-visual";
 import { RotatingWord } from "@/components/marketing/rotating-word";
-import { RatingPill } from "@/components/marketing/rating-pill";
 import { EngineWordmark } from "@/components/marketing/engine-wordmark";
 import { AiMatrixMockup, EditorMockup, NetworkGraphMockup, PanelMockup, ProductMockup } from "@/components/marketing/mockups";
 import { ENGINES } from "@/lib/marketing/social-proof";
@@ -148,9 +147,6 @@ export default async function HomePage() {
             </CtaLink>
           </div>
           <p className="rise rise-3 mt-5 max-w-xl text-sm text-ink-3">3 días gratis · Sin permanencia · Si en 60 días no crece tu tráfico, te devolvemos el dinero</p>
-          <div className="rise rise-3 mt-6">
-            <RatingPill />
-          </div>
 
           <div className="rise rise-3 relative mt-12 w-full max-w-[1100px] sm:mt-16">
             <div aria-hidden className="pointer-events-none absolute -inset-x-10 -top-10 h-40 rounded-full bg-signal/10 blur-3xl" />

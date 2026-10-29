@@ -439,7 +439,12 @@ export async function checkPromptNow(_prev: ActionState, fd: FormData): Promise<
   const { data: p } = await sb.from("ai_prompts").select("id, prompt").eq("id", str(fd, "id")).eq("site_id", site.id).maybeSingle();
   if (!p) return fail("No encontramos esa pregunta.");
   const comps = await listCompetitors(site.id);
-  const results = await runVisibilityCheck(p.prompt, { name: site.name, domain: domainOf(site.url), competitors: comps.map((c) => ({ name: c.name ?? domainOf(c.url), domain: domainOf(c.url) })) });
+  const results = await runVisibilityCheck(
+    p.prompt,
+    { name: site.name, domain: domainOf(site.url), competitors: comps.map((c) => ({ name: c.name ?? domainOf(c.url), domain: domainOf(c.url) })) },
+    undefined,
+    { siteId: site.id, workspaceId: site.workspace_id, purpose: "visibility" },
+  );
   const rows = results.filter((r) => !r.stubbed).map((r) => ({ model: r.model, mentioned: r.mentioned, position: r.position, cited_urls: r.cited_urls, competitors_mentioned: r.competitors_mentioned, answer_excerpt: r.answer_excerpt, prompt_id: p.id }));
   if (!rows.length) return fail("No hay ningún modelo con clave configurada (ANTHROPIC_API_KEY, OPENAI_API_KEY…).");
   // ai_checks solo admite lectura con RLS: escribimos con service role tras verificar el acceso arriba.

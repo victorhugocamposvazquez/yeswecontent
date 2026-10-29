@@ -165,6 +165,7 @@ async function claudeSentence(source: Site, paragraph: string, anchor: string, u
   try {
     const raw = await askClaudeJSON<{ sentence?: string }>({
       system: "Eres editor SEO. Respondes solo con JSON válido.",
+      usage: { siteId: source.id, workspaceId: source.workspace_id, purpose: "links" },
       prompt: `Escribe UNA frase en ${languageLabel(source.language)} que continúe de forma natural este párrafo de un artículo de ${source.name} e incluya exactamente este enlace en Markdown: [${anchor}](${url})
 
 Párrafo:

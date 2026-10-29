@@ -4,8 +4,10 @@
  * en modo demo se sirven desde /api/images/render sin llamadas externas.
  */
 import "server-only";
+import { estimateImageCostUsd, recordAiUsage } from "@/lib/ai/usage";
 import { hasClaude, isDemo } from "@/lib/env";
 import { askClaudeJSON } from "@/lib/panel/claude";
+import { openAIImageModel } from "./providers";
 import { fromBlocks, isClosingSection, isProseParagraph, toBlocks, type Block } from "@/lib/panel/blocks";
 import type { ArticleImage } from "@/lib/types";
 import { extractInfographic, infographicSvg } from "./infographic";
@@ -62,6 +64,7 @@ async function refineWithClaude(a: ArticleImageInput, cover: ImageSpec, inline: 
     const raw = await askClaudeJSON<{ cover?: { prompt?: string; alt?: string }; inline?: { prompt?: string; alt?: string }[] }>({
       prompt: claudeImagePrompt(a, sections, a.site),
       maxTokens: 1500,
+      usage: { siteId: a.siteId, purpose: "image_brief" },
     });
     if (raw.cover?.prompt) cover.prompt = `${raw.cover.prompt} No text, no letters, no logos.`;
     if (raw.cover?.alt) cover.alt = raw.cover.alt;
@@ -89,6 +92,16 @@ export async function materialize(a: Pick<ArticleImageInput, "siteId" | "site" |
     kind: spec.kind,
     seed,
   });
+  if (img.provider === "openai") {
+    void recordAiUsage({
+      provider: "openai",
+      model: openAIImageModel(),
+      purpose: "image",
+      costUsd: estimateImageCostUsd(),
+      siteId: a.siteId,
+      meta: { kind: spec.kind },
+    });
+  }
   const url = await uploadArticleImage(img.bytes, { siteId: a.siteId, name: `${fileStem(a.slug, spec.kind)}.${img.ext}`, contentType: img.contentType });
   if (url) return { ...base, url, provider: img.provider };
   return { ...base, url: absoluteUrl(fallback)!, provider: "editorial" };

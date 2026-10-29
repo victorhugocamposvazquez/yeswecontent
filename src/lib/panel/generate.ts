@@ -61,6 +61,7 @@ export async function analyzeSite(url: URL): Promise<{ analysis: SiteAnalysis; s
         system: SYSTEM_STRATEGIST,
         prompt: analyzeSitePrompt(url.toString(), [`Título: ${ex.title}`, `Descripción: ${ex.description}`, `Encabezados: ${ex.heads.join(" / ")}`, ex.text].join("\n")),
         maxTokens: 1500,
+        usage: { purpose: "analyze" },
       });
       const analysis = siteAnalysisSchema.parse(raw);
       return { analysis: { ...analysis, name: analysis.name || fallbackName }, source: "claude" };
@@ -96,12 +97,17 @@ export const planItemSchema = z.object({
 });
 export type PlanItem = z.infer<typeof planItemSchema>;
 
-type PlanSite = Pick<Site, "name" | "url" | "niche" | "audience" | "description" | "language">;
+type PlanSite = Pick<Site, "id" | "workspace_id" | "name" | "url" | "niche" | "audience" | "description" | "language">;
 
 export async function generatePlan(site: PlanSite, count: number, existing: string[], month: string): Promise<{ items: PlanItem[]; source: "claude" | "demo" }> {
   if (hasClaude) {
     try {
-      const raw = await askClaudeJSON<{ items: unknown[] }>({ system: SYSTEM_STRATEGIST, prompt: contentPlanPrompt(site, count, existing, month), maxTokens: 6000 });
+      const raw = await askClaudeJSON<{ items: unknown[] }>({
+        system: SYSTEM_STRATEGIST,
+        prompt: contentPlanPrompt(site, count, existing, month),
+        maxTokens: 6000,
+        usage: { siteId: site.id, workspaceId: site.workspace_id, purpose: "plan" },
+      });
       const items = z.array(planItemSchema).parse(raw.items).slice(0, count);
       if (items.length) return { items, source: "claude" };
     } catch {
@@ -149,7 +155,7 @@ export const articleSchema = z.object({
 });
 export type GeneratedArticle = z.infer<typeof articleSchema> & { schema_jsonld: Record<string, unknown>; score: ScoreResult; source: "claude" | "demo" };
 
-type ArticleSite = Pick<Site, "name" | "url" | "niche" | "audience" | "description" | "language" | "brand_voice" | "seo_settings">;
+type ArticleSite = Pick<Site, "id" | "workspace_id" | "name" | "url" | "niche" | "audience" | "description" | "language" | "brand_voice" | "seo_settings">;
 type ArticleItem = Pick<ContentItem, "title" | "keyword" | "intent" | "cluster">;
 
 export async function generateArticle(item: ArticleItem, site: ArticleSite, internalLinks: { title: string; url: string }[] = []): Promise<GeneratedArticle> {
@@ -157,7 +163,12 @@ export async function generateArticle(item: ArticleItem, site: ArticleSite, inte
   let source: "claude" | "demo" = "demo";
   if (hasClaude) {
     try {
-      const raw = await askClaudeJSON<unknown>({ system: SYSTEM_STRATEGIST, prompt: articlePrompt(item, site, internalLinks), maxTokens: 12000 });
+      const raw = await askClaudeJSON<unknown>({
+        system: SYSTEM_STRATEGIST,
+        prompt: articlePrompt(item, site, internalLinks),
+        maxTokens: 12000,
+        usage: { siteId: site.id, workspaceId: site.workspace_id, purpose: "article" },
+      });
       base = articleSchema.parse(raw);
       source = "claude";
     } catch {

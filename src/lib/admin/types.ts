@@ -84,6 +84,29 @@ export interface UserDetail {
   usage: { label: string; used: number; limit: number | null }[];
 }
 
+/** Coste interno de IA agregado por sitio (mes en curso o rango). */
+export type AiCostSiteRow = {
+  site_id: string | null;
+  site_name: string;
+  workspace_id: string | null;
+  workspace_name: string;
+  owner_email: string | null;
+  calls: number;
+  input_tokens: number;
+  output_tokens: number;
+  cost_usd: number;
+  by_purpose: { purpose: string; cost_usd: number; calls: number }[];
+};
+
+export type AiCostOverview = {
+  month_label: string;
+  total_usd: number;
+  total_eur: number;
+  total_calls: number;
+  sites: AiCostSiteRow[];
+  by_provider: { provider: string; cost_usd: number; calls: number }[];
+};
+
 export interface Overview {
   mrr: number; // céntimos
   activeSubs: number;

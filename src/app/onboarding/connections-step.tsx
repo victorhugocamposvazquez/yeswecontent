@@ -13,7 +13,18 @@ export interface OAuthReturn {
 }
 
 /** Paso «Conexiones» del onboarding: OAuth real (o simulado en demo) con selector de propiedad y página. */
-export function ConnectionsStep({ siteId, demo, oauth }: { siteId: string | null; demo: boolean; oauth: OAuthReturn | null }) {
+export function ConnectionsStep({
+  siteId,
+  demo,
+  oauth,
+  keysReady = true,
+}: {
+  siteId: string | null;
+  demo: boolean;
+  oauth: OAuthReturn | null;
+  /** false si faltan INTEGRATIONS_ENCRYPTION_KEY u OAUTH_STATE_SECRET en el servidor. */
+  keysReady?: boolean;
+}) {
   const [details, setDetails] = useState<ConnectionDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   // En demo recordamos lo "conectado" durante la sesión del asistente.
@@ -38,6 +49,12 @@ export function ConnectionsStep({ siteId, demo, oauth }: { siteId: string | null
 
   return (
     <div className="space-y-3">
+      {!demo && !keysReady && (
+        <p role="status" className="rounded-xl border border-warn/30 bg-warn-soft px-3.5 py-2.5 text-[13px] text-ink">
+          Faltan <code className="rounded bg-black/10 px-1 font-mono text-[12px]">INTEGRATIONS_ENCRYPTION_KEY</code> o{" "}
+          <code className="rounded bg-black/10 px-1 font-mono text-[12px]">OAUTH_STATE_SECRET</code> en el servidor. Configúralas en Vercel/.env antes de conectar CMS u OAuth.
+        </p>
+      )}
       {oauth && <OAuthNotice provider={oauth.provider} estado={oauth.estado} motivo={oauth.motivo} demo={demo} />}
       {!siteId && !demo ? (
         <p className="text-sm text-ink-2">Primero indica tu web en el primer paso.</p>

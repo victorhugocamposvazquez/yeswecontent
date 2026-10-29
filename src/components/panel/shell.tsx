@@ -108,6 +108,7 @@ export function PanelShell({
   user,
   isAdmin,
   isDemo,
+  isAgency = false,
   logoutAction,
 }: {
   children: ReactNode;
@@ -116,6 +117,7 @@ export function PanelShell({
   user: { name: string; email: string };
   isAdmin: boolean;
   isDemo: boolean;
+  isAgency?: boolean;
   logoutAction: () => Promise<void>;
 }) {
   const path = usePathname();
@@ -197,7 +199,9 @@ export function PanelShell({
           <div key={g.group || "main"}>
             {g.group && <p className="mb-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">{g.group}</p>}
             <ul className="space-y-px">
-              {g.items.map((it) => {
+              {g.items
+                .filter((it) => isAgency || it.href !== "/agencia/clientes")
+                .map((it) => {
                 const active = isActive(path, it.href);
                 return (
                   <li key={it.href}>

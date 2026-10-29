@@ -204,12 +204,13 @@ export async function retryJob(_: ActionResult, fd: FormData): Promise<ActionRes
     const [kind, realId] = id.split(":");
     if (kind === "a") {
       const { data: art } = await db.from("articles").update({ status: "draft", updated_at: new Date().toISOString() }).eq("id", realId).select("content_item_id").single();
-      if (art?.content_item_id) await db.from("content_items").update({ status: "writing" }).eq("id", art.content_item_id);
+      // planned → el cron /api/cron/generate lo recoge; no dejar en writing forever.
+      if (art?.content_item_id) await db.from("content_items").update({ status: "planned" }).eq("id", art.content_item_id);
     } else {
       await db.from("content_items").update({ status: "planned" }).eq("id", realId);
     }
     revalidatePath("/admin/cola");
-    return ok("Reencolado. El próximo ciclo del cron lo procesará.");
+    return ok("Reencolado. El cron de redacción (/api/cron/generate) lo procesará.");
   });
 }
 

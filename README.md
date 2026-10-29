@@ -52,7 +52,7 @@ Si faltan `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`, la app e
    psql "$DATABASE_URL" -f supabase/seed.sql   # planes iniciales
    ```
 
-   Si usas el editor SQL, ejecuta las migraciones `0001`–`0010` en orden y después `supabase/seed.sql`.
+   Si usas el editor SQL, ejecuta las migraciones `0001`–`0012` en orden y después `supabase/seed.sql`.
 
 3. **Ajustes globales del admin.** La tabla `app_settings` (ajustes globales, descuentos por volumen y dominios vetados) se crea en `supabase/migrations/0002_app_settings.sql`. Si la tabla no existe, el admin muestra valores por defecto y avisa al intentar guardar.
 
@@ -189,10 +189,11 @@ Quora no tiene API pública para publicar. Las sugerencias se quedan en Social �
 3. **Crons** (definidos en `vercel.json`; todos **1×/día** en UTC):
    - `/api/cron/analytics` — 04:00: sincroniza Search Console y GA4 en `analytics_daily`.
    - `/api/cron/visibility` — 05:00: consulta los asistentes de IA.
+   - `/api/cron/generate` — 05:30: redacta temas `planned` con cupo del plan (antes del publish).
    - `/api/cron/publish` — 06:00: publica los artículos programados.
    - `/api/cron/social` — 07:00: publica en Instagram, Facebook y Reddit lo programado.
 
-   No hay cron de **redacción**: los artículos se generan con «Escribir ya» en el panel (prioridad siguiente del piloto: automatizarlo). Vercel envía `Authorization: Bearer $CRON_SECRET` y los endpoints rechazan cualquier otra llamada.
+   Vercel envía `Authorization: Bearer $CRON_SECRET` y los endpoints rechazan cualquier otra llamada. Sin `ANTHROPIC_API_KEY` el plan y los artículos son plantillas de demostración (el panel lo avisa).
 4. Configura el webhook de Stripe con el dominio de producción y verifica el dominio de envío en Resend.
 
 ## Estructura del proyecto

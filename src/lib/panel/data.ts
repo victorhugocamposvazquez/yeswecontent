@@ -94,6 +94,20 @@ export async function listTeam(workspaceId: string): Promise<{ email: string; na
   });
 }
 
+export async function listPendingInvitations(
+  workspaceId: string,
+): Promise<{ id: string; email: string; role: string; created_at: string }[]> {
+  if (isDemo) return [];
+  const sb = await createClient();
+  const { data } = await sb
+    .from("invitations")
+    .select("id, email, role, created_at")
+    .eq("workspace_id", workspaceId)
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
 export async function getWorkspace(workspaceId: string): Promise<{ id: string; name: string; kind: string; white_label: Record<string, string>; referral_code: string | null } | null> {
   if (isDemo) return { id: "w_demo", name: "Tierrafina", kind: "business", white_label: {}, referral_code: "tierra26" };
   const sb = await createClient();
@@ -189,7 +203,7 @@ export async function listInvoices(): Promise<{ id: string; date: string; amount
       { id: "YWC-2026-0142", date: "2026-10-01", amount: 178800, status: "pagada", url: null },
       { id: "YWC-2025-0981", date: "2025-10-01", amount: 178800, status: "pagada", url: null },
     ];
-  // TODO: leer facturas desde Stripe (invoices.list por customer) cuando esté el portal.
+  // Stripe invoices.list cuando el portal esté cableado; hasta entonces vacío (UI lo dice).
   return [];
 }
 

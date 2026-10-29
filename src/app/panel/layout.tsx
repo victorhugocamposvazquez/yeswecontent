@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui";
 import { PanelShell } from "@/components/panel/shell";
 import { SiteSwitcher } from "@/components/panel/site-switcher";
 import { getCurrentSite, getProfile, getSubscription, listPlans, listSites } from "@/lib/data";
-import { isDemo } from "@/lib/env";
+import { hasClaude, isDemo } from "@/lib/env";
 import { getGlobalSettings } from "@/lib/panel/app-settings";
+import { getWorkspace } from "@/lib/panel/data";
 import { logout, setSite } from "./actions";
 
 export const metadata: Metadata = { title: { default: "Panel", template: "%s · Panel · yeswecontent" }, robots: { index: false } };
@@ -16,7 +17,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   if (!profile) redirect("/entrar?next=/panel");
   const [sites, site] = await Promise.all([listSites(), getCurrentSite()]);
   if (!site) redirect("/onboarding");
-  const [sub, plans, global] = await Promise.all([getSubscription(site.id), listPlans(), getGlobalSettings()]);
+  const [sub, plans, global, workspace] = await Promise.all([getSubscription(site.id), listPlans(), getGlobalSettings(), getWorkspace(site.workspace_id)]);
   const plan = plans.find((p) => p.id === sub?.plan_id);
 
   let badge: React.ReactNode;
@@ -54,6 +55,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     <PanelShell
       isDemo={isDemo}
       isAdmin={profile.role === "admin"}
+      isAgency={workspace?.kind === "agency"}
       user={{ name: profile.full_name ?? profile.email.split("@")[0], email: profile.email }}
       logoutAction={logout}
       topBadge={badge}
@@ -62,6 +64,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       {global.maintenance_banner && (
         <p role="status" className="mb-5 rounded-xl border border-warn/30 bg-warn-soft px-4 py-3 text-sm text-ink">
           {global.maintenance_banner}
+        </p>
+      )}
+      {!hasClaude && !isDemo && (
+        <p role="status" className="mb-5 rounded-xl border border-warn/30 bg-warn-soft px-4 py-3 text-sm text-ink">
+          Sin <code className="rounded bg-black/10 px-1 font-mono text-[12px]">ANTHROPIC_API_KEY</code> el plan y los artículos son plantillas de demostración, no texto generado con Claude.
         </p>
       )}
       {children}

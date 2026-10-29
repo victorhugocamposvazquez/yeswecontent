@@ -134,9 +134,17 @@ export async function saveOnboardingStep(step: string, s: OnboardingState, siteI
     }
     case "agencia":
       return updateWorkspace({ name: s.agency.brand || undefined, kind: "agency", white_label: { brand_name: s.agency.brand, logo_url: s.agency.logo_url, primary_color: s.agency.color } });
-    case "equipo":
-      // TODO: crear invitaciones y enviarlas con Resend (s.agency.invites).
+    case "equipo": {
+      const emails = (s.agency.invites ?? []).map((e) => e.trim().toLowerCase()).filter((e) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e));
+      for (const email of emails) {
+        await sb.from("invitations").upsert(
+          { workspace_id: workspaceId, email, role: "editor", status: "pending", invited_by: auth.user.id },
+          { onConflict: "workspace_id,email", ignoreDuplicates: true },
+        );
+      }
+      // El email se enviará cuando Resend esté activo; aquí solo se registra.
       return { ok: true, siteId };
+    }
     case "dominio":
       return updateWorkspace({ white_label: { custom_domain: s.agency.domain } });
     case "llamada":

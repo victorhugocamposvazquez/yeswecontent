@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/ui";
+import { hasEncryptionKey } from "@/lib/crypto";
 import { listPlans } from "@/lib/data";
 import { isDemo } from "@/lib/env";
 import { Wizard } from "./wizard";
@@ -9,6 +10,7 @@ export const metadata: Metadata = { title: "Configura tu cuenta", robots: { inde
 
 export default async function OnboardingPage() {
   const plans = await listPlans();
+  const integrationKeysReady = hasEncryptionKey() && !!process.env.OAUTH_STATE_SECRET;
   return (
     <div className="glow min-h-screen bg-paper-2">
       {isDemo && (
@@ -26,7 +28,7 @@ export default async function OnboardingPage() {
         </Link>
       </header>
       <main className="px-4 pb-8 pt-2 sm:pb-16 sm:pt-4">
-        <Wizard plans={plans} demo={isDemo} bookingUrl={process.env.NEXT_PUBLIC_BOOKING_URL ?? null} />
+        <Wizard plans={plans} demo={isDemo} bookingUrl={process.env.NEXT_PUBLIC_BOOKING_URL ?? null} integrationKeysReady={integrationKeysReady} />
       </main>
     </div>
   );

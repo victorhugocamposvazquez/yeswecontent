@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Code2, ExternalLink, GitBranch, Globe, RefreshCw, Rss, SquareDashedMousePointer } from "lucide-react";
 import { ActionForm } from "@/components/panel/action-form";
+import { IntegrationKeysBanner } from "@/components/panel/integration-keys-banner";
 import { LinkTabs } from "@/components/panel/tabs";
 import { Badge, Card, CardHeader, Field, Input, PageHeader, Select } from "@/components/ui";
 import { getCurrentSite } from "@/lib/data";
@@ -110,6 +111,8 @@ export default async function IntegracionesPage({ searchParams }: Props) {
           </>
         }
       />
+
+      {!isDemo && <IntegrationKeysBanner />}
 
       <ul className="mb-6 grid grid-cols-2 gap-2.5 sm:mb-8 sm:gap-3 xl:grid-cols-4">
         {paths.map((p) => (

@@ -8,7 +8,7 @@ import { UsageMeter } from "@/components/admin/UsageMeter";
 import { getUserDetail, listAdminPlans } from "@/lib/admin/data";
 import { stripeDashboardUrl } from "@/lib/admin/links";
 import { eur, fmtDate } from "@/lib/utils";
-import { cancelSubscription, extendTrial, impersonateUser, setUserRole } from "../../actions";
+import { cancelSubscription, extendTrial, setUserRole } from "../../actions";
 
 export const metadata = { title: "Detalle de usuario" };
 
@@ -39,12 +39,12 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           </span>
         }
         actions={
-          <ActionForm action={impersonateUser} inline confirm={`Vas a entrar en el panel como ${user.email}. ¿Continuar?`}>
-            <input type="hidden" name="userId" value={user.id} />
-            <SubmitButton variant="primary" size="sm" className="h-10 sm:h-9">
+          <span className="inline-flex flex-col items-end gap-1">
+            <button type="button" disabled className="inline-flex h-10 cursor-not-allowed items-center gap-2 rounded-lg bg-ink/40 px-3 text-sm font-medium text-paper opacity-70 sm:h-9">
               <UserCog className="size-4" aria-hidden /> Entrar como este usuario
-            </SubmitButton>
-          </ActionForm>
+            </button>
+            <span className="max-w-[14rem] text-right text-[11px] text-ink-3">Pendiente de cablear sesión; no cambia el panel todavía.</span>
+          </span>
         }
       />
 
@@ -116,7 +116,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
               ) : (
                 <p className="text-[13px] text-ink-3">Sin suscripciones activas que cancelar.</p>
               )}
-              <p className="text-xs text-ink-3">La suplantación es un stub de soporte: falta el registro de auditoría antes de producción.</p>
+              <p className="text-xs text-ink-3">La suplantación está deshabilitada hasta cablear la sesión real y auditoría.</p>
             </DangerZone>
           </>
         }

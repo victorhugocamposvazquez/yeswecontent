@@ -115,7 +115,15 @@ export function NegocioSection({ site }: { site: Site }) {
 }
 
 /* ───────── Equipo ───────── */
-export function EquipoSection({ team, seats }: { team: { email: string; name: string | null; role: string }[]; seats: number | null }) {
+export function EquipoSection({
+  team,
+  seats,
+  invites = [],
+}: {
+  team: { email: string; name: string | null; role: string }[];
+  seats: number | null;
+  invites?: { id: string; email: string; role: string; created_at: string }[];
+}) {
   const roles: Record<string, string> = { owner: "Propietaria", editor: "Editor", viewer: "Solo lectura", client: "Cliente" };
   return (
     <div className="space-y-6">
@@ -135,8 +143,23 @@ export function EquipoSection({ team, seats }: { team: { email: string; name: st
           ))}
         </ul>
       </Section>
-      <Section title="Invitar a alguien" intro="Le llegará un email con un enlace para unirse.">
-        <ActionForm action={inviteMember} submitLabel="Enviar invitación" bar>
+      {invites.length > 0 && (
+        <Section title="Invitaciones pendientes" intro="Registradas en el sistema. El email saldrá cuando Resend esté activo.">
+          <ul className="divide-y divide-line">
+            {invites.map((i) => (
+              <li key={i.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium">{i.email}</p>
+                  <p className="text-xs text-ink-3">{fmtDate(i.created_at, { day: "numeric", month: "short" })}</p>
+                </div>
+                <Badge tone="warn">{roles[i.role] ?? i.role}</Badge>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+      <Section title="Invitar a alguien" intro="Guardamos la invitación ahora. El email se enviará cuando Resend esté activo.">
+        <ActionForm action={inviteMember} submitLabel="Registrar invitación" bar>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_200px]">
             <Field label="Email">
               <Input name="email" type="email" required placeholder="nombre@empresa.com" />
@@ -603,11 +626,13 @@ export function FacturacionSection({
   plans,
   siteId,
   invoices,
+  stripeReady = false,
 }: {
   sub: Subscription | null;
   plans: Plan[];
   siteId: string;
   invoices: { id: string; date: string; amount: number; status: string; url: string | null }[];
+  stripeReady?: boolean;
 }) {
   const plan = plans.find((p) => p.id === sub?.plan_id);
   const statusLabel: Record<Subscription["status"], string> = { trialing: "En prueba", active: "Activa", past_due: "Pago pendiente", canceled: "Cancelada" };
@@ -629,7 +654,7 @@ export function FacturacionSection({
                     : ""}
               </p>
             </div>
-            <PortalButton />
+            {stripeReady ? <PortalButton /> : <p className="text-xs text-ink-3">Portal de pago disponible cuando actives Stripe.</p>}
           </div>
         ) : (
           <p className="text-sm text-ink-2">No tienes un plan activo para este sitio. Elige uno abajo.</p>
@@ -693,12 +718,14 @@ export function FacturacionSection({
             footer={<TableCount shown={invoices.length} total={invoices.length} unit="facturas" />}
           />
         ) : (
-          <p className="text-sm text-ink-3">Tus facturas aparecerán aquí y en el portal de pago.</p>
+          <p className="text-sm text-ink-3">
+            {stripeReady ? "Cuando haya cobros en Stripe verás aquí las facturas." : "Cuando actives Stripe verás aquí las facturas."}
+          </p>
         )}
       </Section>
 
-      <Section title="Cancelar suscripción" intro="Puedes cancelar cuando quieras desde el portal de pago. Conservarás el acceso hasta el final del periodo pagado.">
-        <PortalButton label="Cancelar desde el portal" variant="outline" />
+      <Section title="Cancelar suscripción" intro={stripeReady ? "Puedes cancelar cuando quieras desde el portal de pago. Conservarás el acceso hasta el final del periodo pagado." : "La cancelación desde el portal estará disponible cuando actives Stripe."}>
+        {stripeReady ? <PortalButton label="Cancelar desde el portal" variant="outline" /> : <p className="text-sm text-ink-3">Sin Stripe el plan se gestiona en base de datos (trial / activo).</p>}
       </Section>
     </div>
   );

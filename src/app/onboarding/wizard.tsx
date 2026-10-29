@@ -69,7 +69,7 @@ const domainOf = (u: string) => {
   }
 };
 
-export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boolean; bookingUrl: string | null }) {
+export function Wizard({ plans, demo, bookingUrl, integrationKeysReady = true }: { plans: Plan[]; demo: boolean; bookingUrl: string | null; integrationKeysReady?: boolean }) {
   const router = useRouter();
   const [s, setS] = useState<OnboardingState>({ ...initialState, planId: plans[0]?.id ?? "" });
   const [siteId, setSiteId] = useState<string | null>(null);
@@ -517,7 +517,7 @@ export function Wizard({ plans, demo, bookingUrl }: { plans: Plan[]; demo: boole
         {step === "conectar" && (
           <StepHead title="Conecta tus herramientas" intro="Para medir resultados y publicar desde tus cuentas sin que muevas un dedo. Puedes hacerlo ahora o más tarde desde Ajustes.">
             <div className="space-y-3">
-              <ConnectionsStep siteId={siteId} demo={demo} oauth={oauth} />
+              <ConnectionsStep siteId={siteId} demo={demo} oauth={oauth} keysReady={integrationKeysReady} />
               <BlogStep
                 name={s.name}
                 siteId={siteId}
@@ -685,7 +685,7 @@ function TeamStep({ invites, onChange }: { invites: string[]; onChange: (v: stri
     setEmail("");
   };
   return (
-    <StepHead title="Invita a tu equipo" intro="Les llegará un email para unirse cuando termines. Usuarios ilimitados en planes de agencia.">
+    <StepHead title="Invita a tu equipo" intro="Guardaremos las invitaciones al terminar. El email se enviará cuando Resend esté activo. Usuarios ilimitados en planes de agencia.">
       <div className="flex gap-2">
         <label htmlFor="invite" className="sr-only">
           Email de la persona

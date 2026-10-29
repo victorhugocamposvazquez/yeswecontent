@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { hasEncryptionKey } from "@/lib/crypto";
 import { hasClaude, hasStripe, isDemo } from "@/lib/env";
 import { getAdmin } from "@/lib/admin/guard";
 import { IMPERSONATE_COOKIE } from "@/lib/admin/constants";
@@ -37,6 +38,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     { label: "Stripe", ok: hasStripe },
     { label: "IA", ok: hasClaude || !!process.env.OPENAI_API_KEY || !!process.env.GEMINI_API_KEY },
     { label: "Cron", ok: !!process.env.CRON_SECRET },
+    { label: "Enc", ok: hasEncryptionKey() },
+    { label: "OAuth", ok: !!process.env.OAUTH_STATE_SECRET },
   ];
 
   return (

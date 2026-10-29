@@ -13,14 +13,17 @@ import { runAudit } from "@/lib/panel/audit";
 import { listCompetitors } from "@/lib/panel/data";
 import { commitBacklinks, ensureBacklinksBeforePublish, listInternalCandidates, markBacklinksLive } from "@/lib/links";
 import { buildJsonLd, generateArticleWithEngine, generatePlan } from "@/lib/panel/generate";
+import { getArticleQuota, quotaExceededMessage } from "@/lib/panel/quotas";
 import { scoreArticle } from "@/lib/panel/score";
 import { runVisibilityCheck } from "@/lib/panel/visibility";
+import { writeContentItem } from "@/lib/panel/write-content";
 import { hasEncryptionKey } from "@/lib/crypto";
 import { loadIntegrationConfig, sealConfig } from "@/lib/oauth/tokens";
 import { CMS_PROVIDERS, publish } from "@/lib/publish";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import type { Site } from "@/lib/types";
 import { slugify } from "@/lib/utils";
+
 
 /* ───────── utilidades ───────── */
 
@@ -181,10 +184,31 @@ export async function disconnectIntegration(provider: string): Promise<ActionSta
 }
 
 export async function inviteMember(_prev: ActionState, fd: FormData): Promise<ActionState> {
-  const email = str(fd, "email");
+  const email = str(fd, "email").toLowerCase();
+  const role = ["editor", "viewer", "client"].includes(str(fd, "role")) ? str(fd, "role") : "editor";
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("Ese email no parece válido.");
-  // TODO: crear invitación (tabla invitations) y enviarla con Resend.
-  return ok(`Invitación enviada a ${email}.`);
+  if (isDemo) return ok(`Invitación registrada para ${email} (el email se enviará cuando Resend esté activo).`);
+  try {
+    const site = await siteOrFail();
+    const profile = await getProfile();
+    if (!profile) return fail("Tu sesión ha caducado.");
+    const sb = await createClient();
+    const { error } = await sb.from("invitations").insert({
+      workspace_id: site.workspace_id,
+      email,
+      role,
+      status: "pending",
+      invited_by: profile.id,
+    });
+    if (error) {
+      if (/duplicate|unique/i.test(error.message)) return fail("Ya hay una invitación pendiente para ese email.");
+      return fail(error.message);
+    }
+    revalidatePath("/panel/ajustes/equipo");
+    return ok(`Invitación registrada para ${email} (el email se enviará cuando Resend esté activo).`);
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "No se ha podido registrar la invitación.");
+  }
 }
 
 /* ───────── plan de contenidos ───────── */
@@ -211,16 +235,21 @@ export async function generateNextMonthPlan(_prev: ActionState, fd: FormData): P
   const count = Math.min(60, Math.max(1, Number(str(fd, "count")) || 12));
   const site = await siteOrFail();
   const month = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1));
-  if (isDemo) return ok(`Plan de ${month} listo: ${count} temas nuevos en 4 clústeres.`);
+  if (isDemo) return ok(`Plan de ${month} listo: ${count} temas nuevos en 4 clústeres. (plantillas de demostración)`);
   if (await generationPaused()) return fail(PAUSED);
+  const q = await getArticleQuota(site.id);
+  if (q.remaining <= 0) return fail(quotaExceededMessage(q));
+  const capped = Math.min(count, q.remaining);
   const existing = (await listContentItems(site.id)).map((c) => c.title);
-  const { items } = await generatePlan(site, count, existing, month);
+  const { items, source } = await generatePlan(site, capped, existing, month);
   const slots = nextMonthSlots(site, items.length);
   const sb = await createClient();
   const { error } = await sb.from("content_items").insert(items.map((it, i) => ({ ...it, site_id: site.id, language: site.language, scheduled_for: slots[i], status: "planned", kind: "new" })));
   if (error) return fail(error.message);
   revalidatePath("/panel/plan");
-  return ok(`Plan de ${month} listo: ${items.length} temas nuevos.`);
+  const demoNote = source !== "claude" ? " (plantillas de demostración: sin ANTHROPIC_API_KEY no hay plan con IA real)." : "";
+  const capNote = capped < count ? ` Cupo del plan: ${capped} de ${count} solicitados.` : "";
+  return ok(`Plan de ${month} listo: ${items.length} temas nuevos.${capNote}${demoNote}`);
 }
 
 export async function setContentStatus(_prev: ActionState, fd: FormData): Promise<ActionState> {
@@ -261,43 +290,16 @@ export async function markForRefresh(_prev: ActionState, fd: FormData): Promise<
 /** Escribe ya el artículo de un tema del plan y abre el editor. */
 export async function writeNow(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const id = str(fd, "id");
-  if (isDemo) return ok("Artículo en cola: estará listo para revisar en unos minutos.");
+  if (isDemo) return ok("Artículo en cola: estará listo para revisar en unos minutos. (plantilla de demostración)");
   if (await generationPaused()) return fail(PAUSED);
   const site = await siteOrFail();
   const item = (await listContentItems(site.id)).find((c) => c.id === id);
   if (!item) return fail("No encontramos ese tema.");
-  const sb = await createClient();
-  await sb.from("content_items").update({ status: "writing" }).eq("id", id);
-  // Motor: texto → imágenes → enlaces internos → red de enlaces → puntuación.
-  const g = await generateArticleWithEngine(item, site, { internalCandidates: await listInternalCandidates(site.id) });
-  const row = {
-    site_id: site.id,
-    content_item_id: item.id,
-    title: g.title,
-    slug: g.slug,
-    meta_description: g.meta_description,
-    body_md: g.body_md,
-    faq: g.faq,
-    schema_jsonld: g.schema_jsonld,
-    cover_url: g.cover_url,
-    images: g.images,
-    language: item.language,
-    word_count: g.score.word_count,
-    quality_score: g.score.score,
-    quality_breakdown: g.score.breakdown,
-    status: "review",
-  };
-  let { data, error } = await sb.from("articles").insert(row).select("id").single();
-  if (error && /images/.test(error.message)) {
-    // Migración 0006 sin aplicar: guardamos sin la columna images.
-    const { images: _images, ...rest } = row;
-    void _images;
-    ({ data, error } = await sb.from("articles").insert(rest).select("id").single());
-  }
-  if (error || !data) return fail(error?.message ?? "No se pudo guardar el artículo.");
-  await sb.from("content_items").update({ status: "review" }).eq("id", id);
-  if (g.backlinks.length) await commitBacklinks(data.id, site.id, g.backlinks).catch((e) => console.warn("[links]", e));
-  redirect(`/panel/articulos/${data.id}`);
+  if (item.status !== "planned" && item.status !== "writing") return fail("Ese tema no está pendiente de redacción.");
+  const r = await writeContentItem(site, item);
+  if (!r.ok) return fail(r.error);
+  // redirect lanza; no hace falta mensaje. Si source=demo, el banner del panel ya avisa.
+  redirect(`/panel/articulos/${r.articleId}`);
 }
 
 /* ───────── artículos ───────── */
@@ -359,7 +361,8 @@ export async function regenerateArticle(_prev: ActionState, fd: FormData): Promi
   // Retira los enlaces pendientes del texto anterior y registra los nuevos.
   await commitBacklinks(id, site.id, g.backlinks).catch((e) => console.warn("[links]", e));
   revalidatePath(`/panel/articulos/${id}`);
-  return ok(`Artículo regenerado (${g.score.score}/100).`);
+  const demoNote = g.source !== "claude" ? " Plantilla de demostración (sin Claude)." : "";
+  return ok(`Artículo regenerado (${g.score.score}/100).${demoNote}`);
 }
 
 export async function publishNow(_prev: ActionState, fd: FormData): Promise<ActionState> {
